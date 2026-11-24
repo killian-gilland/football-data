@@ -2,38 +2,42 @@
    (journée, leader, scores) ; le reste est un terrain clair « craie » où les données respirent.
    Typo : capitales condensées de signalétique pour les titres et les scores, sans-serif lisible pour le reste. */
 
+/* Thème par défaut : sombre (« match en nocturne »). Le mode clair s'active avec le bouton ◐ (data-theme="light"). */
 :root {
-  color-scheme: light;
+  color-scheme: dark;
   /* Couleurs */
-  --craie: #f1f3ee;        /* fond de page, blanc de traçage légèrement vert */
-  --papier: #fbfcf9;       /* surfaces : tableaux, cartes */
-  --papier-2: #e8ece5;     /* en-têtes de tableau, pastilles */
-  --gazon: #0d3b2c;        /* bandeau, tableau d'affichage */
-  --gazon-2: #17533f;
-  --sur-gazon: #eef3ee;    /* texte sur le bandeau */
-  --sur-gazon-2: #a9c2b5;
-  --encre: #131b17;
-  --encre-2: #4b5751;
-  --encre-3: #737e78;
-  --trait: #dbe1d9;
-  --trait-fort: #c3ccc3;
-  --lien: #136847;
-  --projecteur: #f0b429;   /* l'accent : lumière des projecteurs, utilisé avec parcimonie */
-  /* Séries de données (palette validée daltonisme) */
-  --dom: #2a78d6;
-  --ext: #eb6834;
-  --nul: #b8bdb4;
+  --craie: #0a0e13;        /* fond de page : nuit */
+  --papier: #111821;       /* surfaces : tableaux, cartes */
+  --papier-2: #18212c;     /* en-têtes de tableau, pastilles */
+  --gazon: #0e1620;        /* bandeau */
+  --gazon-2: #1f2b38;      /* filets du bandeau */
+  --sur-gazon: #eef2f6;    /* texte sur le bandeau */
+  --sur-gazon-2: #93a2b2;
+  --encre: #e6ebf0;
+  --encre-2: #a9b4c0;
+  --encre-3: #7b8896;
+  --trait: #1d2631;
+  --trait-fort: #2c3845;
+  --lien: #8cc0ff;
+  --projecteur: #f5b83d;   /* l'accent : lumière des projecteurs */
+  --lueur: rgba(245, 184, 61, 0.13);
+  --score-fond: #f5b83d;   /* panneau de score lumineux */
+  --score-texte: #0a0e13;
+  /* Séries de données (palette validée daltonisme, version sombre) */
+  --dom: #3987e5;
+  --ext: #d95926;
+  --nul: #4f5864;
   --bon: #0ca30c;
   --mauvais: #d03b3b;
-  --bon-texte: #0b6a1f;
-  --mauvais-texte: #b02a2a;
-  --zone-c1: #2a78d6;
-  --zone-c3: #1baf7a;
-  --zone-barrage: #eda100;
-  --zone-relegation: #d03b3b;
-  --seq-rgb: 42, 120, 214;
-  --div-pos: #2a78d6;
-  --div-neg: #e34948;
+  --bon-texte: #5fd06a;
+  --mauvais-texte: #f08b8b;
+  --zone-c1: #3987e5;
+  --zone-c3: #199e70;
+  --zone-barrage: #c98500;
+  --zone-relegation: #e66767;
+  --seq-rgb: 57, 135, 229;
+  --div-pos: #3987e5;
+  --div-neg: #e66767;
   /* Alias utilisés par les composants de graphiques (suivent le thème via les jetons ci-dessus) */
   --serie-1: var(--dom);
   --serie-2: var(--ext);
@@ -59,65 +63,38 @@
   --gouttiere: max(16px, env(safe-area-inset-left, 0px));
   --gouttiere-d: max(16px, env(safe-area-inset-right, 0px));
 }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    color-scheme: dark;
-    --craie: #0b120f;
-    --papier: #111a16;
-    --papier-2: #18241f;
-    --gazon: #0a2a1f;
-    --gazon-2: #134232;
-    --sur-gazon: #e6eee8;
-    --sur-gazon-2: #92ae9f;
-    --encre: #e7ede8;
-    --encre-2: #b0bcb4;
-    --encre-3: #84918a;
-    --trait: #222f29;
-    --trait-fort: #31423a;
-    --lien: #6dd0a3;
-    --projecteur: #f5c04a;
-    --dom: #3987e5;
-    --ext: #d95926;
-    --nul: #5b625c;
-    --bon-texte: #5fd06a;
-    --mauvais-texte: #f08b8b;
-    --zone-c1: #3987e5;
-    --zone-c3: #199e70;
-    --zone-barrage: #c98500;
-    --zone-relegation: #e66767;
-    --seq-rgb: 57, 135, 229;
-    --div-pos: #3987e5;
-    --div-neg: #e66767;
-  }
-}
-:root[data-theme="dark"] {
-  color-scheme: dark;
-  --craie: #0b120f;
-  --papier: #111a16;
-  --papier-2: #18241f;
-  --gazon: #0a2a1f;
-  --gazon-2: #134232;
-  --sur-gazon: #e6eee8;
-  --sur-gazon-2: #92ae9f;
-  --encre: #e7ede8;
-  --encre-2: #b0bcb4;
-  --encre-3: #84918a;
-  --trait: #222f29;
-  --trait-fort: #31423a;
-  --lien: #6dd0a3;
-  --projecteur: #f5c04a;
-  --dom: #3987e5;
-  --ext: #d95926;
-  --nul: #5b625c;
-  --bon-texte: #5fd06a;
-  --mauvais-texte: #f08b8b;
-  --zone-c1: #3987e5;
-  --zone-c3: #199e70;
-  --zone-barrage: #c98500;
-  --zone-relegation: #e66767;
-  --seq-rgb: 57, 135, 229;
-  --div-pos: #3987e5;
-  --div-neg: #e66767;
+/* Mode clair : le bandeau reste « nuit » pour garder l'identité, le contenu passe sur fond clair. */
+:root[data-theme="light"] {
+  color-scheme: light;
+  --craie: #f2f4f7;
+  --papier: #ffffff;
+  --papier-2: #e9edf2;
+  --gazon: #0e1620;
+  --gazon-2: #22303e;
+  --sur-gazon: #eef2f6;
+  --sur-gazon-2: #9fb0c1;
+  --encre: #0e141b;
+  --encre-2: #4a5664;
+  --encre-3: #6c7886;
+  --trait: #dde3ea;
+  --trait-fort: #c3ccd6;
+  --lien: #1f5fb8;
+  --projecteur: #f0b429;
+  --lueur: rgba(240, 180, 41, 0.14);
+  --score-fond: #0e1620;
+  --score-texte: #f5b83d;
+  --dom: #2a78d6;
+  --ext: #eb6834;
+  --nul: #b8bdb4;
+  --bon-texte: #0b6a1f;
+  --mauvais-texte: #b02a2a;
+  --zone-c1: #2a78d6;
+  --zone-c3: #1baf7a;
+  --zone-barrage: #eda100;
+  --zone-relegation: #d03b3b;
+  --seq-rgb: 42, 120, 214;
+  --div-pos: #2a78d6;
+  --div-neg: #e34948;
 }
 
 /* ---------- Base ---------- */
@@ -144,9 +121,9 @@ ul, ol { margin: 0; padding-left: 1.2em; }
 .conteneur { max-width: 1160px; margin: 0 auto; padding-left: var(--gouttiere); padding-right: var(--gouttiere-d); }
 
 /* ---------- Bandeau (en-tête + titre de page) ---------- */
-.bandeau { background: var(--gazon); color: var(--sur-gazon); }
+.bandeau { background: radial-gradient(ellipse 70% 120% at 85% -30%, var(--lueur), transparent 70%), var(--gazon); color: var(--sur-gazon); border-bottom: 1px solid var(--gazon-2); }
 .bandeau a { color: inherit; }
-.barre { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: var(--gazon); border-bottom: 1px solid var(--gazon-2); }
+.barre { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: color-mix(in srgb, var(--gazon) 92%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid var(--gazon-2); }
 .barre .ligne { display: flex; align-items: center; gap: 20px; min-height: 56px; }
 .logo { font: 800 1.35rem/1 var(--f-titre); text-transform: uppercase; letter-spacing: 0.03em; white-space: nowrap; color: var(--sur-gazon); }
 .logo b { color: var(--projecteur); font-weight: 800; }
@@ -241,7 +218,7 @@ tr.separateur td { border-bottom: 2px solid var(--trait-fort); }
 .pastille { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }
 
 /* ---------- Matchs ---------- */
-.score { display: inline-grid; place-items: center; min-width: 64px; padding: 3px 10px 2px; background: var(--gazon); color: var(--sur-gazon); border-radius: 4px; font: 800 1.25rem/1 var(--f-titre); letter-spacing: 0.04em; }
+.score { display: inline-grid; place-items: center; min-width: 64px; padding: 3px 10px 2px; background: var(--score-fond); color: var(--score-texte); border-radius: 4px; font: 800 1.25rem/1 var(--f-titre); letter-spacing: 0.04em; }
 .score.vide { background: var(--papier-2); color: var(--encre-3); font-size: 1rem; }
 .jour { display: grid; gap: 0; }
 .jour > h3 { font: 600 var(--t-xs)/1 var(--f-texte); text-transform: uppercase; letter-spacing: 0.1em; color: var(--encre-3); padding: 12px 0 8px; }
@@ -270,14 +247,14 @@ tr.separateur td { border-bottom: 2px solid var(--trait-fort); }
 .affiche .equipe-nom { font: 800 clamp(1.6rem, 5vw, 2.8rem)/0.95 var(--f-titre); text-transform: uppercase; color: var(--sur-gazon); }
 .affiche .equipe-nom:hover { text-decoration: none; color: var(--projecteur); }
 .affiche .cote-dom { text-align: right; }
-.affiche .tableau-score { font: 800 clamp(2.4rem, 8vw, 4rem)/1 var(--f-titre); color: var(--gazon); background: var(--sur-gazon); padding: 6px 18px 4px; border-radius: var(--rayon); letter-spacing: 0.04em; }
+.affiche .tableau-score { font: 800 clamp(2.4rem, 8vw, 4rem)/1 var(--f-titre); color: var(--score-texte); background: var(--score-fond); padding: 6px 18px 4px; border-radius: var(--rayon); letter-spacing: 0.04em; }
 .affiche .tableau-score.vs { font-size: 1.4rem; padding: 10px 16px; }
 
 /* ---------- Puces, contrôles ---------- */
 .puces { display: flex; flex-wrap: wrap; gap: 6px; }
 .puce { padding: 5px 11px; border: 1px solid var(--trait-fort); border-radius: 999px; font-size: var(--t-s); color: var(--encre-2); background: var(--papier); }
 .puce:hover { border-color: var(--lien); color: var(--encre); text-decoration: none; }
-.puce[aria-current="true"] { background: var(--gazon); border-color: var(--gazon); color: var(--sur-gazon); }
+.puce[aria-current="true"] { background: var(--projecteur); border-color: var(--projecteur); color: #0a0e13; }
 select { font: 600 var(--t-m) var(--f-texte); padding: 8px 10px; border-radius: var(--rayon); border: 1px solid var(--trait-fort); background: var(--papier); color: var(--encre); max-width: 100%; }
 details summary { cursor: pointer; color: var(--lien); font-weight: 600; font-size: var(--t-s); }
 
@@ -299,7 +276,7 @@ details summary { cursor: pointer; color: var(--lien); font-weight: 600; font-si
 .liste-jauges .nom { display: flex; justify-content: space-between; font-size: var(--t-s); margin-bottom: 3px; }
 
 /* ---------- Pied de page ---------- */
-.pied { background: var(--gazon); color: var(--sur-gazon-2); font-size: var(--t-s); }
+.pied { border-top: 1px solid var(--gazon-2); background: var(--gazon); color: var(--sur-gazon-2); font-size: var(--t-s); }
 .pied .conteneur { padding-block: 28px 40px; display: grid; gap: 8px; }
 .pied a { color: var(--sur-gazon); }
 .pied .logo { font-size: 1.1rem; }
