@@ -28,6 +28,8 @@ const europe = parRang.map((e) => ({ e, p: pctZone(e, ["c1", "c1q", "c3", "c4"])
 const leader = classement.lignes[0];
 const evolution = ctx.lire("evolution.json");
 const equipesEvo = (evolution?.equipes ?? []).map((e) => ({ id: e.equipe, court: ctx.court(e.equipe), rangs: e.rangs, points: e.points }));
+const base = classement.lignes.map((l) => ({ equipe: l.equipe, rang: l.rang, pts: l.pts, diff: l.diff, bp: l.bp, g: l.g, j: l.j }));
+const zonesParRang = Object.fromEntries(classement.lignes.map((l) => [l.rang, l.zone ?? ""]));
 const parDefaut = [...classement.lignes.slice(0, 4), ...classement.lignes.slice(-2)].map((l) => l.equipe);
 ---
 <Base
@@ -45,9 +47,10 @@ const parDefaut = [...classement.lignes.slice(0, 4), ...classement.lignes.slice(
   </Fragment>
 
   <section class="section">
-    <header><h2>Classement</h2></header>
+    <header><h2>Classement <span class="badge-direct" data-direct-titre hidden>En direct</span></h2></header>
+    <script type="application/json" id="classement-base" set:html={JSON.stringify(base)} />
     <div class="tableau">
-      <table>
+      <table data-classement-direct data-sep={`${finEurope},${debutRel - 1}`} data-zones={JSON.stringify(zonesParRang)}>
         <thead>
           <tr>
             <th class="g" colspan="2">Équipe</th><th>J</th><th>G</th><th>N</th><th>P</th><th class="cache-mobile">BP</th><th class="cache-mobile">BC</th>
@@ -57,11 +60,11 @@ const parDefaut = [...classement.lignes.slice(0, 4), ...classement.lignes.slice(
         </thead>
         <tbody>
           {classement.lignes.map((l) => (
-            <tr class={finDeZone.has(l.rang) || l.rang === debutRel - 1 ? "separateur" : ""}>
-              <td class="g rang"><span class={`zone zone-${l.zone}`} title={LIBELLES_ZONES[l.zone] ?? ""}></span>{l.rang}</td>
+            <tr class={finDeZone.has(l.rang) || l.rang === debutRel - 1 ? "separateur" : ""} data-equipe={l.equipe}>
+              <td class="g rang"><span class={`zone zone-${l.zone}`} title={LIBELLES_ZONES[l.zone] ?? ""}></span><span class="n">{l.rang}</span></td>
               <td class="equipe"><a href={ctx.lienEquipe(l.equipe)}>{ctx.court(l.equipe)}</a></td>
-              <td>{l.j}</td><td>{l.g}</td><td>{l.n}</td><td>{l.p}</td><td class="cache-mobile">{l.bp}</td><td class="cache-mobile">{l.bc}</td>
-              <td>{fmt.signe(l.diff, 0)}</td><td class="pts">{l.pts}{l.penalite > 0 && <span class="negatif" title="Pénalité"> (−{l.penalite})</span>}</td>
+              <td class="j">{l.j}</td><td>{l.g}</td><td>{l.n}</td><td>{l.p}</td><td class="cache-mobile">{l.bp}</td><td class="cache-mobile">{l.bc}</td>
+              <td class="diff">{fmt.signe(l.diff, 0)}</td><td class="pts">{l.pts}{l.penalite > 0 && <span class="negatif" title="Pénalité"> (−{l.penalite})</span>}</td>
               <td class="g"><Forme resultats={l.forme} /></td>
               <td>{fmt.ent(l.elo)}</td>
               <td>{fmt.num(l.points_attendus_fin, 0)} pts</td>

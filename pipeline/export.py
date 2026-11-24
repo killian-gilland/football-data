@@ -36,6 +36,8 @@ SOURCES = [
      "usage": "Résultats, statistiques de match et cotes (source principale)"},
     {"nom": "openfootball", "url": "https://github.com/openfootball/football.json",
      "usage": "Calendrier de la saison en cours et contrôle croisé des scores", "licence": "CC0 (domaine public)"},
+    {"nom": "football-data.org", "url": "https://www.football-data.org/",
+     "usage": "Scores en quasi-direct et résultats du soir (« Football data provided by the Football-Data.org API »)"},
 ]
 
 

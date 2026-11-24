@@ -33,6 +33,7 @@ const alertes = q.controles.filter((c) => !c.ok);
   <h2>1. Les données</h2>
   <ul>
     <li><b>Résultats, statistiques de match et cotes</b> : <a href="https://www.football-data.co.uk/">football-data.co.uk</a>, un fichier par saison depuis 1993-94. Tirs, corners et cartons disponibles depuis {premiereStats ?? "—"}, cotes depuis {premiereCotes ?? "—"}, cotes de clôture depuis {premiereCloture ?? "—"}.</li>
+    <li><b>Scores en quasi-direct et résultats du soir</b> : <a href="https://www.football-data.org/">football-data.org</a> (offre gratuite, scores avec un léger retard). football-data.co.uk ne publiant ses fichiers que deux fois par semaine, ces résultats sont intégrés provisoirement puis remplacés par ceux de football-data.co.uk, qui restent la référence.</li>
     <li><b>Calendrier de la saison en cours</b> : <a href="https://github.com/openfootball/football.json">openfootball</a> (domaine public), qui sert aussi de contrôle croisé des scores.</li>
     <li>Aucune donnée individuelle de joueur : il n'existe pas de source ouverte pour la saison en cours. Le site est centré sur les équipes et les matchs.</li>
     <li>Pas de xG : aucun xG ouvert n'existe pour la saison en cours. Notre <b>indice d'occasions</b> (voir plus bas) n'en est pas un.</li>

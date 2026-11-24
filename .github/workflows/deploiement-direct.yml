@@ -1,0 +1,39 @@
+# Déploie le Worker Cloudflare « direct » (scores en quasi-direct) quand son code ou le référentiel des clubs change.
+name: Déploiement du direct
+
+on:
+  push:
+    branches: [main]
+    paths: ["worker/**", "config/equipes/**"]
+  workflow_dispatch:
+
+jobs:
+  deployer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Alias des clubs pour le Worker
+        run: python scripts/generer_alias_worker.py
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Tests du Worker
+        run: node --test worker/test/direct.test.js
+      - name: Déploiement sur Cloudflare Workers
+        uses: cloudflare/wrangler-action@v3
+        env:
+          FOOTBALL_DATA_ORG_TOKEN: ${{ secrets.FOOTBALL_DATA_ORG_TOKEN }}
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: worker
+          wranglerVersion: "4.158.0"
+          secrets: |
+            FOOTBALL_DATA_ORG_TOKEN
+          command: deploy --var ORIGINES:${{ vars.SITE_URL }},http://localhost:4321

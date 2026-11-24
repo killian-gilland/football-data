@@ -5,8 +5,8 @@ name: Mise à jour
 
 on:
   schedule:
-    - cron: "0 5 * * *"          # chaque matin (UTC)
-    - cron: "30 22 * * 5,6,0,1"  # soirs de match : après la journée
+    - cron: "0 5 * * *"              # chaque matin (UTC)
+    - cron: "15 13-23/2 * * 5,6,0,1"  # jours de match : toutes les 2 h de 13 h 15 à 23 h 15 UTC (résultats du soir)
   workflow_dispatch:
 
 permissions:
@@ -36,6 +36,8 @@ jobs:
         run: python -m pytest -q
 
       - name: Pipeline (ingestion, contrôles, modèles, export)
+        env:
+          FOOTBALL_DATA_ORG_TOKEN: ${{ secrets.FOOTBALL_DATA_ORG_TOKEN }}
         run: python -m pipeline
 
       - name: Enregistrer les données validées et le journal des prédictions
@@ -58,6 +60,7 @@ jobs:
         working-directory: site
         env:
           SITE_URL: ${{ vars.SITE_URL }}
+          PUBLIC_URL_DIRECT: ${{ vars.URL_DIRECT }}
         run: |
           npm ci
           npm run build

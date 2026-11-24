@@ -15,6 +15,7 @@ import pandas as pd
 from .config import DOSSIER_DONNEES, Competition, charger_referentiel, saison_vers_code
 from .referentiel import Referentiel
 from .sources import footballdata_couk as fd
+from .sources import footballdata_org as fdo
 from .sources import openfootball as of
 from .telechargement import ErreurSource, telecharger
 
@@ -36,6 +37,7 @@ class ResultatIngestion:
     alertes: list[str] = field(default_factory=list)
     diagnostics: dict = field(default_factory=dict)
     calendrier_openfootball: pd.DataFrame | None = None
+    resultats_org: pd.DataFrame | None = None
 
 
 def chemin_brut(comp: Competition, source: str, nom: str, racine: Path = DOSSIER_DONNEES) -> Path:
@@ -116,6 +118,30 @@ def ingerer(comp: Competition, hors_ligne: bool = False, racine: Path = DOSSIER_
             res.calendrier_openfootball = cal
             matchs = _fusionner_calendrier(matchs, cal, s, res)
 
+    # 2 bis) football-data.org : résultats du soir même et horaires à jour (source annexe, jamais bloquante).
+    cfg_org = comp.sources.get("football_data_org")
+    if cfg_org and s in saisons:
+        chemin = chemin_brut(comp, "football-data-org", f"{cfg_org['code']}_{s}.json", racine)
+        contenu = None
+        cle = fdo.jeton()
+        if cle and not hors_ligne:
+            try:
+                contenu = fdo.telecharger(cfg_org["code"], s, cle)
+                if not chemin.exists() or chemin.read_bytes() != contenu:
+                    res.bruts[chemin] = contenu
+            except Exception as e:
+                res.alertes.append(f"football-data.org indisponible ({e}) : résultats du soir non intégrés.")
+        if contenu is None and chemin.exists():
+            contenu = chemin.read_bytes()
+        if contenu is not None:
+            org, inconnus = fdo.identifier(fdo.normaliser(contenu, comp.id, s), ref)
+            if inconnus:
+                res.alertes.append("football-data.org : équipes non reconnues, à ajouter aux alias de "
+                                   f"config/equipes : {', '.join(inconnus)}")
+            org = org.dropna(subset=["dom", "ext"])
+            res.resultats_org = org
+            matchs = _completer_avec_org(matchs, org, s, res)
+
     # 3) Cotes des prochains matchs (fixtures.csv de football-data, quelques jours à l'avance).
     if comp.enrichissements and s in saisons and not hors_ligne:
         try:
@@ -137,6 +163,43 @@ def ingerer(comp: Competition, hors_ligne: bool = False, racine: Path = DOSSIER_
             matchs[c] = np.nan
     res.matchs = matchs[COLONNES].sort_values(["date", "match_id"]).reset_index(drop=True)
     return res
+
+
+def _completer_avec_org(matchs: pd.DataFrame, org: pd.DataFrame, saison: str,
+                        res: ResultatIngestion) -> pd.DataFrame:
+    """football-data.co.uk reste prioritaire. football-data.org complète :
+    - les matchs terminés pas encore publiés par football-data.co.uk (score + mi-temps) ;
+    - la date, l'heure et la journée des matchs à venir (reports et reprogrammations)."""
+    index = {(d, e): i for i, (d, e, sa) in enumerate(zip(matchs["dom"], matchs["ext"], matchs["saison"])) if sa == saison}
+    ajoutes, completes = [], 0
+    for r in org.itertuples():
+        i = index.get((r.dom, r.ext))
+        termine = r.statut_source == "termine" and not pd.isna(r.buts_dom) and not pd.isna(r.buts_ext)
+        if i is None:
+            ajoutes.append({"competition": r.competition, "saison": saison, "journee": r.journee, "date": r.date,
+                            "heure": r.heure_locale, "dom": r.dom, "ext": r.ext,
+                            "statut": "joue" if termine else "a_venir",
+                            "buts_dom": r.buts_dom if termine else np.nan, "buts_ext": r.buts_ext if termine else np.nan,
+                            "mt_dom": r.mt_dom if termine else np.nan, "mt_ext": r.mt_ext if termine else np.nan,
+                            "source": "football-data.org"})
+            continue
+        lig = matchs.index[i]
+        if matchs.at[lig, "statut"] == "a_venir":
+            matchs.at[lig, "date"] = r.date
+            matchs.at[lig, "heure"] = r.heure_locale
+            if pd.isna(matchs.at[lig, "journee"]):
+                matchs.at[lig, "journee"] = r.journee
+            if termine:
+                for c in ("buts_dom", "buts_ext", "mt_dom", "mt_ext"):
+                    matchs.at[lig, c] = getattr(r, c)
+                matchs.at[lig, "statut"] = "joue"
+                matchs.at[lig, "source"] = "football-data.org"
+                completes += 1
+    if completes:
+        res.alertes.append(f"{completes} résultat(s) intégré(s) depuis football-data.org en attendant football-data.co.uk.")
+    if ajoutes:
+        matchs = pd.concat([matchs, pd.DataFrame(ajoutes)], ignore_index=True)
+    return matchs
 
 
 def _ajouter_cotes_prochains(matchs: pd.DataFrame, prochains: pd.DataFrame, saison: str) -> pd.DataFrame:

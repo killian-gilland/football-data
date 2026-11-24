@@ -15,7 +15,7 @@ from datetime import datetime, timezone
 from . import export, predictions, stockage
 from .config import DOSSIER_DONNEES, charger_competitions
 from .ingestion import ErreurIngestion, ingerer
-from .qualite import controle_croise, controler, matrice_disponibilite
+from .qualite import controle_croise, controle_croise_org, controler, matrice_disponibilite
 from .telechargement import ErreurSource
 
 
@@ -33,6 +33,7 @@ def executer(cid: str, hors_ligne: bool = False) -> int:
     precedent = stockage.charger_matchs(cid)
     rapport = controler(res.matchs, comp, precedent)
     controle_croise(res.matchs, res.calendrier_openfootball, rapport)
+    controle_croise_org(res.matchs, res.resultats_org, rapport)
     print(rapport.resume() if not rapport.valide else
           "\n".join(l for l in rapport.resume().splitlines() if not l.startswith("[OK")) or "Contrôles qualité : tout est OK")
     if not rapport.valide:

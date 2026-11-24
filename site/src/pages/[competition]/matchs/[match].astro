@@ -45,10 +45,11 @@ const jsonld = {
     <span class="sur-titre">{meta.competition.nom} · {m.journee ? `${m.journee}e journée` : meta.saison} · {fmt.majuscule(fmt.dateLongue(m.date))}{m.heure && ` · ${m.heure}`}</span>
     <h1 class="affiche" aria-label={titre}>
       <a class="equipe-nom cote-dom" href={ctx.lienEquipe(m.dom)}>{d}</a>
-      <span class={`tableau-score ${joue ? "" : "vs"}`}>{joue ? `${m.score[0]}–${m.score[1]}` : "VS"}</span>
+      <span class={`tableau-score ${joue ? "" : "vs"}`} data-score-match={m.id}>{joue ? `${m.score[0]}–${m.score[1]}` : "VS"}</span>
       <a class="equipe-nom" href={ctx.lienEquipe(m.ext)}>{e}</a>
     </h1>
     {m.mi_temps && <p style="text-align:center;max-width:none">Mi-temps : {m.mi_temps[0]}–{m.mi_temps[1]}</p>}
+    {!joue && <p class="etat-direct" data-etat-match={m.id} hidden></p>}
   </Fragment>
 
   <div class="grille-2">

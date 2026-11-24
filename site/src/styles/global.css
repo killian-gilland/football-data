@@ -327,3 +327,20 @@ details summary { cursor: pointer; color: var(--lien); font-weight: 600; font-si
 .ligne-duel .piste { width: 100%; height: 6px; display: flex; }
 .ligne-duel .a .piste { justify-content: flex-end; }
 .ligne-duel .piste span { height: 100%; border-radius: 3px; }
+
+/* ---------- Quasi-direct ---------- */
+.puce-direct { display: inline-flex; align-items: center; gap: 5px; font: 700 var(--t-xs)/1 var(--f-texte); color: var(--mauvais-texte); text-transform: uppercase; letter-spacing: 0.04em; }
+.puce-direct::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--mauvais); animation: pulsation 1.6s ease-in-out infinite; }
+.puce-direct.pause { color: var(--encre-2); }
+.puce-direct.pause::before { background: var(--encre-3); animation: none; }
+.puce-etat { font-size: var(--t-xs); color: var(--encre-3); text-transform: uppercase; letter-spacing: 0.04em; }
+.score.direct, .tableau-score.direct { box-shadow: 0 0 0 2px var(--mauvais); }
+.badge-direct { display: inline-block; vertical-align: middle; margin-left: 8px; padding: 3px 8px; border-radius: 4px; background: var(--mauvais); color: #fff; font: 700 0.7rem/1 var(--f-texte); letter-spacing: 0.06em; text-transform: uppercase; }
+.etat-direct { text-align: center; max-width: none; }
+.etat-direct .puce-direct, .etat-direct .puce-etat { font-size: var(--t-s); }
+.mouvement { margin-left: 6px; font: 700 0.7rem/1 var(--f-texte); }
+.mouvement.monte { color: var(--bon-texte); }
+.mouvement.descend { color: var(--mauvais-texte); }
+tr.en-jeu td.equipe a::after { content: ""; display: inline-block; width: 7px; height: 7px; margin-left: 6px; border-radius: 50%; background: var(--mauvais); vertical-align: 1px; }
+@keyframes pulsation { 50% { opacity: 0.3; } }
+@media (prefers-reduced-motion: reduce) { .puce-direct::before { animation: none; } }

@@ -7,7 +7,7 @@ import "@fontsource/barlow/latin-500";
 import "@fontsource/barlow/latin-600";
 import "@fontsource/barlow/latin-700";
 import "../styles/global.css";
-import { competitions } from "../lib/donnees.js";
+import { competitions, lire } from "../lib/donnees.js";
 
 const { titre, description, slug, jsonld, actif } = Astro.props;
 const comps = competitions();
@@ -31,6 +31,18 @@ const liens = s
   : [];
 const maj = comp?.mis_a_jour;
 const aTete = Astro.slots.has("tete");
+// Quasi-direct : actif seulement si l'adresse du Worker est fournie au build (variable PUBLIC_URL_DIRECT)
+const urlDirect = import.meta.env.PUBLIC_URL_DIRECT;
+let configDirect = null;
+if (urlDirect && comp) {
+  const matchs = lire(comp.competition.id, "matchs.json") || [];
+  const limite = new Date(new Date(comp.derniere_date_match + "T12:00").getTime() - 5 * 86400000).toISOString().slice(0, 10);
+  configDirect = {
+    url: `${urlDirect.replace(/\/$/, "")}/direct`,
+    prefixe: comp.saison.slice(2, 4) + comp.saison.slice(5, 7),
+    joues: matchs.filter((m) => m.statut === "joue" && m.date >= limite).map((m) => m.id),
+  };
+}
 ---
 <!doctype html>
 <html lang="fr">
@@ -98,6 +110,10 @@ const aTete = Astro.slots.has("tete");
         <p><a href="/methodologie/">Méthodologie</a>{s && <> · <a href={`/${s}/predictions/`}>Précision de nos prédictions</a></>}</p>
       </div>
     </footer>
+    {configDirect && <script type="application/json" id="config-direct" set:html={JSON.stringify(configDirect)} />}
+    <script>
+      import "../scripts/direct.js";
+    </script>
     <script is:inline>
       document.getElementById("bouton-theme")?.addEventListener("click", () => {
         const r = document.documentElement;

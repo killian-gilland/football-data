@@ -170,3 +170,15 @@ def matrice_disponibilite(matchs: pd.DataFrame) -> list[dict]:
             ligne[nom] = round(float(g[col].notna().mean()), 3)
         res.append(ligne)
     return res
+
+
+def controle_croise_org(matchs: pd.DataFrame, org: pd.DataFrame | None, rapport: Rapport) -> None:
+    """Compare les scores football-data.co.uk et football-data.org quand les deux existent."""
+    if org is None or org.empty:
+        return
+    fd = matchs[(matchs["source"] == "football-data.co.uk") & (matchs["statut"] == "joue")]
+    o = org[org["statut_source"] == "termine"]
+    m = fd.merge(o, on=["saison", "dom", "ext"], suffixes=("", "_org"))
+    desaccords = m[(m["buts_dom"] != m["buts_dom_org"]) | (m["buts_ext"] != m["buts_ext_org"])]
+    rapport.ajouter("croisement_football_data_org", ALERTE, desaccords.empty,
+                    f"{len(desaccords)} score(s) en désaccord sur {len(m)} comparés : {_exemples(desaccords)}")

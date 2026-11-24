@@ -1,0 +1,13 @@
+{
+  "name": "ligue1-direct",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test test/direct.test.js",
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
+  },
+  "devDependencies": {
+    "wrangler": "4.158.0"
+  }
+}

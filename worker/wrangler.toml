@@ -1,0 +1,10 @@
+# Worker « direct » : relaie les scores de football-data.org vers le site, avec un cache d'une minute.
+# La clé reste secrète côté serveur :  npx wrangler secret put FOOTBALL_DATA_ORG_TOKEN
+name = "ligue1-direct"
+main = "src/index.js"
+compatibility_date = "2026-10-01"
+
+[vars]
+COMPETITION = "FL1"
+# Origines autorisées à interroger le Worker (séparées par des virgules)
+ORIGINES = "https://ligue1-data.pages.dev,http://localhost:4321"

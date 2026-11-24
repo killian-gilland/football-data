@@ -21,6 +21,8 @@ const dates = matchsJournee.map((m) => m.date).sort();
 const periode = dates.length
   ? `${new Date(dates[0] + "T12:00").toLocaleDateString("fr-FR", { day: "numeric" })} – ${new Date(dates.at(-1) + "T12:00").toLocaleDateString("fr-FR", { day: "numeric", month: "long" })}`
   : "";
+const base = classement.lignes.map((l) => ({ equipe: l.equipe, rang: l.rang, pts: l.pts, diff: l.diff, bp: l.bp, g: l.g, j: l.j }));
+const zonesParRang = Object.fromEntries(classement.lignes.map((l) => [l.rang, l.zone ?? ""]));
 const lienTF = (t) => (t.equipe ? ctx.lienEquipe(t.equipe) : t.match_id ? ctx.lienMatch(t.match_id) : null);
 ---
 <Base
@@ -70,16 +72,17 @@ const lienTF = (t) => (t.equipe ? ctx.lienEquipe(t.equipe) : t.match_id ? ctx.li
 
     <div class="colonne">
       <section class="section">
-        <header><h2>Classement</h2></header>
+        <header><h2>Classement <span class="badge-direct" data-direct-titre hidden>En direct</span></h2></header>
+        <script type="application/json" id="classement-base" set:html={JSON.stringify(base)} />
         <div class="tableau">
-          <table>
+          <table data-classement-direct data-zones={JSON.stringify(zonesParRang)}>
             <thead><tr><th class="g" colspan="2">Équipe</th><th>J</th><th>Diff</th><th>Pts</th><th class="g cache-mobile">Forme</th></tr></thead>
             <tbody>
               {classement.lignes.map((l) => (
-                <tr>
-                  <td class="g rang"><span class={`zone zone-${l.zone}`}></span>{l.rang}</td>
+                <tr data-equipe={l.equipe}>
+                  <td class="g rang"><span class={`zone zone-${l.zone}`}></span><span class="n">{l.rang}</span></td>
                   <td class="equipe"><a href={ctx.lienEquipe(l.equipe)}>{ctx.court(l.equipe)}</a></td>
-                  <td>{l.j}</td><td>{fmt.signe(l.diff, 0)}</td><td class="pts">{l.pts}</td>
+                  <td class="j">{l.j}</td><td class="diff">{fmt.signe(l.diff, 0)}</td><td class="pts">{l.pts}</td>
                   <td class="g cache-mobile"><Forme resultats={l.forme} /></td>
                 </tr>
               ))}

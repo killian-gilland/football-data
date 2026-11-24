@@ -19,6 +19,7 @@ donnees/
   canonique/            table des matchs validée + manifeste (dernière version valide)
   predictions/          journal horodaté des prédictions
 site/                   Astro (statique), lit site/src/donnees/<competition>/*.json
+worker/                 Worker Cloudflare « direct » : relaie les scores de football-data.org (cache 1 min)
 tests/                  pytest (aucun accès réseau)
 .github/workflows/      mise à jour quotidienne + tests à chaque push
 ```
@@ -51,7 +52,21 @@ Code de sortie 2 = un contrôle bloquant a échoué : rien n'est écrit, la dern
    - variables : `CF_PAGES_PROJET` (nom du projet Pages), `SITE_URL` (ex. `https://ligue1-data.pages.dev`).
 4. Lancer une première fois le workflow « Mise à jour » à la main (*Actions > Mise à jour > Run workflow*).
 
-Ensuite tout est automatique : chaque matin et chaque soir de match, le workflow télécharge les données, exécute les
+### Quasi-direct (scores pendant les matchs)
+
+5. Créer un compte gratuit sur [football-data.org](https://www.football-data.org/client/register) et récupérer
+   la clé d'API reçue par e-mail.
+6. Ajouter le secret `FOOTBALL_DATA_ORG_TOKEN` dans GitHub (même écran que ci-dessus).
+7. Lancer le workflow « Déploiement du direct ». Il publie le Worker sur
+   `https://ligue1-direct.<votre-sous-domaine>.workers.dev`.
+8. Ajouter la variable `URL_DIRECT` avec cette adresse, puis relancer « Mise à jour ».
+
+Sans ces étapes, le site fonctionne normalement, sans direct. L'offre gratuite de football-data.org fournit des
+scores « delayed » (retard non précisé par le fournisseur) ; passer à leur offre « Live scores » ne demande que
+de changer la clé. Leurs conditions imposent la mention « Football data provided by the Football-Data.org API »,
+présente dans le pied de page via la liste des sources.
+
+Ensuite tout est automatique : chaque matin, et toutes les 2 heures les jours de match, le workflow télécharge les données, exécute les
 contrôles, recalcule tout, enregistre le journal des prédictions dans le dépôt et redéploie. En cas d'échec, rien
 n'est déployé et une issue « Échec de la mise à jour automatique » est ouverte.
 

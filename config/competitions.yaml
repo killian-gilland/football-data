@@ -19,6 +19,9 @@ competitions:
         division: F1
       openfootball:
         code: fr.1
+      # Quasi-direct (clé gratuite dans la variable d'environnement FOOTBALL_DATA_ORG_TOKEN)
+      football_data_org:
+        code: FL1
 
   fr-ligue2:
     nom: Ligue 2
