@@ -12,13 +12,19 @@ const { meta } = ctx;
 const classement = ctx.lire("classement.json");
 const simulation = ctx.lire("simulation.json");
 const backtest = ctx.lire("backtest.json");
-const simParEq = Object.fromEntries(simulation.equipes.map((e) => [e.equipe, e]));
 const zones = meta.zones;
 const n = classement.lignes.length;
 const attIO = classement.attendu.filter((a) => a.ecart_io != null).sort((a, b) => b.ecart_io - a.ecart_io);
 const attMarche = classement.attendu.filter((a) => a.ecart_marche != null).sort((a, b) => b.ecart_marche - a.ecart_marche);
-const fond = (p) => `background: rgba(var(--seq-rgb), ${Math.min(0.08 + p * 0.92, 1).toFixed(3)}); color: ${p > 0.45 ? "#fff" : "inherit"}`;
+const fond = (p) => `background: rgba(var(--seq-rgb), ${p < 0.005 ? 0 : Math.min(0.1 + p * 0.9, 1).toFixed(3)}); color: ${p > 0.5 ? "#fff" : "inherit"}`;
 const parRang = simulation.equipes.slice().sort((a, b) => a.rang_moyen - b.rang_moyen);
+// Deux lignes de séparation : fin des places européennes, début de la zone rouge
+const finEurope = Math.max(0, ...zones.filter((z) => ["c1", "c1q", "c3", "c4"].includes(z.code)).flatMap((z) => z.positions));
+const debutRel = Math.min(n + 1, ...zones.filter((z) => ["barrage", "relegation"].includes(z.code)).flatMap((z) => z.positions));
+const finDeZone = new Set([finEurope]);
+const pctZone = (e, codes) => codes.reduce((s, c) => s + (e.zones[c] ?? 0), 0);
+const europe = parRang.map((e) => ({ e, p: pctZone(e, ["c1", "c1q", "c3", "c4"]) })).sort((a, b) => b.p - a.p);
+const leader = classement.lignes[0];
 ---
 <Base
   titre={`Classement ${meta.competition.nom} ${meta.saison} et simulations de fin de saison`}
@@ -26,114 +32,149 @@ const parRang = simulation.equipes.slice().sort((a, b) => a.rang_moyen - b.rang_
   slug={ctx.slug}
   actif="classement"
 >
-  <p class="sur-titre">{meta.competition.nom} · {meta.saison}</p>
-  <h1>Classement et simulations</h1>
+  <Fragment slot="tete">
+    <div style="display:grid;gap:6px">
+      <span class="sur-titre">{meta.competition.nom} · {meta.saison} · après {leader.j} journées</span>
+      <h1>Classement et projections</h1>
+      <p>Le classement actuel, puis {simulation.n_simulations.toLocaleString("fr-FR")} fins de saison simulées à partir de notre modèle pour les {simulation.matchs_restants} matchs restants.</p>
+    </div>
+  </Fragment>
 
-  <h2 style="margin-top:0.6em">Classement</h2>
-  <div class="tableau">
-    <table>
-      <thead>
-        <tr>
-          <th class="g">#</th><th class="g">Équipe</th><th>J</th><th>G</th><th>N</th><th>P</th><th>BP</th><th>BC</th>
-          <th>Diff</th><th>Pts</th><th class="g">Forme</th><th data-tip="Note Elo maison">Elo</th>
-          <th data-tip="Points attendus en fin de saison (moyenne des simulations)">Pts fin*</th>
-        </tr>
-      </thead>
-      <tbody>
-        {classement.lignes.map((l) => (
+  <section class="section">
+    <header><h2>Classement</h2></header>
+    <div class="tableau">
+      <table>
+        <thead>
           <tr>
-            <td class="g"><span class={`zone zone-${l.zone}`} title={LIBELLES_ZONES[l.zone] ?? ""}></span>{l.rang}</td>
-            <td class="equipe"><a href={ctx.lienEquipe(l.equipe)}>{ctx.court(l.equipe)}</a></td>
-            <td>{l.j}</td><td>{l.g}</td><td>{l.n}</td><td>{l.p}</td><td>{l.bp}</td><td>{l.bc}</td>
-            <td>{fmt.signe(l.diff, 0)}</td><td><b>{l.pts}</b>{l.penalite > 0 && <span class="negatif" title="Pénalité"> (−{l.penalite})</span>}</td>
-            <td class="g"><Forme resultats={l.forme} /></td>
-            <td>{fmt.ent(l.elo)}</td>
-            <td>{fmt.num(l.points_attendus_fin, 0)}</td>
+            <th class="g" colspan="2">Équipe</th><th>J</th><th>G</th><th>N</th><th>P</th><th class="cache-mobile">BP</th><th class="cache-mobile">BC</th>
+            <th>Diff</th><th>Pts</th><th class="g">Forme</th><th data-tip="Note Elo maison">Elo</th>
+            <th data-tip="Points attendus en fin de saison (moyenne des simulations)">Projection</th>
           </tr>
-        ))}
-      </tbody>
-    </table>
-  </div>
-  <div class="legende" style="margin-top:8px">
-    {[["c1", "Ligue des champions"], ["c3", "Ligue Europa / Conférence"], ["barrage", "Barrage"], ["relegation", "Relégation"]].map(([z, l]) => (
-      <span><span class={`zone zone-${z}`}></span>{l}</span>
-    ))}
-  </div>
-  {meta.note_format && <p class="tres-discret">{meta.note_format}</p>}
+        </thead>
+        <tbody>
+          {classement.lignes.map((l) => (
+            <tr class={finDeZone.has(l.rang) || l.rang === debutRel - 1 ? "separateur" : ""}>
+              <td class="g rang"><span class={`zone zone-${l.zone}`} title={LIBELLES_ZONES[l.zone] ?? ""}></span>{l.rang}</td>
+              <td class="equipe"><a href={ctx.lienEquipe(l.equipe)}>{ctx.court(l.equipe)}</a></td>
+              <td>{l.j}</td><td>{l.g}</td><td>{l.n}</td><td>{l.p}</td><td class="cache-mobile">{l.bp}</td><td class="cache-mobile">{l.bc}</td>
+              <td>{fmt.signe(l.diff, 0)}</td><td class="pts">{l.pts}{l.penalite > 0 && <span class="negatif" title="Pénalité"> (−{l.penalite})</span>}</td>
+              <td class="g"><Forme resultats={l.forme} /></td>
+              <td>{fmt.ent(l.elo)}</td>
+              <td>{fmt.num(l.points_attendus_fin, 0)} pts</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+    <div class="legende">
+      {[["c1", "Ligue des champions"], ["c3", "Ligue Europa / Conférence"], ["barrage", "Barrage de relégation"], ["relegation", "Relégation directe"]].map(([z, l]) => (
+        <span><span class={`zone zone-${z}`}></span>{l}</span>
+      ))}
+    </div>
+    {meta.note_format && <p class="tres-discret">{meta.note_format}</p>}
+  </section>
 
-  <h2>Fin de saison : {simulation.n_simulations.toLocaleString("fr-FR")} simulations</h2>
-  <p class="discret">
-    Chaque match restant ({simulation.matchs_restants}) est simulé à partir de notre modèle de buts. Les pourcentages
-    indiquent dans combien de saisons simulées l'équipe termine dans chaque zone.
-    {backtest.simulation?.valide && " Ce procédé a été testé sur les saisons passées (voir la méthodologie)."}
-  </p>
-  <div class="tableau">
-    <table>
-      <thead>
-        <tr>
-          <th class="g">Équipe</th><th>Pts actuels</th><th>Pts attendus</th><th class="cache-mobile">Fourchette 80 %</th>
-          <th>Titre</th>
-          {zones.map((z) => <th data-tip={z.nom}>{LIBELLES_ZONES[z.code] ?? z.nom}</th>)}
-        </tr>
-      </thead>
-      <tbody>
-        {parRang.map((e) => (
-          <tr>
-            <td class="equipe"><a href={ctx.lienEquipe(e.equipe)}>{ctx.court(e.equipe)}</a></td>
-            <td>{e.points_actuels}</td>
-            <td><b>{fmt.num(e.points_attendus, 0)}</b></td>
-            <td class="cache-mobile">{fmt.num(e.points_p10, 0)} – {fmt.num(e.points_p90, 0)}</td>
-            <td style={fond(e.titre)}>{fmt.pct(e.titre)}</td>
-            {zones.map((z) => <td style={fond(e.zones[z.code] ?? 0)}>{fmt.pct(e.zones[z.code] ?? 0)}</td>)}
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  </div>
-
-  <h3>Probabilité de chaque place finale</h3>
-  <div class="tableau">
-    <table style="font-size:0.78rem">
-      <thead><tr><th class="g">Équipe</th>{Array.from({ length: n }, (_, i) => <th>{i + 1}</th>)}</tr></thead>
-      <tbody>
-        {parRang.map((e) => (
-          <tr>
-            <td class="equipe">{ctx.court(e.equipe)}</td>
-            {e.positions.map((p, i) => (
-              <td style={fond(p)} data-tip={`${ctx.court(e.equipe)} ${i + 1}e : ${fmt.pct(p, 1)}`}>{p >= 0.005 ? Math.round(p * 100) : ""}</td>
-            ))}
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  </div>
-  <p class="tres-discret">En %, cases vides : moins de 0,5 %.</p>
-
-  <h2>Classement attendu vs classement réel</h2>
   <div class="grille-2">
-    {attIO.length > 0 && (
-      <div class="carte">
-        <h3 style="margin-top:0">D'après la qualité des occasions</h3>
-        <p class="discret">
-          Points réels moins points « mérités » d'après notre indice d'occasions (tirs cadrés et non cadrés). Positif :
-          l'équipe a pris plus de points que ses occasions ne le laissaient attendre.
-        </p>
-        <BarresDivergentes titre="Écart aux points attendus selon les occasions"
-          items={attIO.map((a) => ({ label: ctx.court(a.equipe), valeur: a.ecart_io,
-            tip: `${ctx.court(a.equipe)} : ${a.points} pts réels, ${fmt.num(a.points_io)} attendus` }))} />
+    <section class="section">
+      <header><h2>Course au titre et à l'Europe</h2><p class="discret">Barre : chances de finir à une place européenne (1re à 6e).</p></header>
+      <div class="carte liste-jauges">
+        {europe.slice(0, 8).map(({ e, p }) => (
+          <div>
+            <div class="nom"><a href={ctx.lienEquipe(e.equipe)}>{ctx.court(e.equipe)}</a><span class="discret">titre {fmt.pct(e.titre)}</span></div>
+            <div class="jauge"><div class="piste"><span style={`width:${(p * 100).toFixed(1)}%`}></span></div><b>{fmt.pct(p)}</b></div>
+          </div>
+        ))}
       </div>
-    )}
-    {attMarche.length > 0 && (
-      <div class="carte">
-        <h3 style="margin-top:0">D'après les bookmakers</h3>
-        <p class="discret">
-          Points réels moins points attendus d'après les cotes d'avant-match. Positif : l'équipe a fait mieux que ce que
-          le marché prévoyait.
-        </p>
-        <BarresDivergentes titre="Écart aux points attendus selon les cotes"
-          items={attMarche.map((a) => ({ label: ctx.court(a.equipe), valeur: a.ecart_marche,
-            tip: `${ctx.court(a.equipe)} : ${a.points} pts réels, ${fmt.num(a.points_marche)} attendus` }))} />
+    </section>
+    <section class="section">
+      <header><h2>Lutte pour le maintien</h2><p class="discret">Barre : risque de relégation directe (17e-18e). Le barrage concerne le 16e.</p></header>
+      <div class="carte liste-jauges">
+        {parRang.slice().sort((a, b) => pctZone(b, ["barrage", "relegation"]) - pctZone(a, ["barrage", "relegation"])).slice(0, 8).map((e) => (
+          <div>
+            <div class="nom"><a href={ctx.lienEquipe(e.equipe)}>{ctx.court(e.equipe)}</a><span class="discret">barrage {fmt.pct(e.zones.barrage ?? 0)}</span></div>
+            <div class="jauge alerte-rouge"><div class="piste"><span style={`width:${((e.zones.relegation ?? 0) * 100).toFixed(1)}%`}></span></div><b>{fmt.pct(e.zones.relegation ?? 0)}</b></div>
+          </div>
+        ))}
       </div>
-    )}
+    </section>
   </div>
+
+  <section class="section">
+    <header>
+      <h2>Toutes les projections</h2>
+      <p class="discret">
+        Points attendus, fourchette dans 80 % des simulations et probabilité de chaque zone.
+        {backtest.simulation?.valide && <> Méthode testée sur {backtest.simulation.saisons.length} saisons passées (<a href="/methodologie/">méthodologie</a>).</>}
+      </p>
+    </header>
+    <div class="tableau">
+      <table>
+        <thead>
+          <tr>
+            <th class="g">Équipe</th><th>Pts</th><th>Projection</th><th class="cache-mobile">Fourchette</th>
+            <th>Titre</th>
+            {zones.map((z) => <th data-tip={z.nom}>{LIBELLES_ZONES[z.code] ?? z.nom}</th>)}
+          </tr>
+        </thead>
+        <tbody>
+          {parRang.map((e) => (
+            <tr>
+              <td class="equipe"><a href={ctx.lienEquipe(e.equipe)}>{ctx.court(e.equipe)}</a></td>
+              <td>{e.points_actuels}</td>
+              <td class="pts">{fmt.num(e.points_attendus, 0)}</td>
+              <td class="cache-mobile discret">{fmt.num(e.points_p10, 0)} – {fmt.num(e.points_p90, 0)}</td>
+              <td style={fond(e.titre)}>{fmt.pct(e.titre)}</td>
+              {zones.map((z) => <td style={fond(e.zones[z.code] ?? 0)}>{fmt.pct(e.zones[z.code] ?? 0)}</td>)}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="section">
+    <header><h2>Place finale : la distribution complète</h2><p class="discret">En %. Case vide : moins de 0,5 %.</p></header>
+    <div class="tableau">
+      <table style="font-size:0.78rem">
+        <thead><tr><th class="g">Équipe</th>{Array.from({ length: n }, (_, i) => <th style="text-align:center">{i + 1}</th>)}</tr></thead>
+        <tbody>
+          {parRang.map((e) => (
+            <tr>
+              <td class="equipe">{ctx.court(e.equipe)}</td>
+              {e.positions.map((p, i) => (
+                <td style={`${fond(p)};text-align:center;padding:7px 4px`} data-tip={`${ctx.court(e.equipe)} ${i + 1}e : ${fmt.pct(p, 1)}`}>{p >= 0.005 ? Math.round(p * 100) : ""}</td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="section">
+    <header>
+      <h2>Qui surperforme ?</h2>
+      <p class="discret">Points réels comparés aux points « attendus ». Bleu : l'équipe a pris plus de points que prévu. Rouge : moins.</p>
+    </header>
+    <div class="grille-2">
+      {attIO.length > 0 && (
+        <div class="carte">
+          <h3>Selon la qualité des occasions</h3>
+          <p class="tres-discret">Points mérités d'après notre indice d'occasions (tirs cadrés et non cadrés).</p>
+          <BarresDivergentes titre="Écart aux points attendus selon les occasions"
+            items={attIO.map((a) => ({ label: ctx.court(a.equipe), valeur: a.ecart_io,
+              tip: `${ctx.court(a.equipe)} : ${a.points} pts réels, ${fmt.num(a.points_io)} attendus` }))} />
+        </div>
+      )}
+      {attMarche.length > 0 && (
+        <div class="carte">
+          <h3>Selon les bookmakers</h3>
+          <p class="tres-discret">Points attendus d'après les cotes d'avant-match.</p>
+          <BarresDivergentes titre="Écart aux points attendus selon les cotes"
+            items={attMarche.map((a) => ({ label: ctx.court(a.equipe), valeur: a.ecart_marche,
+              tip: `${ctx.court(a.equipe)} : ${a.points} pts réels, ${fmt.num(a.points_marche)} attendus` }))} />
+        </div>
+      )}
+    </div>
+  </section>
 </Base>

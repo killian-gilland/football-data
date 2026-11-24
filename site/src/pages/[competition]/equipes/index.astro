@@ -17,7 +17,12 @@ const anciens = historique.all_time.filter((r) => !meta.equipes_saison.includes(
   slug={ctx.slug}
   actif="equipes"
 >
-  <h1>Équipes</h1>
+  <Fragment slot="tete">
+    <div style="display:grid;gap:6px">
+      <span class="sur-titre">{meta.competition.nom} · {meta.saison}</span>
+      <h1>Équipes</h1>
+    </div>
+  </Fragment>
   <h2 style="margin-top:0.6em">Saison {meta.saison}</h2>
   <div class="puces">
     {enCours.map((e) => <a class="puce" href={ctx.lienEquipe(e)}>{ctx.nom(e)}</a>)}

@@ -1,6 +1,6 @@
 ---
 import Base from "../../../layouts/Base.astro";
-import CarteMatch from "../../../components/CarteMatch.astro";
+import ListeMatchs from "../../../components/ListeMatchs.astro";
 import { chemins, contexte } from "../../../lib/donnees.js";
 
 export function getStaticPaths() {
@@ -16,6 +16,7 @@ for (const m of ctx.matchs) {
 }
 const journees = [...parJournee.keys()].sort((a, b) => a - b);
 const courante = meta.journee_courante ?? journees.at(-1);
+const ordre = [courante, ...journees.filter((j) => j > courante), ...journees.filter((j) => j < courante).reverse()];
 ---
 <Base
   titre={`Calendrier et résultats ${meta.competition.nom} ${meta.saison}`}
@@ -23,16 +24,23 @@ const courante = meta.journee_courante ?? journees.at(-1);
   slug={ctx.slug}
   actif="matchs"
 >
-  <h1>Calendrier et résultats {meta.saison}</h1>
-  <nav class="puces" aria-label="Journées">
-    {journees.map((j) => <a class="puce" href={`#j${j}`} aria-current={j === courante ? "true" : undefined}>J{j}</a>)}
-  </nav>
-  {journees.map((j) => (
-    <section id={`j${j}`}>
-      <h2>{j ? `${j}e journée` : "Matchs"}{j === courante && " · en cours"}</h2>
-      <div class="grille">
-        {parJournee.get(j).map((m) => <CarteMatch m={m} ctx={ctx} />)}
-      </div>
+  <Fragment slot="tete">
+    <div style="display:grid;gap:6px">
+      <span class="sur-titre">{meta.competition.nom} · {meta.saison}</span>
+      <h1>Calendrier et résultats</h1>
+      <p>Les {ctx.matchs.length} matchs de la saison, journée par journée, avec nos probabilités.</p>
+    </div>
+    <nav class="puces" aria-label="Aller à la journée">
+      {journees.map((j) => <a class="puce" href={`#j${j}`} aria-current={j === courante ? "true" : undefined}>J{j}</a>)}
+    </nav>
+  </Fragment>
+  {ordre.map((j) => (
+    <section class="section" id={`j${j}`}>
+      <header>
+        <span class="sur-titre">{j === courante ? "Journée en cours" : j > courante ? "À venir" : "Jouée"}</span>
+        <h2>{j ? `${j}e journée` : "Matchs"}</h2>
+      </header>
+      <ListeMatchs matchs={parJournee.get(j)} ctx={ctx} />
     </section>
   ))}
 </Base>

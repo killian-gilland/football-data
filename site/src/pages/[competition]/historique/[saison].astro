@@ -23,8 +23,12 @@ const champion = s.classement[0];
   slug={ctx.slug}
   actif="historique"
 >
-  <p class="sur-titre"><a href={`/${ctx.slug}/historique/`}>Historique</a></p>
-  <h1>{meta.competition.nom} {s.saison}</h1>
+  <Fragment slot="tete">
+    <div style="display:grid;gap:6px">
+      <a class="sur-titre" href={`/${ctx.slug}/historique/`}>← Historique</a>
+      <h1>{meta.competition.nom} {s.saison}</h1>
+    </div>
+  </Fragment>
   <p class="discret">
     {s.terminee ? <>Champion : <a href={ctx.lienEquipe(champion.equipe)}><b>{ctx.nom(champion.equipe)}</b></a> avec {champion.pts} points.</> : "Saison en cours."}
     {" "}{s.equipes} équipes, victoire à {s.bareme_victoire} points.

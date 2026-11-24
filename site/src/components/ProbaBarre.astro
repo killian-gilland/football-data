@@ -1,5 +1,5 @@
 ---
-// Barre 1N2 : domicile (série 1), nul (neutre), extérieur (série 2), avec étiquettes visibles.
+// Barre 1N2 : domicile (bleu), nul (gris), extérieur (orange), valeurs toujours écrites.
 import { fmt } from "../lib/donnees.js";
 const { p, dom, ext, compact = false } = Astro.props;
 const [a, n, b] = p;
@@ -11,8 +11,8 @@ const [a, n, b] = p;
     <span class="p2" style={`flex:${b}`} data-tip={`Victoire ${ext} : ${fmt.pct(b, 1)}`}></span>
   </div>
   <div class="proba-legende">
-    <span>{!compact && <>{dom} </>}<b>{fmt.pct(a)}</b></span>
-    <span>Nul <b>{fmt.pct(n)}</b></span>
-    <span>{!compact && <>{ext} </>}<b>{fmt.pct(b)}</b></span>
+    <span>{!compact && `${dom} `}<b>{fmt.pct(a)}</b></span>
+    <span>{compact ? "nul " : "Nul "}<b>{fmt.pct(n)}</b></span>
+    <span>{!compact && `${ext} `}<b>{fmt.pct(b)}</b></span>
   </div>
 </div>

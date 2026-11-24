@@ -35,7 +35,12 @@ const evLib = { titre: "Titre", top3: "Top 3", bas3: "3 dernières places" };
   slug={ctx.slug}
   actif="predictions"
 >
-  <h1>Nos prédictions et leur précision</h1>
+  <Fragment slot="tete">
+    <div style="display:grid;gap:6px">
+      <span class="sur-titre">{meta.competition.nom} · transparence</span>
+      <h1>Nos prédictions et leur précision</h1>
+    </div>
+  </Fragment>
   <p class="discret">
     Deux sources de vérité : le <b>journal public</b> des prédictions publiées avant chaque match (impossible à
     modifier après coup) et le <b>backtest</b> sur les saisons passées, où le modèle n'a jamais accès aux matchs qu'il

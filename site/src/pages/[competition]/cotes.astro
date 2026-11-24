@@ -19,7 +19,12 @@ const favoris = c?.favoris_par_saison ?? [];
   slug={ctx.slug}
   actif="cotes"
 >
-  <h1>Lecture des cotes</h1>
+  <Fragment slot="tete">
+    <div style="display:grid;gap:6px">
+      <span class="sur-titre">{meta.competition.nom} · {meta.saison}</span>
+      <h1>Lecture des cotes</h1>
+    </div>
+  </Fragment>
   {!c ? <p>Données de cotes non disponibles.</p> : (
     <>
       <p class="discret">

@@ -22,7 +22,12 @@ const alertes = q.controles.filter((c) => !c.ok);
   slug={ctx.slug}
   actif="methodologie"
 >
-  <h1>Méthodologie</h1>
+  <Fragment slot="tete">
+    <div style="display:grid;gap:6px">
+      <span class="sur-titre">Comment tout est calculé</span>
+      <h1>Méthodologie</h1>
+    </div>
+  </Fragment>
   <p class="discret">Tout est calculé automatiquement, chaque jour, à partir de données ouvertes. Cette page décrit chaque étape et ses limites.</p>
 
   <h2>1. Les données</h2>

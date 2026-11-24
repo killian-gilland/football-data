@@ -21,7 +21,12 @@ const libSeries = { victoires: "Victoires consécutives", invincibilite: "Matchs
   slug={ctx.slug}
   actif="historique"
 >
-  <h1>Historique et records</h1>
+  <Fragment slot="tete">
+    <div style="display:grid;gap:6px">
+      <span class="sur-titre">{meta.competition.nom} · depuis {premiere}</span>
+      <h1>Historique et records</h1>
+    </div>
+  </Fragment>
   <p class="discret">Toutes les saisons depuis {premiere}, calculées à partir des résultats match par match.</p>
 
   <h2>Classements de chaque saison</h2>

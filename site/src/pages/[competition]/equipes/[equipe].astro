@@ -31,36 +31,42 @@ const description = sc
 ---
 <Base titre={`${eq.nom} : stats, forme et prédictions`} description={description} slug={ctx.slug} actif="equipes"
   jsonld={{ "@context": "https://schema.org", "@type": "SportsTeam", name: eq.nom, sport: "Football" }}>
-  <p class="sur-titre">{meta.competition.nom}</p>
-  <h1>{eq.nom}</h1>
-
-  {sc ? (
-    <>
-      <div class="grille" style="margin-bottom:8px">
-        <div class="carte">
-          <div class="sur-titre">Classement {meta.saison}</div>
-          <div class="chiffre">{sc.rang}<sup style="font-size:0.9rem">e</sup></div>
-          <div class="discret">{st?.general.pts ?? 0} pts en {st?.general.j ?? 0} matchs{sc.zone && ` · ${LIBELLES_ZONES[sc.zone]}`}</div>
+  <Fragment slot="tete">
+    <div style="display:grid;gap:6px">
+      <span class="sur-titre">{meta.competition.nom}{sc ? ` · ${meta.saison}` : ` · ${evo.length} saisons depuis 1993-94`}</span>
+      <h1>{eq.nom}</h1>
+      {eq.titres.length > 0 && <p>{eq.titres.length} titre{eq.titres.length > 1 && "s"} de champion depuis 1993-94 ({eq.titres.join(", ")})</p>}
+    </div>
+    {sc && (
+      <div class="affichage">
+        <div>
+          <span class="etiquette">Classement</span>
+          <span class="valeur">{sc.rang}<sup>e</sup></span>
+          <span class="detail">{st?.general.pts ?? 0} pts en {st?.general.j ?? 0} matchs{sc.zone && ` · ${LIBELLES_ZONES[sc.zone]}`}</span>
         </div>
-        <div class="carte">
-          <div class="sur-titre">Note Elo</div>
-          <div class="chiffre">{fmt.ent(sc.elo)}</div>
-          <div class="discret">{sc.elo_rang}e note du championnat</div>
+        <div>
+          <span class="etiquette">Forme</span>
+          <span style="padding:6px 0 4px"><Forme resultats={sc.forme.derniers.map((x) => x.resultat)} /></span>
+          <span class="detail">{sc.forme.points_5_derniers} pts sur les 15 derniers</span>
         </div>
-        <div class="carte">
-          <div class="sur-titre">Forme (5 derniers)</div>
-          <div style="margin:6px 0"><Forme resultats={sc.forme.derniers.map((x) => x.resultat)} /></div>
-          <div class="discret">{sc.forme.points_5_derniers} pts sur 15</div>
+        <div>
+          <span class="etiquette">Note Elo</span>
+          <span class="valeur">{fmt.ent(sc.elo)}</span>
+          <span class="detail">{sc.elo_rang}e note du championnat</span>
         </div>
         {sc.simulation && (
-          <div class="carte">
-            <div class="sur-titre">Projection fin de saison</div>
-            <div class="chiffre">{fmt.num(sc.simulation.points_attendus, 0)} pts</div>
-            <div class="discret">entre {fmt.num(sc.simulation.points_p10, 0)} et {fmt.num(sc.simulation.points_p90, 0)} (80 % des simulations) · rang moyen {fmt.num(sc.simulation.rang_moyen, 1)}</div>
+          <div>
+            <span class="etiquette">Projection</span>
+            <span class="valeur">{fmt.num(sc.simulation.points_attendus, 0)} <small>pts</small></span>
+            <span class="detail">entre {fmt.num(sc.simulation.points_p10, 0)} et {fmt.num(sc.simulation.points_p90, 0)} dans 80 % des simulations</span>
           </div>
         )}
       </div>
+    )}
+  </Fragment>
 
+  {sc ? (
+    <>
       {sc.simulation && (
         <section>
           <h2>Chances en fin de saison</h2>
@@ -81,14 +87,14 @@ const description = sc
           <h2>Statistiques {meta.saison}</h2>
           <div class="grille">
             <div class="carte">
-              <h3 style="margin-top:0">Attaque et défense</h3>
+              <h3>Attaque et défense</h3>
               <p>Buts marqués : <b>{st.general.bp}</b> ({fmt.num(pm(st.general.bp, st.general.j), 2)} par match)<br />
                  Buts encaissés : <b>{st.general.bc}</b> ({fmt.num(pm(st.general.bc, st.general.j), 2)} par match)<br />
                  Matchs sans encaisser : <b>{st.clean_sheets}</b> · sans marquer : <b>{st.sans_marquer}</b></p>
               {sc.io && <p class="discret">Indice d'occasions : {fmt.num(sc.io.pour_par_match, 2)} créé · {fmt.num(sc.io.contre_par_match, 2)} concédé par match</p>}
             </div>
             <div class="carte">
-              <h3 style="margin-top:0">Domicile / extérieur</h3>
+              <h3>Domicile / extérieur</h3>
               <div class="tableau"><table>
                 <thead><tr><th class="g"></th><th>J</th><th>G</th><th>N</th><th>P</th><th>BP</th><th>BC</th><th>Pts</th></tr></thead>
                 <tbody>
@@ -100,7 +106,7 @@ const description = sc
             </div>
             {st.mi_temps && (
               <div class="carte">
-                <h3 style="margin-top:0">Par mi-temps</h3>
+                <h3>Par mi-temps</h3>
                 <p>1re période : {st.mi_temps.bp_1} marqués, {st.mi_temps.bc_1} encaissés<br />
                    2de période : {st.mi_temps.bp_2} marqués, {st.mi_temps.bc_2} encaissés</p>
                 <p class="discret">Mené à la pause {st.mi_temps.mene_a_la_pause} fois : <b>{st.mi_temps.points_gagnes_apres_avoir_ete_mene}</b> pts repris.<br />
@@ -109,7 +115,7 @@ const description = sc
             )}
             {st.tirs && (
               <div class="carte">
-                <h3 style="margin-top:0">Tirs</h3>
+                <h3>Tirs</h3>
                 <p>{fmt.num(st.tirs.tirs_par_match)} tirs par match dont {fmt.num(st.tirs.cadres_par_match)} cadrés<br />
                    Concédés : {fmt.num(st.tirs.tirs_concedes_par_match)} tirs, {fmt.num(st.tirs.cadres_concedes_par_match)} cadrés</p>
                 <p class="discret">Précision {fmt.pct(st.tirs.precision)} · buts par tir cadré {fmt.pct(st.tirs.conversion)} · part des tirs du match {fmt.pct(st.tirs.part_des_tirs)}</p>
@@ -117,14 +123,14 @@ const description = sc
             )}
             {(st.corners || st.discipline) && (
               <div class="carte">
-                <h3 style="margin-top:0">Corners et discipline</h3>
+                <h3>Corners et discipline</h3>
                 {st.corners && <p>Corners : {fmt.num(st.corners.pour_par_match)} obtenus, {fmt.num(st.corners.contre_par_match)} concédés par match</p>}
                 {st.discipline && <p class="discret">Fautes : {fmt.num(st.discipline.fautes_par_match)} par match · {fmt.ent(st.discipline.jaunes)} jaunes · {fmt.ent(st.discipline.rouges)} rouges</p>}
               </div>
             )}
             {series && (
               <div class="carte">
-                <h3 style="margin-top:0">Séries</h3>
+                <h3>Séries</h3>
                 <ul style="margin:0;padding-left:18px">
                   {Object.entries(libSeries).filter(([k]) => series.en_cours[k] >= 2).map(([k, l]) => <li>En cours : <b>{series.en_cours[k]}</b> {l}</li>)}
                   {Object.entries(libSeries).filter(([k]) => series.record[k] >= 2).map(([k, l]) => <li class="discret">Record de la saison : {series.record[k]} {l}</li>)}
@@ -212,6 +218,7 @@ const description = sc
     <p class="discret">{eq.nom} ne dispute pas la saison {meta.saison} de {meta.competition.nom}. Voici son parcours depuis 1993-94.</p>
   )}
 
+  <section class="section">
   <h2>Historique en {meta.competition.nom}</h2>
   <p class="discret">
     {evo.length} saison{evo.length > 1 && "s"} depuis 1993-94{eq.titres.length > 0 && <> · <b>{eq.titres.length} titre{eq.titres.length > 1 && "s"}</b> ({eq.titres.join(", ")})</>}.
@@ -240,8 +247,10 @@ const description = sc
       </tbody>
     </table></div>
   </details>
+  </section>
 
-  <h3>Bilan face à chaque adversaire</h3>
+  <section class="section">
+  <h2>Bilan face à chaque adversaire</h2>
   <div class="tableau"><table>
     <thead><tr><th class="g">Adversaire</th><th>J</th><th>V</th><th>N</th><th>D</th><th>BP</th><th>BC</th><th class="g cache-mobile">Derniers</th></tr></thead>
     <tbody>
@@ -254,4 +263,5 @@ const description = sc
       ))}
     </tbody>
   </table></div>
+  </section>
 </Base>

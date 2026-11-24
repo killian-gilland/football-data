@@ -16,7 +16,12 @@ const tri = comp.slice().sort((a, b) => a.rang - b.rang);
   slug={ctx.slug}
   actif="comparateur"
 >
-  <h1>Comparateur d'équipes</h1>
+  <Fragment slot="tete">
+    <div style="display:grid;gap:6px">
+      <span class="sur-titre">{meta.competition.nom} · {meta.saison}</span>
+      <h1>Comparateur d'équipes</h1>
+    </div>
+  </Fragment>
   <p class="discret">Saison {meta.saison}. Choisissez deux équipes : chaque ligne montre la meilleure des deux.</p>
   <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:16px">
     <select id="eqA" aria-label="Première équipe">{tri.map((x, i) => <option value={x.equipe} selected={i === 0}>{x.nom}</option>)}</select>

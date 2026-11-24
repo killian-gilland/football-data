@@ -1,0 +1,22 @@
+---
+// Matchs groupés par jour, chaque jour dans un bloc de lignes.
+import LigneMatch from "./LigneMatch.astro";
+import { fmt } from "../lib/donnees.js";
+const { matchs = [], ctx } = Astro.props;
+const jours = [];
+for (const m of matchs) {
+  const d = jours.at(-1);
+  if (d && d.date === m.date) d.matchs.push(m);
+  else jours.push({ date: m.date, matchs: [m] });
+}
+---
+<div>
+  {jours.map((j) => (
+    <div class="jour">
+      <h3>{fmt.majuscule(fmt.dateLongue(j.date))}</h3>
+      <div class="matchs">
+        {j.matchs.map((m) => <LigneMatch m={m} ctx={ctx} />)}
+      </div>
+    </div>
+  ))}
+</div>
