@@ -97,3 +97,21 @@ def classement(matchs: pd.DataFrame, fmt: dict, equipes: list[str] | None = None
             if pos <= len(table):
                 table.loc[pos - 1, "zone"] = z["code"]
     return table
+
+
+def evolution_par_journee(matchs_saison: pd.DataFrame, fmt: dict) -> dict:
+    """Rang et points de chaque équipe après chaque journée (matchs de la journée N et des précédentes).
+    Un match reporté compte dans sa journée d'origine dès qu'il est joué."""
+    joues = matchs_saison[matchs_saison["statut"] == "joue"]
+    journees = sorted(int(j) for j in joues["journee"].dropna().unique())
+    equipes = sorted(set(matchs_saison["dom"]) | set(matchs_saison["ext"]))
+    series_eq = {e: {"rangs": [], "points": []} for e in equipes}
+    for j in journees:
+        sous = matchs_saison.copy()
+        hors = ~((sous["statut"] == "joue") & (sous["journee"] <= j))
+        sous.loc[hors, "statut"] = "a_venir"
+        t = classement(sous, {**fmt, "zones": []}, equipes).set_index("equipe")
+        for e in equipes:
+            series_eq[e]["rangs"].append(int(t.at[e, "rang"]))
+            series_eq[e]["points"].append(int(t.at[e, "pts"]))
+    return {"journees": journees, "equipes": [{"equipe": e, **series_eq[e]} for e in equipes]}

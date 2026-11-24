@@ -2,6 +2,7 @@
 import Base from "../../layouts/Base.astro";
 import Forme from "../../components/Forme.astro";
 import BarresDivergentes from "../../components/BarresDivergentes.astro";
+import EvolutionClassement from "../../components/react/EvolutionClassement.jsx";
 import { chemins, contexte, fmt, LIBELLES_ZONES } from "../../lib/donnees.js";
 
 export function getStaticPaths() {
@@ -25,6 +26,9 @@ const finDeZone = new Set([finEurope]);
 const pctZone = (e, codes) => codes.reduce((s, c) => s + (e.zones[c] ?? 0), 0);
 const europe = parRang.map((e) => ({ e, p: pctZone(e, ["c1", "c1q", "c3", "c4"]) })).sort((a, b) => b.p - a.p);
 const leader = classement.lignes[0];
+const evolution = ctx.lire("evolution.json");
+const equipesEvo = (evolution?.equipes ?? []).map((e) => ({ id: e.equipe, court: ctx.court(e.equipe), rangs: e.rangs, points: e.points }));
+const parDefaut = [...classement.lignes.slice(0, 4), ...classement.lignes.slice(-2)].map((l) => l.equipe);
 ---
 <Base
   titre={`Classement ${meta.competition.nom} ${meta.saison} et simulations de fin de saison`}
@@ -73,6 +77,17 @@ const leader = classement.lignes[0];
     </div>
     {meta.note_format && <p class="tres-discret">{meta.note_format}</p>}
   </section>
+
+  {evolution?.journees.length > 1 && (
+    <section class="section">
+      <header>
+        <h2>Évolution du classement</h2>
+        <p class="discret">Journée après journée. Choisissez jusqu'à 8 équipes et basculez entre le rang et les points.</p>
+      </header>
+      <EvolutionClassement client:visible journees={evolution.journees} equipes={equipesEvo} nbEquipes={n}
+        finEurope={finEurope} debutRelegation={debutRel} parDefaut={parDefaut} />
+    </section>
+  )}
 
   <div class="grille-2">
     <section class="section">

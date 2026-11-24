@@ -1,5 +1,6 @@
 ---
 import Base from "../../layouts/Base.astro";
+import Comparateur from "../../components/react/Comparateur.jsx";
 import { chemins, contexte } from "../../lib/donnees.js";
 
 export function getStaticPaths() {
@@ -7,12 +8,11 @@ export function getStaticPaths() {
 }
 const ctx = contexte(Astro.params.competition);
 const { meta } = ctx;
-const comp = ctx.lire("comparateur.json").map((x) => ({ ...x, nom: ctx.court(x.equipe) }));
-const tri = comp.slice().sort((a, b) => a.rang - b.rang);
+const equipes = ctx.lire("comparateur.json").map((x) => ({ ...x, nom: ctx.court(x.equipe) }));
 ---
 <Base
   titre={`Comparateur d'équipes ${meta.competition.nom} ${meta.saison}`}
-  description={`Comparez deux équipes de ${meta.competition.nom} ${meta.saison} : attaque, défense, tirs, corners, discipline, forme et note Elo.`}
+  description={`Comparez deux équipes de ${meta.competition.nom} ${meta.saison} : profil radar, attaque, défense, tirs, occasions, corners, discipline, forme et note Elo.`}
   slug={ctx.slug}
   actif="comparateur"
 >
@@ -20,81 +20,8 @@ const tri = comp.slice().sort((a, b) => a.rang - b.rang);
     <div style="display:grid;gap:6px">
       <span class="sur-titre">{meta.competition.nom} · {meta.saison}</span>
       <h1>Comparateur d'équipes</h1>
+      <p>Deux équipes face à face : leur profil sur le radar, puis chaque statistique ligne par ligne.</p>
     </div>
   </Fragment>
-  <p class="discret">Saison {meta.saison}. Choisissez deux équipes : chaque ligne montre la meilleure des deux.</p>
-  <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:16px">
-    <select id="eqA" aria-label="Première équipe">{tri.map((x, i) => <option value={x.equipe} selected={i === 0}>{x.nom}</option>)}</select>
-    <span class="discret">contre</span>
-    <select id="eqB" aria-label="Seconde équipe">{tri.map((x, i) => <option value={x.equipe} selected={i === 1}>{x.nom}</option>)}</select>
-  </div>
-  <div class="legende">
-    <span><i class="pastille" style="background:var(--serie-1)"></i><span id="nomA"></span></span>
-    <span><i class="pastille" style="background:var(--serie-2)"></i><span id="nomB"></span></span>
-  </div>
-  <div class="tableau"><table id="comparaison"><tbody></tbody></table></div>
-  <p class="tres-discret" style="margin-top:8px">Pour les statistiques « contre » (buts encaissés, tirs concédés, cartons…), la plus petite valeur est la meilleure.</p>
-  <script is:inline type="application/json" id="donnees-comparateur" set:html={JSON.stringify(comp)}></script>
-  <script is:inline>
-    const D = JSON.parse(document.getElementById("donnees-comparateur").textContent);
-    const par = Object.fromEntries(D.map((x) => [x.equipe, x]));
-    const n = (x, d = 1) => (x == null ? "—" : x.toLocaleString("fr-FR", { minimumFractionDigits: d, maximumFractionDigits: d }));
-    const p = (x) => (x == null ? "—" : Math.round(x * 100) + " %");
-    // [libellé, accès, format, plus grand = meilleur ?]
-    const lignes = [
-      ["Classement", (x) => x.rang, (v) => v + "e", false],
-      ["Points par match", (x) => x.ppm, (v) => n(v, 2), true],
-      ["Buts marqués / match", (x) => x.bp_pm, (v) => n(v, 2), true],
-      ["Buts encaissés / match", (x) => x.bc_pm, (v) => n(v, 2), false],
-      ["Points à domicile", (x) => x.dom?.pts, (v) => n(v, 0), true],
-      ["Points à l'extérieur", (x) => x.ext?.pts, (v) => n(v, 0), true],
-      ["Matchs sans encaisser", (x) => x.clean_sheets, (v) => n(v, 0), true],
-      ["Points sur les 5 derniers", (x) => x.forme5, (v) => n(v, 0), true],
-      ["Note Elo", (x) => x.elo, (v) => n(v, 0), true],
-      ["Indice d'occasions créé / match", (x) => x.io?.pour_par_match, (v) => n(v, 2), true],
-      ["Indice d'occasions concédé / match", (x) => x.io?.contre_par_match, (v) => n(v, 2), false],
-      ["Tirs / match", (x) => x.tirs?.tirs_par_match, (v) => n(v), true],
-      ["Tirs cadrés / match", (x) => x.tirs?.cadres_par_match, (v) => n(v), true],
-      ["Tirs concédés / match", (x) => x.tirs?.tirs_concedes_par_match, (v) => n(v), false],
-      ["Précision des tirs", (x) => x.tirs?.precision, p, true],
-      ["Buts par tir cadré", (x) => x.tirs?.conversion, p, true],
-      ["Corners obtenus / match", (x) => x.corners?.pour_par_match, (v) => n(v), true],
-      ["Fautes / match", (x) => x.discipline?.fautes_par_match, (v) => n(v), false],
-      ["Cartons jaunes", (x) => x.discipline?.jaunes, (v) => n(v, 0), false],
-      ["Points repris après avoir été mené à la pause", (x) => x.mi_temps?.points_gagnes_apres_avoir_ete_mene, (v) => n(v, 0), true],
-      ["Points perdus en menant à la pause", (x) => x.mi_temps?.points_perdus_en_menant, (v) => n(v, 0), false],
-      ["Chances de titre", (x) => x.titre, p, true],
-    ];
-    const selA = document.getElementById("eqA"), selB = document.getElementById("eqB");
-    try {
-      const memo = JSON.parse(localStorage.getItem("comparateur") || "null");
-      if (memo && par[memo[0]] && par[memo[1]]) { selA.value = memo[0]; selB.value = memo[1]; }
-    } catch (e) {}
-    function rendre() {
-      const a = par[selA.value], b = par[selB.value];
-      document.getElementById("nomA").textContent = a.nom;
-      document.getElementById("nomB").textContent = b.nom;
-      try { localStorage.setItem("comparateur", JSON.stringify([selA.value, selB.value])); } catch (e) {}
-      const corps = document.querySelector("#comparaison tbody");
-      corps.innerHTML = "";
-      for (const [lib, f, fm, grand] of lignes) {
-        const va = f(a), vb = f(b);
-        if (va == null && vb == null) continue;
-        const max = Math.max(Math.abs(va ?? 0), Math.abs(vb ?? 0)) || 1;
-        const meilleurA = va != null && vb != null && va !== vb && (grand ? va > vb : va < vb);
-        const meilleurB = va != null && vb != null && va !== vb && !meilleurA;
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td style="width:30%"><b style="${meilleurA ? "" : "font-weight:400"}">${fm(va)}</b>
-            <div style="display:flex;justify-content:flex-end"><span style="height:6px;border-radius:4px;background:var(--serie-1);width:${(Math.abs(va ?? 0) / max) * 100}%"></span></div></td>
-          <td class="g" style="text-align:center;white-space:normal;color:var(--texte-2);font-size:0.85rem">${lib}</td>
-          <td class="g" style="width:30%"><b style="${meilleurB ? "" : "font-weight:400"}">${fm(vb)}</b>
-            <div><span style="display:block;height:6px;border-radius:4px;background:var(--serie-2);width:${(Math.abs(vb ?? 0) / max) * 100}%"></span></div></td>`;
-        corps.append(tr);
-      }
-    }
-    selA.addEventListener("change", rendre);
-    selB.addEventListener("change", rendre);
-    rendre();
-  </script>
+  <Comparateur client:load equipes={equipes} />
 </Base>

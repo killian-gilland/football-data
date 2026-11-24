@@ -102,3 +102,15 @@ def test_score_corrige_est_une_alerte_pas_un_blocage(comp_test):
     r = controler(m2, comp_test, precedent=m)
     assert r.valide
     assert any(c.code == "scores_inchanges" and not c.ok for c in r.controles)
+
+
+def test_evolution_par_journee_coherente_avec_le_classement_final():
+    from pipeline.classement import evolution_par_journee
+    m = faire_saison(["a", "b", "c", "d"], graine=3)
+    evo = evolution_par_journee(m, FMT)
+    final = classement(m, FMT).set_index("equipe")
+    assert evo["journees"] == sorted(m["journee"].unique().astype(int).tolist())
+    for e in evo["equipes"]:
+        assert e["rangs"][-1] == final.loc[e["equipe"], "rang"]
+        assert e["points"][-1] == final.loc[e["equipe"], "pts"]
+        assert all(a <= b for a, b in zip(e["points"], e["points"][1:]))  # les points ne baissent jamais

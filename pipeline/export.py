@@ -21,7 +21,7 @@ from . import cotes as cotes_mod
 from . import historique as hist
 from . import predictions as journal_mod
 from . import simulation as sim_mod
-from .classement import classement, vue_equipes
+from .classement import classement, evolution_par_journee, vue_equipes
 from .config import DOSSIER_EXPORT, Competition, charger_referentiel
 from .modeles import dixon_coles as dc
 from .modeles import elo as elo_mod
@@ -390,7 +390,7 @@ def construire(comp: Competition, matchs: pd.DataFrame, rapport: dict, alertes: 
     fichiers = {"meta.json": meta, "classement.json": {"saison": s, "lignes": lignes, "attendu": sorted(
         attendu.values(), key=lambda a: -a["points"])}, "simulation.json": simulation, "matchs.json": liste_matchs,
         "accueil.json": accueil, "historique.json": historique, "backtest.json": backtest,
-        "comparateur.json": comparateur, "predictions.json": journal_mod.evaluer(journal, matchs),
+        "comparateur.json": comparateur, "evolution.json": evolution_par_journee(cur, fmt), "predictions.json": journal_mod.evaluer(journal, matchs),
         **fichiers_equipes}
     if cotes is not None:
         fichiers["cotes.json"] = cotes
