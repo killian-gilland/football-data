@@ -1,0 +1,161 @@
+---
+import Base from "../../layouts/Base.astro";
+import GraphLignes from "../../components/GraphLignes.astro";
+import { chemins, contexte, fmt, LIBELLES_MODELES } from "../../lib/donnees.js";
+
+export function getStaticPaths() {
+  return chemins();
+}
+const ctx = contexte(Astro.params.competition);
+const { meta } = ctx;
+const bt = ctx.lire("backtest.json");
+const pr = ctx.lire("predictions.json");
+const principal = bt.modele_principal;
+const ordre = ["ensemble", "dixon_coles", "elo", "marche", "cloture", "naif"];
+const ps = bt.par_saison;
+const series = [
+  [principal, "var(--serie-1)", LIBELLES_MODELES[principal]],
+  ["marche", "var(--serie-2)", "Bookmakers"],
+  ["naif", "var(--serie-3)", "Référence naïve"],
+].map(([k, couleur, nom]) => ({
+  nom, couleur, etiquette: k === principal ? "Notre modèle" : k === "marche" ? "Bookmakers" : "Naïf",
+  points: ps.map((s, i) => ({ i, y: s[k], tip: `${s.saison} — ${nom} : RPS ${fmt.num(s[k], 4)}` })),
+}));
+const cal = bt.calibration[principal] ?? [];
+const calM = bt.calibration.marche ?? [];
+const v = bt.validation[principal];
+const issueLib = { dom: "1", nul: "N", ext: "2" };
+const sim = bt.simulation;
+const simRetenu = sim?.par_sigma?.[String(sim.sigma_retenu)];
+const evLib = { titre: "Titre", top3: "Top 3", bas3: "3 dernières places" };
+---
+<Base
+  titre="Nos prédictions et leur précision"
+  description={`Historique public de toutes nos prédictions ${meta.competition.nom} et de leur précision, backtest sur ${ps.length} saisons comparé aux bookmakers et à une référence naïve.`}
+  slug={ctx.slug}
+  actif="predictions"
+>
+  <h1>Nos prédictions et leur précision</h1>
+  <p class="discret">
+    Deux sources de vérité : le <b>journal public</b> des prédictions publiées avant chaque match (impossible à
+    modifier après coup) et le <b>backtest</b> sur les saisons passées, où le modèle n'a jamais accès aux matchs qu'il
+    prédit.
+  </p>
+
+  <h2>Journal public</h2>
+  <p class="discret">
+    Chaque jour, les probabilités des matchs des 10 jours suivants sont horodatées et ajoutées au journal, sans jamais
+    modifier les lignes existantes. Pour chaque match, on évalue la dernière prédiction enregistrée avant le jour du match.
+    {pr.premiere && <> Journal ouvert le {new Date(pr.premiere).toLocaleDateString("fr-FR", { dateStyle: "long" })}.</>}
+  </p>
+  <div class="grille">
+    <div class="carte"><div class="sur-titre">Prédictions enregistrées</div><div class="chiffre">{pr.n_predictions}</div></div>
+    <div class="carte"><div class="sur-titre">Matchs évalués</div><div class="chiffre">{pr.n_evaluees}</div></div>
+    {pr.modele && (
+      <div class="carte"><div class="sur-titre">RPS (plus bas = mieux)</div>
+        <div class="chiffre">{fmt.num(pr.modele.rps, 3)}</div>
+        <div class="discret">Bookmakers sur les mêmes matchs : {pr.marche ? fmt.num(pr.marche.rps, 3) : "—"}</div></div>
+    )}
+  </div>
+  {pr.n_evaluees === 0 && <p class="alerte" style="margin-top:12px">Le journal vient d'être ouvert : les premiers matchs seront évalués après leur coup de sifflet final.</p>}
+  {pr.en_attente?.length > 0 && (
+    <>
+      <h3>En attente du résultat</h3>
+      <div class="tableau"><table>
+        <thead><tr><th class="g">Match</th><th class="g">Date</th><th>1</th><th>N</th><th>2</th><th class="g cache-mobile">Publiée le</th></tr></thead>
+        <tbody>
+          {pr.en_attente.map((e) => {
+            const m = ctx.parId[e.match_id];
+            return (
+              <tr><td class="g"><a href={ctx.lienMatch(e.match_id)}>{m ? `${ctx.court(m.dom)} – ${ctx.court(m.ext)}` : e.match_id}</a></td>
+                <td class="g">{fmt.date(e.date_match)}</td>{e.p.map((x) => <td>{fmt.pct(x)}</td>)}
+                <td class="g cache-mobile tres-discret">{new Date(e.horodatage).toLocaleString("fr-FR", { timeZone: "Europe/Paris", dateStyle: "short", timeStyle: "short" })}</td></tr>
+            );
+          })}
+        </tbody>
+      </table></div>
+    </>
+  )}
+  {pr.liste?.length > 0 && (
+    <>
+      <h3>Matchs évalués</h3>
+      <div class="tableau"><table>
+        <thead><tr><th class="g">Match</th><th>1</th><th>N</th><th>2</th><th>Issue</th><th>RPS</th></tr></thead>
+        <tbody>
+          {pr.liste.map((e) => {
+            const m = ctx.parId[e.match_id];
+            return (
+              <tr><td class="g"><a href={ctx.lienMatch(e.match_id)}>{m ? `${ctx.court(m.dom)} ${m.score?.join("-")} ${ctx.court(m.ext)}` : e.match_id}</a></td>
+                {e.p.map((x) => <td>{fmt.pct(x)}</td>)}<td>{issueLib[e.issue]}</td><td>{fmt.num(e.rps, 3)}</td></tr>
+            );
+          })}
+        </tbody>
+      </table></div>
+    </>
+  )}
+
+  <h2>Backtest {bt.periode[0]} → {bt.periode[1]}</h2>
+  <p class="discret">
+    Pour chaque semaine de chaque saison, les modèles sont réajustés uniquement avec les matchs déjà joués, puis
+    prédisent les matchs de la semaine. Métriques : RPS (Ranked Probability Score), log loss et score de Brier, plus
+    bas = meilleur.
+  </p>
+  <div class="tableau"><table>
+    <thead><tr><th class="g">Modèle</th><th>Matchs</th><th>RPS</th><th>Log loss</th><th>Brier</th><th>Issue la plus probable juste</th></tr></thead>
+    <tbody>
+      {ordre.filter((k) => bt.global[k]).map((k) => (
+        <tr style={k === principal ? "font-weight:700" : ""}>
+          <td class="g">{LIBELLES_MODELES[k]}{k === principal && " (affiché sur le site)"}</td>
+          <td>{fmt.ent(bt.global[k].n)}</td><td>{fmt.num(bt.global[k].rps, 4)}</td><td>{fmt.num(bt.global[k].log_loss, 4)}</td>
+          <td>{fmt.num(bt.global[k].brier, 4)}</td><td>{fmt.pct(bt.global[k].precision, 1)}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table></div>
+  {v && (
+    <p class="discret" style="margin-top:8px">
+      Validation : sur {fmt.ent(bt.global[principal].n)} matchs, notre modèle améliore le RPS de la référence naïve de
+      {" "}{fmt.num(-v.ecart_rps_vs_naif, 4)} (intervalle de confiance à 95 % : {fmt.num(-v.ic95_vs_naif[1], 4)} à {fmt.num(-v.ic95_vs_naif[0], 4)}).
+      Il reste derrière les bookmakers de {fmt.num(v.ecart_rps_vs_marche, 4)} point de RPS : le marché intègre des
+      informations (blessures, compositions, actualité) que nos modèles n'ont pas.
+    </p>
+  )}
+  {bt.saison_en_cours && (
+    <p class="discret">Saison en cours ({bt.saison_en_cours[principal].n} matchs, prédictions recalculées sans connaître les résultats) : RPS {fmt.num(bt.saison_en_cours[principal].rps, 4)} pour notre modèle, {fmt.num(bt.saison_en_cours.marche.rps, 4)} pour les bookmakers.</p>
+  )}
+
+  <h3>RPS par saison</h3>
+  <GraphLignes titre="RPS par saison" series={series} etiquettesX={ps.map((s) => s.saison.slice(2))} hauteur={240}
+    formatY={(x) => fmt.num(x, 3)} />
+
+  <h3>Calibration</h3>
+  <p class="discret">Quand notre modèle annonce 40 %, l'événement se produit-il 4 fois sur 10 ? Plus les points sont proches de la diagonale, mieux c'est.</p>
+  <GraphLignes titre="Calibration : probabilité annoncée et fréquence observée" hauteur={260} diagonale
+    xMin={0} xMax={1} yMin={0} yMax={1} ticksY={[0, 0.2, 0.4, 0.6, 0.8, 1]} formatY={(x) => fmt.pct(x)}
+    etiquettesX={[]}
+    series={[
+      { nom: LIBELLES_MODELES[principal], couleur: "var(--serie-1)", sansLigne: true, sansEtiquette: true,
+        points: cal.map((c) => ({ i: c.annonce, y: c.observe, tip: `Annoncé ${fmt.pct(c.annonce, 1)} → observé ${fmt.pct(c.observe, 1)} (${c.n} cas)` })) },
+      { nom: "Bookmakers", couleur: "var(--serie-2)", sansLigne: true, sansEtiquette: true,
+        points: calM.map((c) => ({ i: c.annonce, y: c.observe, tip: `Annoncé ${fmt.pct(c.annonce, 1)} → observé ${fmt.pct(c.observe, 1)} (${c.n} cas)` })) },
+    ]} />
+  <p class="tres-discret">Axe horizontal : probabilité annoncée (0 à 100 %). Axe vertical : fréquence observée.</p>
+
+  {sim && simRetenu && (
+    <>
+      <h2>Backtest des simulations de fin de saison</h2>
+      <p class="discret">
+        Sur {sim.saisons.length} saisons passées, nous avons lancé la simulation à mi-saison et comparé ses
+        probabilités au classement final. Référence : le classement de mi-saison figé.
+      </p>
+      <div class="tableau"><table>
+        <thead><tr><th class="g">Événement</th><th>Brier simulation</th><th>Brier classement figé</th></tr></thead>
+        <tbody>
+          {Object.entries(simRetenu).map(([k, x]) => (
+            <tr><td class="g">{evLib[k] ?? k}</td><td><b>{fmt.num(x.brier_modele, 4)}</b></td><td>{fmt.num(x.brier_classement_fige, 4)}</td></tr>
+          ))}
+        </tbody>
+      </table></div>
+    </>
+  )}
+</Base>

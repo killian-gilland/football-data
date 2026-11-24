@@ -1,0 +1,36 @@
+# Compétitions gérées par le pipeline.
+# La compétition est un paramètre partout : ajouter un championnat = ajouter un bloc ici
+# + un fichier de format dans config/formats/ + ses équipes dans config/equipes/.
+
+competitions:
+  fr-ligue1:
+    nom: Ligue 1
+    pays: France
+    slug: ligue-1            # segment d'URL sur le site
+    actif: true
+    saison_courante: "2026-27"
+    premiere_saison: "1993-94"
+    referentiel_equipes: fr  # config/equipes/fr.yaml
+    # Couche « enrichissements » : tirs, corners, cartons, cotes (football-data.co.uk).
+    # Si false, le site tourne sur les seuls scores.
+    enrichissements: true
+    sources:
+      football_data_couk:
+        division: F1
+      openfootball:
+        code: fr.1
+
+  fr-ligue2:
+    nom: Ligue 2
+    pays: France
+    slug: ligue-2
+    actif: false             # prêt pour plus tard : passer à true + compléter le format
+    saison_courante: "2026-27"
+    premiere_saison: "1993-94"
+    referentiel_equipes: fr
+    enrichissements: true
+    sources:
+      football_data_couk:
+        division: F2
+      openfootball:
+        code: fr.2

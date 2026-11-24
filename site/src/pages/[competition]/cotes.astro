@@ -1,0 +1,74 @@
+---
+import Base from "../../layouts/Base.astro";
+import BarresDivergentes from "../../components/BarresDivergentes.astro";
+import GraphLignes from "../../components/GraphLignes.astro";
+import { chemins, contexte, fmt } from "../../lib/donnees.js";
+
+export function getStaticPaths() {
+  return chemins();
+}
+const ctx = contexte(Astro.params.competition);
+const { meta } = ctx;
+const c = ctx.lire("cotes.json");
+const issueLib = (x) => (x.issue === "nul" ? "Match nul" : `Victoire de ${ctx.court(x.issue === "dom" ? x.dom : x.ext)}`);
+const favoris = c?.favoris_par_saison ?? [];
+---
+<Base
+  titre={`Lecture des cotes ${meta.competition.nom} ${meta.saison} : surprises et équipes sous-estimées`}
+  description={`Les plus grosses surprises de la ${meta.competition.nom} et les équipes sous-estimées ou surestimées par les bookmakers, d'après les cotes d'avant-match.`}
+  slug={ctx.slug}
+  actif="cotes"
+>
+  <h1>Lecture des cotes</h1>
+  {!c ? <p>Données de cotes non disponibles.</p> : (
+    <>
+      <p class="discret">
+        Les cotes moyennes d'avant-match, une fois la marge des bookmakers retirée, donnent la probabilité que le marché
+        attribuait à chaque issue. Elles permettent de repérer les surprises et les équipes que le marché a mal jugées.
+        Cette page ne donne aucun conseil de pari.
+      </p>
+
+      <h2>Équipes sous-estimées et surestimées cette saison</h2>
+      <p class="discret">Points réels moins points attendus d'après les cotes. Positif : l'équipe fait mieux que ce que le marché prévoyait.</p>
+      <div class="carte">
+        <BarresDivergentes titre="Écart entre points réels et points attendus par le marché"
+          items={c.equipes.map((x) => ({ label: ctx.court(x.equipe), valeur: x.ecart,
+            tip: `${ctx.court(x.equipe)} : ${x.points} pts réels, ${fmt.num(x.points_attendus_marche)} attendus, favorite dans ${x.favori} matchs sur ${x.matchs}` }))} />
+      </div>
+
+      <div class="grille-2">
+        <section>
+          <h2>Plus grosses surprises de la saison</h2>
+          <div class="tableau"><table>
+            <thead><tr><th class="g">Match</th><th class="g">Issue</th><th>Proba. marché</th></tr></thead>
+            <tbody>
+              {c.surprises_saison.map((x) => (
+                <tr><td class="g"><a href={ctx.lienMatch(x.match_id)}>{ctx.court(x.dom)} {x.score} {ctx.court(x.ext)}</a></td>
+                  <td class="g">{issueLib(x)}</td><td><b>{fmt.pct(x.proba_marche)}</b></td></tr>
+              ))}
+            </tbody>
+          </table></div>
+        </section>
+        <section>
+          <h2>Plus grosses surprises depuis 2000</h2>
+          <div class="tableau"><table>
+            <thead><tr><th class="g">Saison</th><th class="g">Match</th><th>Proba.</th></tr></thead>
+            <tbody>
+              {c.surprises_historiques.map((x) => (
+                <tr><td class="g">{x.saison}</td><td class="g">{ctx.court(x.dom)} {x.score} {ctx.court(x.ext)}</td><td><b>{fmt.pct(x.proba_marche, 1)}</b></td></tr>
+              ))}
+            </tbody>
+          </table></div>
+        </section>
+      </div>
+
+      <h2>Le favori gagne-t-il plus souvent qu'avant ?</h2>
+      <p class="discret">Part des matchs remportés par l'équipe favorite des bookmakers, saison par saison.</p>
+      <GraphLignes titre="Part des matchs gagnés par le favori" hauteur={200} yMin={0.3} yMax={0.65}
+        ticksY={[0.3, 0.4, 0.5, 0.6]} formatY={(v) => fmt.pct(v)}
+        etiquettesX={favoris.map((f) => f.saison.slice(2))}
+        series={[{ nom: "Favori vainqueur", couleur: "var(--serie-1)", sansEtiquette: true,
+          points: favoris.map((f, i) => ({ i, y: f.favori_gagne, tip: `${f.saison} : ${fmt.pct(f.favori_gagne, 1)} (${f.matchs} matchs, ${fmt.pct(f.nuls)} de nuls)` })) }]} />
+    </>
+  )}
+</Base>

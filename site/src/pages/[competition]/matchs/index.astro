@@ -1,0 +1,38 @@
+---
+import Base from "../../../layouts/Base.astro";
+import CarteMatch from "../../../components/CarteMatch.astro";
+import { chemins, contexte } from "../../../lib/donnees.js";
+
+export function getStaticPaths() {
+  return chemins();
+}
+const ctx = contexte(Astro.params.competition);
+const { meta } = ctx;
+const parJournee = new Map();
+for (const m of ctx.matchs) {
+  const j = m.journee ?? 0;
+  if (!parJournee.has(j)) parJournee.set(j, []);
+  parJournee.get(j).push(m);
+}
+const journees = [...parJournee.keys()].sort((a, b) => a - b);
+const courante = meta.journee_courante ?? journees.at(-1);
+---
+<Base
+  titre={`Calendrier et résultats ${meta.competition.nom} ${meta.saison}`}
+  description={`Tous les matchs de la ${meta.competition.nom} ${meta.saison} : résultats, statistiques et probabilités de chaque match à venir.`}
+  slug={ctx.slug}
+  actif="matchs"
+>
+  <h1>Calendrier et résultats {meta.saison}</h1>
+  <nav class="puces" aria-label="Journées">
+    {journees.map((j) => <a class="puce" href={`#j${j}`} aria-current={j === courante ? "true" : undefined}>J{j}</a>)}
+  </nav>
+  {journees.map((j) => (
+    <section id={`j${j}`}>
+      <h2>{j ? `${j}e journée` : "Matchs"}{j === courante && " · en cours"}</h2>
+      <div class="grille">
+        {parJournee.get(j).map((m) => <CarteMatch m={m} ctx={ctx} />)}
+      </div>
+    </section>
+  ))}
+</Base>

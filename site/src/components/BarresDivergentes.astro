@@ -1,0 +1,29 @@
+---
+// Barres de part et d'autre de zéro (bleu = au-dessus, rouge = en dessous), valeurs écrites.
+import { fmt } from "../lib/donnees.js";
+const { items = [], titre, unite = "pts" } = Astro.props;
+const W = 640, ligne = 24, ml = 120, mr = 56;
+const H = items.length * ligne + 8;
+const max = Math.max(1, ...items.map((d) => Math.abs(d.valeur ?? 0)));
+const reserve = 56; // place pour l'étiquette d'une barre négative maximale
+const demi = (W - ml - reserve - mr) / 2;
+const centre = ml + reserve + demi;
+---
+<svg class="graph" viewBox={`0 0 ${W} ${H}`} role="img" aria-label={titre}>
+  <line class="axe" x1={centre} x2={centre} y1="0" y2={H} />
+  {items.map((d, k) => {
+    const v = d.valeur ?? 0;
+    const larg = (Math.abs(v) / max) * demi;
+    const y = 4 + k * ligne;
+    return (
+      <g data-tip={d.tip}>
+        <rect x="0" y={y} width={W} height={ligne} fill="transparent" />
+        <text x={ml - 8} y={y + 16} text-anchor="end" style="fill:var(--texte)">{d.label}</text>
+        <rect x={v >= 0 ? centre : centre - larg} y={y + 5} width={Math.max(larg, 1)} height={ligne - 10} rx="4"
+              fill={v >= 0 ? "var(--div-pos)" : "var(--div-neg)"} />
+        <text x={v >= 0 ? centre + larg + 6 : centre - larg - 6} y={y + 16} text-anchor={v >= 0 ? "start" : "end"}
+              style="fill:var(--texte-2)">{fmt.signe(v)} {unite}</text>
+      </g>
+    );
+  })}
+</svg>

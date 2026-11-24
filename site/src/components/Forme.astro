@@ -1,0 +1,7 @@
+---
+const { resultats = [] } = Astro.props;
+const lib = { V: "Victoire", N: "Nul", D: "Défaite" };
+---
+<span class="forme" aria-label={`Forme : ${resultats.map((r) => lib[r]).join(", ")}`}>
+  {resultats.map((r) => <b class={r} title={lib[r]}>{r}</b>)}
+</span>

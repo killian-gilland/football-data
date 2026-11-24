@@ -1,0 +1,51 @@
+---
+import Base from "../../../layouts/Base.astro";
+import { competitions, contexte, lire, fmt } from "../../../lib/donnees.js";
+
+export function getStaticPaths() {
+  return competitions().flatMap((meta) =>
+    lire(meta.competition.id, "historique.json").saisons.map((s) => ({
+      params: { competition: meta.competition.slug, saison: s.saison },
+    })),
+  );
+}
+const ctx = contexte(Astro.params.competition);
+const { meta } = ctx;
+const h = ctx.lire("historique.json");
+const i = h.saisons.findIndex((s) => s.saison === Astro.params.saison);
+const s = h.saisons[i];
+const prec = h.saisons[i - 1], suiv = h.saisons[i + 1];
+const champion = s.classement[0];
+---
+<Base
+  titre={`Classement ${meta.competition.nom} ${s.saison}${s.terminee ? ` : ${ctx.nom(champion.equipe)} champion` : ""}`}
+  description={`Classement final de la ${meta.competition.nom} ${s.saison} : ${s.equipes} équipes, points, victoires, buts marqués et encaissés.`}
+  slug={ctx.slug}
+  actif="historique"
+>
+  <p class="sur-titre"><a href={`/${ctx.slug}/historique/`}>Historique</a></p>
+  <h1>{meta.competition.nom} {s.saison}</h1>
+  <p class="discret">
+    {s.terminee ? <>Champion : <a href={ctx.lienEquipe(champion.equipe)}><b>{ctx.nom(champion.equipe)}</b></a> avec {champion.pts} points.</> : "Saison en cours."}
+    {" "}{s.equipes} équipes, victoire à {s.bareme_victoire} points.
+  </p>
+  {s.note && <p class="alerte">{s.note}</p>}
+  <div class="tableau"><table>
+    <thead><tr><th class="g">#</th><th class="g">Équipe</th><th>J</th><th>G</th><th>N</th><th>P</th><th>BP</th><th>BC</th><th>Diff</th><th>Pts</th></tr></thead>
+    <tbody>
+      {s.classement.map((x) => (
+        <tr><td class="g">{x.rang}</td><td class="equipe"><a href={ctx.lienEquipe(x.equipe)}>{ctx.court(x.equipe)}</a></td>
+          <td>{x.j}</td><td>{x.g}</td><td>{x.n}</td><td>{x.p}</td><td>{x.bp}</td><td>{x.bc}</td><td>{fmt.signe(x.diff, 0)}</td><td><b>{x.pts}</b></td></tr>
+      ))}
+    </tbody>
+  </table></div>
+  <p class="tres-discret">
+    Classement recalculé à partir des résultats. Les sanctions administratives (retraits de points, rétrogradations) ne
+    sont appliquées que lorsqu'elles sont renseignées dans notre configuration.
+  </p>
+  <p>
+    {prec && <a href={`/${ctx.slug}/historique/${prec.saison}/`}>← {prec.saison}</a>}
+    {prec && suiv && " · "}
+    {suiv && <a href={`/${ctx.slug}/historique/${suiv.saison}/`}>{suiv.saison} →</a>}
+  </p>
+</Base>

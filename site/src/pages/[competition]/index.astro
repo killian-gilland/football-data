@@ -1,0 +1,139 @@
+---
+import Base from "../../layouts/Base.astro";
+import Forme from "../../components/Forme.astro";
+import BarresDivergentes from "../../components/BarresDivergentes.astro";
+import { chemins, contexte, fmt, LIBELLES_ZONES } from "../../lib/donnees.js";
+
+export function getStaticPaths() {
+  return chemins();
+}
+const ctx = contexte(Astro.params.competition);
+const { meta } = ctx;
+const classement = ctx.lire("classement.json");
+const simulation = ctx.lire("simulation.json");
+const backtest = ctx.lire("backtest.json");
+const simParEq = Object.fromEntries(simulation.equipes.map((e) => [e.equipe, e]));
+const zones = meta.zones;
+const n = classement.lignes.length;
+const attIO = classement.attendu.filter((a) => a.ecart_io != null).sort((a, b) => b.ecart_io - a.ecart_io);
+const attMarche = classement.attendu.filter((a) => a.ecart_marche != null).sort((a, b) => b.ecart_marche - a.ecart_marche);
+const fond = (p) => `background: rgba(var(--seq-rgb), ${Math.min(0.08 + p * 0.92, 1).toFixed(3)}); color: ${p > 0.45 ? "#fff" : "inherit"}`;
+const parRang = simulation.equipes.slice().sort((a, b) => a.rang_moyen - b.rang_moyen);
+---
+<Base
+  titre={`Classement ${meta.competition.nom} ${meta.saison} et simulations de fin de saison`}
+  description={`Classement de la ${meta.competition.nom} ${meta.saison}, chances de titre, de qualification européenne et de relégation calculées par ${simulation.n_simulations.toLocaleString("fr-FR")} simulations.`}
+  slug={ctx.slug}
+  actif="classement"
+>
+  <p class="sur-titre">{meta.competition.nom} · {meta.saison}</p>
+  <h1>Classement et simulations</h1>
+
+  <h2 style="margin-top:0.6em">Classement</h2>
+  <div class="tableau">
+    <table>
+      <thead>
+        <tr>
+          <th class="g">#</th><th class="g">Équipe</th><th>J</th><th>G</th><th>N</th><th>P</th><th>BP</th><th>BC</th>
+          <th>Diff</th><th>Pts</th><th class="g">Forme</th><th data-tip="Note Elo maison">Elo</th>
+          <th data-tip="Points attendus en fin de saison (moyenne des simulations)">Pts fin*</th>
+        </tr>
+      </thead>
+      <tbody>
+        {classement.lignes.map((l) => (
+          <tr>
+            <td class="g"><span class={`zone zone-${l.zone}`} title={LIBELLES_ZONES[l.zone] ?? ""}></span>{l.rang}</td>
+            <td class="equipe"><a href={ctx.lienEquipe(l.equipe)}>{ctx.court(l.equipe)}</a></td>
+            <td>{l.j}</td><td>{l.g}</td><td>{l.n}</td><td>{l.p}</td><td>{l.bp}</td><td>{l.bc}</td>
+            <td>{fmt.signe(l.diff, 0)}</td><td><b>{l.pts}</b>{l.penalite > 0 && <span class="negatif" title="Pénalité"> (−{l.penalite})</span>}</td>
+            <td class="g"><Forme resultats={l.forme} /></td>
+            <td>{fmt.ent(l.elo)}</td>
+            <td>{fmt.num(l.points_attendus_fin, 0)}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+  <div class="legende" style="margin-top:8px">
+    {[["c1", "Ligue des champions"], ["c3", "Ligue Europa / Conférence"], ["barrage", "Barrage"], ["relegation", "Relégation"]].map(([z, l]) => (
+      <span><span class={`zone zone-${z}`}></span>{l}</span>
+    ))}
+  </div>
+  {meta.note_format && <p class="tres-discret">{meta.note_format}</p>}
+
+  <h2>Fin de saison : {simulation.n_simulations.toLocaleString("fr-FR")} simulations</h2>
+  <p class="discret">
+    Chaque match restant ({simulation.matchs_restants}) est simulé à partir de notre modèle de buts. Les pourcentages
+    indiquent dans combien de saisons simulées l'équipe termine dans chaque zone.
+    {backtest.simulation?.valide && " Ce procédé a été testé sur les saisons passées (voir la méthodologie)."}
+  </p>
+  <div class="tableau">
+    <table>
+      <thead>
+        <tr>
+          <th class="g">Équipe</th><th>Pts actuels</th><th>Pts attendus</th><th class="cache-mobile">Fourchette 80 %</th>
+          <th>Titre</th>
+          {zones.map((z) => <th data-tip={z.nom}>{LIBELLES_ZONES[z.code] ?? z.nom}</th>)}
+        </tr>
+      </thead>
+      <tbody>
+        {parRang.map((e) => (
+          <tr>
+            <td class="equipe"><a href={ctx.lienEquipe(e.equipe)}>{ctx.court(e.equipe)}</a></td>
+            <td>{e.points_actuels}</td>
+            <td><b>{fmt.num(e.points_attendus, 0)}</b></td>
+            <td class="cache-mobile">{fmt.num(e.points_p10, 0)} – {fmt.num(e.points_p90, 0)}</td>
+            <td style={fond(e.titre)}>{fmt.pct(e.titre)}</td>
+            {zones.map((z) => <td style={fond(e.zones[z.code] ?? 0)}>{fmt.pct(e.zones[z.code] ?? 0)}</td>)}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Probabilité de chaque place finale</h3>
+  <div class="tableau">
+    <table style="font-size:0.78rem">
+      <thead><tr><th class="g">Équipe</th>{Array.from({ length: n }, (_, i) => <th>{i + 1}</th>)}</tr></thead>
+      <tbody>
+        {parRang.map((e) => (
+          <tr>
+            <td class="equipe">{ctx.court(e.equipe)}</td>
+            {e.positions.map((p, i) => (
+              <td style={fond(p)} data-tip={`${ctx.court(e.equipe)} ${i + 1}e : ${fmt.pct(p, 1)}`}>{p >= 0.005 ? Math.round(p * 100) : ""}</td>
+            ))}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+  <p class="tres-discret">En %, cases vides : moins de 0,5 %.</p>
+
+  <h2>Classement attendu vs classement réel</h2>
+  <div class="grille-2">
+    {attIO.length > 0 && (
+      <div class="carte">
+        <h3 style="margin-top:0">D'après la qualité des occasions</h3>
+        <p class="discret">
+          Points réels moins points « mérités » d'après notre indice d'occasions (tirs cadrés et non cadrés). Positif :
+          l'équipe a pris plus de points que ses occasions ne le laissaient attendre.
+        </p>
+        <BarresDivergentes titre="Écart aux points attendus selon les occasions"
+          items={attIO.map((a) => ({ label: ctx.court(a.equipe), valeur: a.ecart_io,
+            tip: `${ctx.court(a.equipe)} : ${a.points} pts réels, ${fmt.num(a.points_io)} attendus` }))} />
+      </div>
+    )}
+    {attMarche.length > 0 && (
+      <div class="carte">
+        <h3 style="margin-top:0">D'après les bookmakers</h3>
+        <p class="discret">
+          Points réels moins points attendus d'après les cotes d'avant-match. Positif : l'équipe a fait mieux que ce que
+          le marché prévoyait.
+        </p>
+        <BarresDivergentes titre="Écart aux points attendus selon les cotes"
+          items={attMarche.map((a) => ({ label: ctx.court(a.equipe), valeur: a.ecart_marche,
+            tip: `${ctx.court(a.equipe)} : ${a.points} pts réels, ${fmt.num(a.points_marche)} attendus` }))} />
+      </div>
+    )}
+  </div>
+</Base>

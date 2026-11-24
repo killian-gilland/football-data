@@ -1,0 +1,25 @@
+---
+import ProbaBarre from "./ProbaBarre.astro";
+import { fmt } from "../lib/donnees.js";
+const { m, ctx } = Astro.props;
+const lien = ctx.lienMatch(m.id);
+const pred = m.prediction;
+---
+<a class="carte" href={lien} style="color:inherit;text-decoration:none;display:block">
+  <div class="tres-discret">{fmt.majuscule(fmt.dateLongue(m.date))}{m.heure && ` · ${m.heure}`}{m.journee && ` · J${m.journee}`}</div>
+  <div class="match" style="margin-top:6px">
+    <span class="dom">{ctx.court(m.dom)}</span>
+    <span class="score">{m.score ? `${m.score[0]} - ${m.score[1]}` : "—"}</span>
+    <span class="ext">{ctx.court(m.ext)}</span>
+  </div>
+  {pred && (
+    <div style="margin-top:8px">
+      <ProbaBarre p={pred.p} dom={ctx.court(m.dom)} ext={ctx.court(m.ext)} compact />
+      {pred.scores?.[0] && (
+        <div class="tres-discret">
+          {m.statut === "joue" ? "Notre prédiction avant-match" : "Score le plus probable"} : {pred.scores[0].score} ({fmt.pct(pred.scores[0].proba)})
+        </div>
+      )}
+    </div>
+  )}
+</a>

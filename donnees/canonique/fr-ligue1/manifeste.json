@@ -1,0 +1,1142 @@
+{
+  "competition": "fr-ligue1",
+  "valide_le": "2026-11-24T21:45:10+00:00",
+  "empreinte": "96511aa94e883604",
+  "matchs": 12153,
+  "matchs_joues": 11946,
+  "rapport_qualite": {
+    "valide": true,
+    "controles": [
+      {
+        "code": "identifiants_uniques",
+        "niveau": "bloquant",
+        "ok": true,
+        "detail": "doublons : "
+      },
+      {
+        "code": "equipes_renseignees",
+        "niveau": "bloquant",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "code": "pas_d_auto_match",
+        "niveau": "bloquant",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "code": "dates_valides",
+        "niveau": "bloquant",
+        "ok": true,
+        "detail": "0 date(s) manquante(s)"
+      },
+      {
+        "code": "dates_dans_la_saison",
+        "niveau": "bloquant",
+        "ok": true,
+        "detail": "hors fenêtre : "
+      },
+      {
+        "code": "buts_dom_entiers_positifs",
+        "niveau": "bloquant",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "code": "buts_ext_entiers_positifs",
+        "niveau": "bloquant",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "code": "mi_temps_inferieure_au_final",
+        "niveau": "bloquant",
+        "ok": true,
+        "detail": "incohérents : "
+      },
+      {
+        "code": "cadres_inferieurs_aux_tirs_dom",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": "0 cas : "
+      },
+      {
+        "code": "buts_plausibles_vs_cadres_dom",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": "0 cas : "
+      },
+      {
+        "code": "cadres_inferieurs_aux_tirs_ext",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": "0 cas : "
+      },
+      {
+        "code": "buts_plausibles_vs_cadres_ext",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": "0 cas : "
+      },
+      {
+        "code": "cartons_rouges_plausibles",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "code": "cotes_plausibles",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": "0 match(s) à marge anormale : "
+      },
+      {
+        "code": "nombre_equipes_1993-94",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": "20 équipes (attendu 18 ou 20)"
+      },
+      {
+        "code": "aller_retour_unique_1993-94",
+        "niveau": "bloquant",
+        "ok": true,
+        "detail": "une affiche apparaît deux fois"
+      },
+      {
+        "code": "saison_complete_1993-94",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": "380 matchs sur 380"
+      },
+      {
+        "code": "nombre_equipes_1994-95",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": "20 équipes (attendu 18 ou 20)"
+      },
+      {
+        "code": "aller_retour_unique_1994-95",
+        "niveau": "bloquant",
+        "ok": true,
+        "detail": "une affiche apparaît deux fois"
+      },
+      {
+        "code": "saison_complete_1994-95",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": "380 matchs sur 380"
+      },
+      {
+        "code": "nombre_equipes_1995-96",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": "20 équipes (attendu 18 ou 20)"
+      },
+      {
+        "code": "aller_retour_unique_1995-96",
+        "niveau": "bloquant",
+        "ok": true,
+        "detail": "une affiche apparaît deux fois"
+      },
+      {
+        "code": "saison_complete_1995-96",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": "380 matchs sur 380"
+      },
+      {
+        "code": "nombre_equipes_1996-97",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": "20 équipes (attendu 18 ou 20)"
+      },
+      {
+        "code": "aller_retour_unique_1996-97",
+        "niveau": "bloquant",
+        "ok": true,
+        "detail": "une affiche apparaît deux fois"
+      },
+      {
+        "code": "saison_complete_1996-97",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": "380 matchs sur 380"
+      },
+      {
+        "code": "nombre_equipes_1997-98",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": "18 équipes (attendu 18 ou 20)"
+      },
+      {
+        "code": "aller_retour_unique_1997-98",
+        "niveau": "bloquant",
+        "ok": true,
+        "detail": "une affiche apparaît deux fois"
+      },
+      {
+        "code": "saison_complete_1997-98",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": "306 matchs sur 306"
+      },
+      {
+        "code": "nombre_equipes_1998-99",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": "18 équipes (attendu 18 ou 20)"
+      },
+      {
+        "code": "aller_retour_unique_1998-99",
+        "niveau": "bloquant",
+        "ok": true,
+        "detail": "une affiche apparaît deux fois"
+      },
+      {
+        "code": "saison_complete_1998-99",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": "306 matchs sur 306"
+      },
+      {
+        "code": "nombre_equipes_1999-00",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": "18 équipes (attendu 18 ou 20)"
+      },
+      {
+        "code": "aller_retour_unique_1999-00",
+        "niveau": "bloquant",
+        "ok": true,
+        "detail": "une affiche apparaît deux fois"
+      },
+      {
+        "code": "saison_complete_1999-00",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": "306 matchs sur 306"
+      },
+      {
+        "code": "nombre_equipes_2000-01",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": "18 équipes (attendu 18 ou 20)"
+      },
+      {
+        "code": "aller_retour_unique_2000-01",
+        "niveau": "bloquant",
+        "ok": true,
+        "detail": "une affiche apparaît deux fois"
+      },
+      {
+        "code": "saison_complete_2000-01",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": "306 matchs sur 306"
+      },
+      {
+        "code": "nombre_equipes_2001-02",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": "18 équipes (attendu 18 ou 20)"
+      },
+      {
+        "code": "aller_retour_unique_2001-02",
+        "niveau": "bloquant",
+        "ok": true,
+        "detail": "une affiche apparaît deux fois"
+      },
+      {
+        "code": "saison_complete_2001-02",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": "306 matchs sur 306"
+      },
+      {
+        "code": "nombre_equipes_2002-03",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": "20 équipes (attendu 18 ou 20)"
+      },
+      {
+        "code": "aller_retour_unique_2002-03",
+        "niveau": "bloquant",
+        "ok": true,
+        "detail": "une affiche apparaît deux fois"
+      },
+      {
+        "code": "saison_complete_2002-03",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": "380 matchs sur 380"
+      },
+      {
+        "code": "nombre_equipes_2003-04",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": "20 équipes (attendu 18 ou 20)"
+      },
+      {
+        "code": "aller_retour_unique_2003-04",
+        "niveau": "bloquant",
+        "ok": true,
+        "detail": "une affiche apparaît deux fois"
+      },
+      {
+        "code": "saison_complete_2003-04",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": "380 matchs sur 380"
+      },
+      {
+        "code": "nombre_equipes_2004-05",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": "20 équipes (attendu 18 ou 20)"
+      },
+      {
+        "code": "aller_retour_unique_2004-05",
+        "niveau": "bloquant",
+        "ok": true,
+        "detail": "une affiche apparaît deux fois"
+      },
+      {
+        "code": "saison_complete_2004-05",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": "380 matchs sur 380"
+      },
+      {
+        "code": "nombre_equipes_2005-06",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": "20 équipes (attendu 18 ou 20)"
+      },
+      {
+        "code": "aller_retour_unique_2005-06",
+        "niveau": "bloquant",
+        "ok": true,
+        "detail": "une affiche apparaît deux fois"
+      },
+      {
+        "code": "saison_complete_2005-06",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": "380 matchs sur 380"
+      },
+      {
+        "code": "nombre_equipes_2006-07",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": "20 équipes (attendu 18 ou 20)"
+      },
+      {
+        "code": "aller_retour_unique_2006-07",
+        "niveau": "bloquant",
+        "ok": true,
+        "detail": "une affiche apparaît deux fois"
+      },
+      {
+        "code": "saison_complete_2006-07",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": "380 matchs sur 380"
+      },
+      {
+        "code": "nombre_equipes_2007-08",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": "20 équipes (attendu 18 ou 20)"
+      },
+      {
+        "code": "aller_retour_unique_2007-08",
+        "niveau": "bloquant",
+        "ok": true,
+        "detail": "une affiche apparaît deux fois"
+      },
+      {
+        "code": "saison_complete_2007-08",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": "380 matchs sur 380"
+      },
+      {
+        "code": "nombre_equipes_2008-09",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": "20 équipes (attendu 18 ou 20)"
+      },
+      {
+        "code": "aller_retour_unique_2008-09",
+        "niveau": "bloquant",
+        "ok": true,
+        "detail": "une affiche apparaît deux fois"
+      },
+      {
+        "code": "saison_complete_2008-09",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": "380 matchs sur 380"
+      },
+      {
+        "code": "nombre_equipes_2009-10",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": "20 équipes (attendu 18 ou 20)"
+      },
+      {
+        "code": "aller_retour_unique_2009-10",
+        "niveau": "bloquant",
+        "ok": true,
+        "detail": "une affiche apparaît deux fois"
+      },
+      {
+        "code": "saison_complete_2009-10",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": "380 matchs sur 380"
+      },
+      {
+        "code": "nombre_equipes_2010-11",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": "20 équipes (attendu 18 ou 20)"
+      },
+      {
+        "code": "aller_retour_unique_2010-11",
+        "niveau": "bloquant",
+        "ok": true,
+        "detail": "une affiche apparaît deux fois"
+      },
+      {
+        "code": "saison_complete_2010-11",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": "380 matchs sur 380"
+      },
+      {
+        "code": "nombre_equipes_2011-12",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": "20 équipes (attendu 18 ou 20)"
+      },
+      {
+        "code": "aller_retour_unique_2011-12",
+        "niveau": "bloquant",
+        "ok": true,
+        "detail": "une affiche apparaît deux fois"
+      },
+      {
+        "code": "saison_complete_2011-12",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": "380 matchs sur 380"
+      },
+      {
+        "code": "nombre_equipes_2012-13",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": "20 équipes (attendu 18 ou 20)"
+      },
+      {
+        "code": "aller_retour_unique_2012-13",
+        "niveau": "bloquant",
+        "ok": true,
+        "detail": "une affiche apparaît deux fois"
+      },
+      {
+        "code": "saison_complete_2012-13",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": "380 matchs sur 380"
+      },
+      {
+        "code": "nombre_equipes_2013-14",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": "20 équipes (attendu 18 ou 20)"
+      },
+      {
+        "code": "aller_retour_unique_2013-14",
+        "niveau": "bloquant",
+        "ok": true,
+        "detail": "une affiche apparaît deux fois"
+      },
+      {
+        "code": "saison_complete_2013-14",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": "380 matchs sur 380"
+      },
+      {
+        "code": "nombre_equipes_2014-15",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": "20 équipes (attendu 18 ou 20)"
+      },
+      {
+        "code": "aller_retour_unique_2014-15",
+        "niveau": "bloquant",
+        "ok": true,
+        "detail": "une affiche apparaît deux fois"
+      },
+      {
+        "code": "saison_complete_2014-15",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": "380 matchs sur 380"
+      },
+      {
+        "code": "nombre_equipes_2015-16",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": "20 équipes (attendu 18 ou 20)"
+      },
+      {
+        "code": "aller_retour_unique_2015-16",
+        "niveau": "bloquant",
+        "ok": true,
+        "detail": "une affiche apparaît deux fois"
+      },
+      {
+        "code": "saison_complete_2015-16",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": "380 matchs sur 380"
+      },
+      {
+        "code": "nombre_equipes_2016-17",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": "20 équipes (attendu 18 ou 20)"
+      },
+      {
+        "code": "aller_retour_unique_2016-17",
+        "niveau": "bloquant",
+        "ok": true,
+        "detail": "une affiche apparaît deux fois"
+      },
+      {
+        "code": "saison_complete_2016-17",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": "380 matchs sur 380"
+      },
+      {
+        "code": "nombre_equipes_2017-18",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": "20 équipes (attendu 18 ou 20)"
+      },
+      {
+        "code": "aller_retour_unique_2017-18",
+        "niveau": "bloquant",
+        "ok": true,
+        "detail": "une affiche apparaît deux fois"
+      },
+      {
+        "code": "saison_complete_2017-18",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": "380 matchs sur 380"
+      },
+      {
+        "code": "nombre_equipes_2018-19",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": "20 équipes (attendu 18 ou 20)"
+      },
+      {
+        "code": "aller_retour_unique_2018-19",
+        "niveau": "bloquant",
+        "ok": true,
+        "detail": "une affiche apparaît deux fois"
+      },
+      {
+        "code": "saison_complete_2018-19",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": "380 matchs sur 380"
+      },
+      {
+        "code": "nombre_equipes_2019-20",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": "20 équipes (attendu 18 ou 20)"
+      },
+      {
+        "code": "aller_retour_unique_2019-20",
+        "niveau": "bloquant",
+        "ok": true,
+        "detail": "une affiche apparaît deux fois"
+      },
+      {
+        "code": "nombre_equipes_2020-21",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": "20 équipes (attendu 18 ou 20)"
+      },
+      {
+        "code": "aller_retour_unique_2020-21",
+        "niveau": "bloquant",
+        "ok": true,
+        "detail": "une affiche apparaît deux fois"
+      },
+      {
+        "code": "saison_complete_2020-21",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": "380 matchs sur 380"
+      },
+      {
+        "code": "nombre_equipes_2021-22",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": "20 équipes (attendu 18 ou 20)"
+      },
+      {
+        "code": "aller_retour_unique_2021-22",
+        "niveau": "bloquant",
+        "ok": true,
+        "detail": "une affiche apparaît deux fois"
+      },
+      {
+        "code": "saison_complete_2021-22",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": "380 matchs sur 380"
+      },
+      {
+        "code": "nombre_equipes_2022-23",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": "20 équipes (attendu 18 ou 20)"
+      },
+      {
+        "code": "aller_retour_unique_2022-23",
+        "niveau": "bloquant",
+        "ok": true,
+        "detail": "une affiche apparaît deux fois"
+      },
+      {
+        "code": "saison_complete_2022-23",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": "380 matchs sur 380"
+      },
+      {
+        "code": "nombre_equipes_2023-24",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": "18 équipes (attendu 18 ou 20)"
+      },
+      {
+        "code": "aller_retour_unique_2023-24",
+        "niveau": "bloquant",
+        "ok": true,
+        "detail": "une affiche apparaît deux fois"
+      },
+      {
+        "code": "saison_complete_2023-24",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": "306 matchs sur 306"
+      },
+      {
+        "code": "nombre_equipes_2024-25",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": "18 équipes (attendu 18 ou 20)"
+      },
+      {
+        "code": "aller_retour_unique_2024-25",
+        "niveau": "bloquant",
+        "ok": true,
+        "detail": "une affiche apparaît deux fois"
+      },
+      {
+        "code": "saison_complete_2024-25",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": "306 matchs sur 306"
+      },
+      {
+        "code": "nombre_equipes_2025-26",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": "18 équipes (attendu 18 ou 20)"
+      },
+      {
+        "code": "aller_retour_unique_2025-26",
+        "niveau": "bloquant",
+        "ok": true,
+        "detail": "une affiche apparaît deux fois"
+      },
+      {
+        "code": "saison_complete_2025-26",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": "306 matchs sur 306"
+      },
+      {
+        "code": "nombre_equipes_2026-27",
+        "niveau": "bloquant",
+        "ok": true,
+        "detail": "18 équipes (attendu 18)"
+      },
+      {
+        "code": "aller_retour_unique_2026-27",
+        "niveau": "bloquant",
+        "ok": true,
+        "detail": "une affiche apparaît deux fois"
+      },
+      {
+        "code": "calendrier_complet_2026-27",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": "306 matchs connus sur 306 (calendrier incomplet : simulation impossible)"
+      },
+      {
+        "code": "ecart_matchs_joues",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": "de 11 à 11 matchs joués selon les équipes"
+      },
+      {
+        "code": "aucun_match_joue_disparu",
+        "niveau": "bloquant",
+        "ok": true,
+        "detail": "0 match(s) disparu(s) : "
+      },
+      {
+        "code": "scores_inchanges",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": "0 score(s) corrigé(s) par la source : "
+      },
+      {
+        "code": "croisement_openfootball",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": "0 score(s) en désaccord sur 45 comparés : "
+      },
+      {
+        "code": "dates_coherentes_openfootball",
+        "niveau": "alerte",
+        "ok": true,
+        "detail": "0 date(s) divergente(s)"
+      }
+    ],
+    "disponibilite": [
+      {
+        "saison": "1993-94",
+        "matchs": 380,
+        "mi_temps": 0.0,
+        "tirs": 0.0,
+        "tirs_cadres": 0.0,
+        "corners": 0.0,
+        "fautes": 0.0,
+        "cartons": 0.0,
+        "cotes": 0.0,
+        "cotes_cloture": 0.0
+      },
+      {
+        "saison": "1994-95",
+        "matchs": 380,
+        "mi_temps": 0.0,
+        "tirs": 0.0,
+        "tirs_cadres": 0.0,
+        "corners": 0.0,
+        "fautes": 0.0,
+        "cartons": 0.0,
+        "cotes": 0.0,
+        "cotes_cloture": 0.0
+      },
+      {
+        "saison": "1995-96",
+        "matchs": 380,
+        "mi_temps": 0.818,
+        "tirs": 0.0,
+        "tirs_cadres": 0.0,
+        "corners": 0.0,
+        "fautes": 0.0,
+        "cartons": 0.0,
+        "cotes": 0.0,
+        "cotes_cloture": 0.0
+      },
+      {
+        "saison": "1996-97",
+        "matchs": 380,
+        "mi_temps": 0.929,
+        "tirs": 0.0,
+        "tirs_cadres": 0.0,
+        "corners": 0.0,
+        "fautes": 0.0,
+        "cartons": 0.0,
+        "cotes": 0.0,
+        "cotes_cloture": 0.0
+      },
+      {
+        "saison": "1997-98",
+        "matchs": 306,
+        "mi_temps": 0.889,
+        "tirs": 0.0,
+        "tirs_cadres": 0.0,
+        "corners": 0.0,
+        "fautes": 0.0,
+        "cartons": 0.0,
+        "cotes": 0.0,
+        "cotes_cloture": 0.0
+      },
+      {
+        "saison": "1998-99",
+        "matchs": 306,
+        "mi_temps": 1.0,
+        "tirs": 0.0,
+        "tirs_cadres": 0.0,
+        "corners": 0.0,
+        "fautes": 0.0,
+        "cartons": 0.0,
+        "cotes": 0.0,
+        "cotes_cloture": 0.0
+      },
+      {
+        "saison": "1999-00",
+        "matchs": 306,
+        "mi_temps": 1.0,
+        "tirs": 0.0,
+        "tirs_cadres": 0.0,
+        "corners": 0.0,
+        "fautes": 0.0,
+        "cartons": 0.0,
+        "cotes": 0.0,
+        "cotes_cloture": 0.0
+      },
+      {
+        "saison": "2000-01",
+        "matchs": 306,
+        "mi_temps": 1.0,
+        "tirs": 0.0,
+        "tirs_cadres": 0.0,
+        "corners": 0.0,
+        "fautes": 0.0,
+        "cartons": 0.0,
+        "cotes": 0.997,
+        "cotes_cloture": 0.0
+      },
+      {
+        "saison": "2001-02",
+        "matchs": 306,
+        "mi_temps": 1.0,
+        "tirs": 0.0,
+        "tirs_cadres": 0.0,
+        "corners": 0.0,
+        "fautes": 0.0,
+        "cartons": 0.0,
+        "cotes": 0.997,
+        "cotes_cloture": 0.0
+      },
+      {
+        "saison": "2002-03",
+        "matchs": 380,
+        "mi_temps": 1.0,
+        "tirs": 0.0,
+        "tirs_cadres": 0.0,
+        "corners": 0.0,
+        "fautes": 0.0,
+        "cartons": 0.0,
+        "cotes": 1.0,
+        "cotes_cloture": 0.0
+      },
+      {
+        "saison": "2003-04",
+        "matchs": 380,
+        "mi_temps": 1.0,
+        "tirs": 0.0,
+        "tirs_cadres": 0.0,
+        "corners": 0.0,
+        "fautes": 0.0,
+        "cartons": 0.0,
+        "cotes": 1.0,
+        "cotes_cloture": 0.0
+      },
+      {
+        "saison": "2004-05",
+        "matchs": 380,
+        "mi_temps": 1.0,
+        "tirs": 0.0,
+        "tirs_cadres": 0.0,
+        "corners": 0.0,
+        "fautes": 0.0,
+        "cartons": 0.0,
+        "cotes": 1.0,
+        "cotes_cloture": 0.0
+      },
+      {
+        "saison": "2005-06",
+        "matchs": 380,
+        "mi_temps": 1.0,
+        "tirs": 0.997,
+        "tirs_cadres": 0.997,
+        "corners": 0.0,
+        "fautes": 0.0,
+        "cartons": 1.0,
+        "cotes": 1.0,
+        "cotes_cloture": 0.0
+      },
+      {
+        "saison": "2006-07",
+        "matchs": 380,
+        "mi_temps": 1.0,
+        "tirs": 1.0,
+        "tirs_cadres": 1.0,
+        "corners": 1.0,
+        "fautes": 0.0,
+        "cartons": 1.0,
+        "cotes": 1.0,
+        "cotes_cloture": 0.0
+      },
+      {
+        "saison": "2007-08",
+        "matchs": 380,
+        "mi_temps": 1.0,
+        "tirs": 1.0,
+        "tirs_cadres": 1.0,
+        "corners": 1.0,
+        "fautes": 1.0,
+        "cartons": 1.0,
+        "cotes": 1.0,
+        "cotes_cloture": 0.0
+      },
+      {
+        "saison": "2008-09",
+        "matchs": 380,
+        "mi_temps": 1.0,
+        "tirs": 1.0,
+        "tirs_cadres": 1.0,
+        "corners": 1.0,
+        "fautes": 1.0,
+        "cartons": 1.0,
+        "cotes": 1.0,
+        "cotes_cloture": 0.0
+      },
+      {
+        "saison": "2009-10",
+        "matchs": 380,
+        "mi_temps": 1.0,
+        "tirs": 1.0,
+        "tirs_cadres": 1.0,
+        "corners": 1.0,
+        "fautes": 1.0,
+        "cartons": 1.0,
+        "cotes": 1.0,
+        "cotes_cloture": 0.0
+      },
+      {
+        "saison": "2010-11",
+        "matchs": 380,
+        "mi_temps": 1.0,
+        "tirs": 1.0,
+        "tirs_cadres": 1.0,
+        "corners": 1.0,
+        "fautes": 1.0,
+        "cartons": 1.0,
+        "cotes": 1.0,
+        "cotes_cloture": 0.0
+      },
+      {
+        "saison": "2011-12",
+        "matchs": 380,
+        "mi_temps": 1.0,
+        "tirs": 1.0,
+        "tirs_cadres": 1.0,
+        "corners": 1.0,
+        "fautes": 0.995,
+        "cartons": 1.0,
+        "cotes": 1.0,
+        "cotes_cloture": 0.0
+      },
+      {
+        "saison": "2012-13",
+        "matchs": 380,
+        "mi_temps": 1.0,
+        "tirs": 1.0,
+        "tirs_cadres": 1.0,
+        "corners": 1.0,
+        "fautes": 1.0,
+        "cartons": 1.0,
+        "cotes": 1.0,
+        "cotes_cloture": 1.0
+      },
+      {
+        "saison": "2013-14",
+        "matchs": 380,
+        "mi_temps": 1.0,
+        "tirs": 1.0,
+        "tirs_cadres": 1.0,
+        "corners": 1.0,
+        "fautes": 1.0,
+        "cartons": 1.0,
+        "cotes": 1.0,
+        "cotes_cloture": 1.0
+      },
+      {
+        "saison": "2014-15",
+        "matchs": 380,
+        "mi_temps": 1.0,
+        "tirs": 1.0,
+        "tirs_cadres": 1.0,
+        "corners": 1.0,
+        "fautes": 1.0,
+        "cartons": 1.0,
+        "cotes": 1.0,
+        "cotes_cloture": 1.0
+      },
+      {
+        "saison": "2015-16",
+        "matchs": 380,
+        "mi_temps": 1.0,
+        "tirs": 1.0,
+        "tirs_cadres": 1.0,
+        "corners": 1.0,
+        "fautes": 1.0,
+        "cartons": 1.0,
+        "cotes": 1.0,
+        "cotes_cloture": 1.0
+      },
+      {
+        "saison": "2016-17",
+        "matchs": 380,
+        "mi_temps": 0.997,
+        "tirs": 0.997,
+        "tirs_cadres": 0.997,
+        "corners": 0.997,
+        "fautes": 0.997,
+        "cartons": 0.997,
+        "cotes": 1.0,
+        "cotes_cloture": 1.0
+      },
+      {
+        "saison": "2017-18",
+        "matchs": 380,
+        "mi_temps": 1.0,
+        "tirs": 1.0,
+        "tirs_cadres": 1.0,
+        "corners": 1.0,
+        "fautes": 1.0,
+        "cartons": 1.0,
+        "cotes": 1.0,
+        "cotes_cloture": 1.0
+      },
+      {
+        "saison": "2018-19",
+        "matchs": 380,
+        "mi_temps": 1.0,
+        "tirs": 1.0,
+        "tirs_cadres": 1.0,
+        "corners": 1.0,
+        "fautes": 1.0,
+        "cartons": 1.0,
+        "cotes": 1.0,
+        "cotes_cloture": 1.0
+      },
+      {
+        "saison": "2019-20",
+        "matchs": 279,
+        "mi_temps": 1.0,
+        "tirs": 1.0,
+        "tirs_cadres": 1.0,
+        "corners": 1.0,
+        "fautes": 1.0,
+        "cartons": 1.0,
+        "cotes": 1.0,
+        "cotes_cloture": 1.0
+      },
+      {
+        "saison": "2020-21",
+        "matchs": 380,
+        "mi_temps": 1.0,
+        "tirs": 1.0,
+        "tirs_cadres": 1.0,
+        "corners": 1.0,
+        "fautes": 1.0,
+        "cartons": 1.0,
+        "cotes": 1.0,
+        "cotes_cloture": 1.0
+      },
+      {
+        "saison": "2021-22",
+        "matchs": 380,
+        "mi_temps": 1.0,
+        "tirs": 1.0,
+        "tirs_cadres": 1.0,
+        "corners": 1.0,
+        "fautes": 1.0,
+        "cartons": 1.0,
+        "cotes": 1.0,
+        "cotes_cloture": 1.0
+      },
+      {
+        "saison": "2022-23",
+        "matchs": 380,
+        "mi_temps": 1.0,
+        "tirs": 1.0,
+        "tirs_cadres": 1.0,
+        "corners": 1.0,
+        "fautes": 1.0,
+        "cartons": 1.0,
+        "cotes": 1.0,
+        "cotes_cloture": 1.0
+      },
+      {
+        "saison": "2023-24",
+        "matchs": 306,
+        "mi_temps": 1.0,
+        "tirs": 1.0,
+        "tirs_cadres": 1.0,
+        "corners": 1.0,
+        "fautes": 1.0,
+        "cartons": 1.0,
+        "cotes": 1.0,
+        "cotes_cloture": 1.0
+      },
+      {
+        "saison": "2024-25",
+        "matchs": 306,
+        "mi_temps": 1.0,
+        "tirs": 1.0,
+        "tirs_cadres": 1.0,
+        "corners": 1.0,
+        "fautes": 1.0,
+        "cartons": 1.0,
+        "cotes": 1.0,
+        "cotes_cloture": 1.0
+      },
+      {
+        "saison": "2025-26",
+        "matchs": 306,
+        "mi_temps": 1.0,
+        "tirs": 1.0,
+        "tirs_cadres": 1.0,
+        "corners": 1.0,
+        "fautes": 1.0,
+        "cartons": 1.0,
+        "cotes": 1.0,
+        "cotes_cloture": 1.0
+      },
+      {
+        "saison": "2026-27",
+        "matchs": 99,
+        "mi_temps": 1.0,
+        "tirs": 1.0,
+        "tirs_cadres": 1.0,
+        "corners": 1.0,
+        "fautes": 1.0,
+        "cartons": 1.0,
+        "cotes": 1.0,
+        "cotes_cloture": 1.0
+      }
+    ]
+  }
+}

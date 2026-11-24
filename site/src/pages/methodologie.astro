@@ -1,0 +1,133 @@
+---
+import Base from "../layouts/Base.astro";
+import { competitions, contexte, fmt, LIBELLES_MODELES } from "../lib/donnees.js";
+
+const meta = competitions()[0];
+const ctx = contexte(meta.competition.slug);
+const bt = ctx.lire("backtest.json");
+const pe = bt.parametres.elo;
+const pd = bt.parametres.dixon_coles;
+const io = bt.indice_occasions;
+const q = meta.qualite;
+const dispo = q.disponibilite ?? [];
+const premiereStats = dispo.find((d) => d.tirs > 0.9)?.saison;
+const premiereCotes = dispo.find((d) => d.cotes > 0.9)?.saison;
+const premiereCloture = dispo.find((d) => d.cotes_cloture > 0.9)?.saison;
+const nbControles = q.controles.length;
+const alertes = q.controles.filter((c) => !c.ok);
+---
+<Base
+  titre="Méthodologie : données, modèles et validation"
+  description="Comment sont calculées nos statistiques, nos probabilités de match et nos simulations : sources de données ouvertes, modèles Elo et Dixon-Coles, backtests et contrôles qualité."
+  slug={ctx.slug}
+  actif="methodologie"
+>
+  <h1>Méthodologie</h1>
+  <p class="discret">Tout est calculé automatiquement, chaque jour, à partir de données ouvertes. Cette page décrit chaque étape et ses limites.</p>
+
+  <h2>1. Les données</h2>
+  <ul>
+    <li><b>Résultats, statistiques de match et cotes</b> : <a href="https://www.football-data.co.uk/">football-data.co.uk</a>, un fichier par saison depuis 1993-94. Tirs, corners et cartons disponibles depuis {premiereStats ?? "—"}, cotes depuis {premiereCotes ?? "—"}, cotes de clôture depuis {premiereCloture ?? "—"}.</li>
+    <li><b>Calendrier de la saison en cours</b> : <a href="https://github.com/openfootball/football.json">openfootball</a> (domaine public), qui sert aussi de contrôle croisé des scores.</li>
+    <li>Aucune donnée individuelle de joueur : il n'existe pas de source ouverte pour la saison en cours. Le site est centré sur les équipes et les matchs.</li>
+    <li>Pas de xG : aucun xG ouvert n'existe pour la saison en cours. Notre <b>indice d'occasions</b> (voir plus bas) n'en est pas un.</li>
+  </ul>
+
+  <h2>2. Contrôles qualité</h2>
+  <p>
+    Avant toute publication, {nbControles} contrôles sont exécutés : unicité des matchs, nombre d'équipes conforme au
+    format de la saison, aller-retour sans doublon, dates dans la saison, scores cohérents (mi-temps ≤ score final),
+    tirs cadrés ≤ tirs, cotes plausibles, accord des scores avec openfootball, et non-régression (un match déjà joué ne
+    peut pas disparaître). Si un contrôle bloquant échoue, rien n'est publié : la dernière version valide reste en ligne.
+  </p>
+  <p class="discret">État de la dernière mise à jour : {q.valide ? "tous les contrôles bloquants sont passés" : "échec"}{alertes.length > 0 && `, ${alertes.length} alerte(s) non bloquante(s)`}.</p>
+  {alertes.length > 0 && <ul class="discret">{alertes.map((a) => <li>{a.code} : {a.detail}</li>)}</ul>}
+
+  <h2>3. Classements</h2>
+  <p>
+    Les classements sont recalculés à partir des résultats, avec les règles de chaque saison : 2 points par victoire en
+    1993-94 puis 3 points, départage par différence de buts générale, puis confrontations directes (seulement si les
+    deux matchs ont été joués), buts marqués, victoires, victoires à l'extérieur. La saison 2019-20, arrêtée en mars
+    2020, est classée au quotient de points par match. Les sanctions administratives ne sont appliquées que si elles
+    sont renseignées dans notre configuration.
+  </p>
+
+  <h2>4. Note Elo</h2>
+  <p>
+    Chaque équipe a une note, mise à jour après chaque match : K = {pe.k}, avantage du terrain = {pe.avantage_domicile} points
+    Elo, multiplicateur selon l'écart de buts (×1,5 pour deux buts d'écart, davantage au-delà). Entre deux saisons, les
+    notes reviennent de {fmt.pct(pe.regression)} vers la moyenne ; une équipe promue reçoit la note moyenne des équipes
+    reléguées. L'écart de notes est converti en probabilités 1/N/2 par un modèle logit ordonné ajusté sur les saisons
+    précédentes.
+  </p>
+
+  <h2>5. Modèle de buts Dixon-Coles</h2>
+  <p>
+    Chaque équipe a une force d'attaque et une force de défense ; les buts de chaque équipe suivent une loi de Poisson
+    dont la moyenne dépend de ces forces et de l'avantage du terrain. La correction de Dixon et Coles (1997) ajuste la
+    fréquence des petits scores (0-0, 1-0, 0-1, 1-1). Les matchs comptent d'autant moins qu'ils sont anciens (poids
+    divisé par deux en {fmt.ent(Math.log(2) / pd.xi)} jours environ, fenêtre de {Math.round(pd.fenetre_jours / 365)} ans).
+    Une légère régularisation évite les valeurs extrêmes ; les promus sont tirés vers le niveau moyen des équipes
+    reléguées tant qu'ils ont peu joué. Ce modèle donne les scores les plus probables et sert aux simulations.
+  </p>
+  <p>
+    Le modèle affiché sur le site est <b>{LIBELLES_MODELES[bt.modele_principal]}</b>
+    {bt.modele_principal === "ensemble" && " (moyenne des probabilités des deux modèles)"} : c'est celui qui obtient le
+    meilleur RPS en backtest parmi les modèles validés. Ce choix est refait automatiquement à chaque mise à jour.
+  </p>
+
+  <h2>6. Validation (backtest walk-forward)</h2>
+  <p>
+    Un modèle n'est affiché que s'il bat nettement une référence naïve (les fréquences domicile/nul/extérieur des cinq
+    saisons précédentes). Le backtest couvre {bt.periode[0]} à {bt.periode[1]} : pour chaque semaine, les modèles sont
+    réajustés avec les seuls matchs déjà joués, puis prédisent la semaine. Règle de validation : l'intervalle de
+    confiance à 95 % (bootstrap) de l'écart de RPS avec la référence naïve doit être entièrement négatif. Nous publions
+    aussi la comparaison avec les probabilités implicites des bookmakers, qui restent meilleures que nos modèles.
+    <a href={`/${ctx.slug}/predictions/`}>Voir tous les résultats</a>.
+  </p>
+
+  <h2>7. Simulations de fin de saison</h2>
+  <p>
+    La fin de saison est simulée {"10 000"} fois : chaque match restant est tiré au sort selon les buts attendus du modèle
+    Dixon-Coles, puis le classement est établi (points, différence de buts, buts marqués, victoires, victoires à
+    l'extérieur ; les confrontations directes ne sont pas appliquées dans la simulation). Une incertitude sur la force
+    des équipes a été testée ; la variante retenue (σ = {bt.simulation?.sigma_retenu}) est celle qui donne les meilleures
+    probabilités sur {bt.simulation?.saisons.length} saisons passées, simulées depuis la mi-saison. Les places européennes
+    suivent le format officiel de la saison ; elles peuvent changer selon les coupes (vainqueur de la Coupe de France).
+  </p>
+
+  {io && (
+    <>
+      <h2>8. Indice d'occasions</h2>
+      <p>
+        Faute de xG ouvert, nous estimons les buts « mérités » à partir du seul nombre de tirs : chaque tir cadré vaut
+        {" "}{fmt.num(io.coef_cadre, 3)} but et chaque tir non cadré {fmt.num(io.coef_non_cadre, 3)} but (régression de Poisson
+        sur {io.saisons[0]} à {io.saisons[1]}). Ce n'est pas un xG : on ne connaît ni la position ni la nature des tirs.
+      </p>
+      {io.validation && (
+        <p>
+          Est-ce utile ? Pour prédire la différence de buts d'une équipe en seconde moitié de saison
+          ({io.validation.equipes_saisons} équipes-saisons), les buts de la première moitié expliquent
+          {" "}{fmt.pct(io.validation.cible_buts.buts)} de la variance, l'indice seul {fmt.pct(io.validation.cible_buts.io)},
+          et les deux ensemble {fmt.pct(io.validation.cible_buts.buts_plus_io)}. L'indice apporte donc une information en
+          plus des buts, sans les remplacer : c'est pourquoi il sert à repérer les équipes qui sur- ou sous-performent.
+        </p>
+      )}
+    </>
+  )}
+
+  <h2>9. Journal public des prédictions</h2>
+  <p>
+    Chaque jour, les probabilités des matchs à venir sont horodatées et ajoutées à un journal en ajout seul, versionné
+    avec Git : une prédiction publiée ne peut plus être modifiée. Les matchs joués avant l'ouverture du journal sont
+    affichés avec une « rétro-prédiction », calculée sans connaître le résultat et signalée comme telle.
+  </p>
+
+  <h2>10. Limites</h2>
+  <ul>
+    <li>Pas d'information sur les blessures, les compositions ou les transferts : les bookmakers en disposent, nous non.</li>
+    <li>Les statistiques de tirs ne disent rien de la qualité des occasions au-delà du cadrage.</li>
+    <li>Les données sources peuvent contenir des erreurs ; nos contrôles en détectent une partie seulement.</li>
+    <li>Ce site ne donne aucun conseil de pari.</li>
+  </ul>
+</Base>

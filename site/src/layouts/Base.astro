@@ -1,0 +1,115 @@
+---
+import "../styles/global.css";
+import { competitions } from "../lib/donnees.js";
+
+const { titre, description, slug, jsonld, actif } = Astro.props;
+const comps = competitions();
+const comp = slug ? comps.find((c) => c.competition.slug === slug) : comps[0];
+const s = comp?.competition.slug;
+const nomSite = "Ligue 1 en données";
+const titreComplet = titre ? `${titre} — ${nomSite}` : `${nomSite} : stats, prédictions et simulations`;
+const canonique = new URL(Astro.url.pathname, Astro.site).href;
+const liens = s
+  ? [
+      ["accueil", "/", "Accueil"],
+      ["classement", `/${s}/`, "Classement & simulations"],
+      ["matchs", `/${s}/matchs/`, "Matchs"],
+      ["equipes", `/${s}/equipes/`, "Équipes"],
+      ["historique", `/${s}/historique/`, "Historique"],
+      ["comparateur", `/${s}/comparateur/`, "Comparateur"],
+      ["cotes", `/${s}/cotes/`, "Cotes"],
+      ["predictions", `/${s}/predictions/`, "Nos prédictions"],
+      ["methodologie", "/methodologie/", "Méthodologie"],
+    ]
+  : [];
+const maj = comp?.mis_a_jour;
+---
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{titreComplet}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonique} />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="fr_FR" />
+    <meta property="og:title" content={titreComplet} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonique} />
+    <meta name="twitter:card" content="summary" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='14' fill='%232a78d6'/><path d='M9 21l5-6 4 3 5-8' stroke='white' stroke-width='2.5' fill='none' stroke-linecap='round'/></svg>" />
+    <link rel="sitemap" href="/sitemap.xml" />
+    {jsonld && <script type="application/ld+json" set:html={JSON.stringify(jsonld)} />}
+    <script is:inline>
+      try {
+        const t = localStorage.getItem("theme");
+        if (t) document.documentElement.dataset.theme = t;
+      } catch (e) {}
+    </script>
+  </head>
+  <body>
+    <header class="entete">
+      <div class="conteneur ligne">
+        <a class="logo" href="/">{comp?.competition.nom ?? "Football"} <span>en données</span></a>
+        <button class="theme" type="button" id="bouton-theme" aria-label="Changer de thème">◐</button>
+      </div>
+      <nav class="conteneur nav" aria-label="Navigation principale">
+        {liens.map(([id, href, lib]) => <a href={href} aria-current={actif === id ? "page" : undefined}>{lib}</a>)}
+      </nav>
+    </header>
+    <main class="conteneur">
+      <slot />
+    </main>
+    <footer class="pied">
+      <div class="conteneur">
+        <p>
+          Site indépendant, gratuit, construit uniquement à partir de données ouvertes. Aucune affiliation avec la LFP
+          ou les clubs.
+        </p>
+        {comp && (
+          <p>
+            Sources :{" "}
+            {comp.sources.map((src, i) => (
+              <>
+                {i > 0 && " · "}
+                <a href={src.url} rel="noopener">{src.nom}</a>
+              </>
+            ))}
+            . Calculs, modèles et simulations : ce site. {maj && <>Mise à jour : {new Date(maj).toLocaleString("fr-FR", { dateStyle: "long", timeStyle: "short", timeZone: "Europe/Paris" })}.</>}
+          </p>
+        )}
+        <p><a href="/methodologie/">Méthodologie</a>{s && <> · <a href={`/${s}/predictions/`}>Précision de nos prédictions</a></>}</p>
+      </div>
+    </footer>
+    <script is:inline>
+      // Bascule de thème (mémorisée dans le navigateur si possible)
+      document.getElementById("bouton-theme")?.addEventListener("click", () => {
+        const r = document.documentElement;
+        const sombre = r.dataset.theme ? r.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+        r.dataset.theme = sombre ? "light" : "dark";
+        try { localStorage.setItem("theme", r.dataset.theme); } catch (e) {}
+      });
+      // Infobulles : tout élément portant data-tip
+      const tip = document.createElement("div");
+      tip.className = "tip";
+      tip.hidden = true;
+      document.body.append(tip);
+      const placer = (e) => {
+        const x = Math.min(e.clientX + 12, innerWidth - tip.offsetWidth - 8);
+        const y = e.clientY + 14 + tip.offsetHeight > innerHeight ? e.clientY - tip.offsetHeight - 10 : e.clientY + 14;
+        tip.style.left = x + "px";
+        tip.style.top = y + "px";
+      };
+      document.addEventListener("pointerover", (e) => {
+        const t = e.target.closest?.("[data-tip]");
+        if (!t) { tip.hidden = true; return; }
+        tip.textContent = t.getAttribute("data-tip");
+        tip.hidden = false;
+        placer(e);
+      });
+      document.addEventListener("pointermove", (e) => { if (!tip.hidden) placer(e); });
+      document.addEventListener("scroll", () => (tip.hidden = true), { passive: true });
+    </script>
+  </body>
+</html>

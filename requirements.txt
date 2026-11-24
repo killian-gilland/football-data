@@ -1,0 +1,7 @@
+# Versions bornees : le code est teste avec pandas 2.x / numpy 2.x / scipy 1.x
+pandas>=2.2,<3
+numpy>=1.26,<2.5
+scipy>=1.11,<2
+pyyaml>=6.0,<7
+requests>=2.28,<3
+pytest>=7,<9

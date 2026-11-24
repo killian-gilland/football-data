@@ -1,0 +1,257 @@
+---
+import Base from "../../../layouts/Base.astro";
+import Forme from "../../../components/Forme.astro";
+import GraphLignes from "../../../components/GraphLignes.astro";
+import { competitions, contexte, fmt, lire, LIBELLES_ZONES } from "../../../lib/donnees.js";
+
+export function getStaticPaths() {
+  return competitions().flatMap((meta) =>
+    Object.keys(meta.equipes)
+      .filter((id) => lire(meta.competition.id, `equipes/${id}.json`))
+      .map((id) => ({ params: { competition: meta.competition.slug, equipe: id } })),
+  );
+}
+const ctx = contexte(Astro.params.competition);
+const { meta } = ctx;
+const eq = ctx.lire(`equipes/${Astro.params.equipe}.json`);
+const sc = eq.saison_courante;
+const st = sc?.stats;
+const c = ctx.court(eq.id);
+const pm = (x, j) => (j ? x / j : null);
+const evo = eq.evolution;
+const saisons = ctx.lire("historique.json").saisons.map((s) => s.saison);
+const rangParSaison = Object.fromEntries(evo.map((x) => [x.saison, x]));
+const maxEquipes = Math.max(...evo.map((x) => x.equipes), 20);
+const zones = meta.zones;
+const series = sc?.series;
+const libSeries = { victoires: "victoires de suite", invincibilite: "matchs sans défaite", sans_victoire: "matchs sans victoire", defaites: "défaites de suite" };
+const description = sc
+  ? `${eq.nom} en ${meta.competition.nom} ${meta.saison} : ${sc.rang}e avec ${st?.general.pts ?? 0} points. Statistiques, forme, calendrier restant, chances de qualification et historique depuis 1993.`
+  : `${eq.nom} en ${meta.competition.nom} : ${evo.length} saisons depuis 1993-94, classements, statistiques et confrontations.`;
+---
+<Base titre={`${eq.nom} : stats, forme et prédictions`} description={description} slug={ctx.slug} actif="equipes"
+  jsonld={{ "@context": "https://schema.org", "@type": "SportsTeam", name: eq.nom, sport: "Football" }}>
+  <p class="sur-titre">{meta.competition.nom}</p>
+  <h1>{eq.nom}</h1>
+
+  {sc ? (
+    <>
+      <div class="grille" style="margin-bottom:8px">
+        <div class="carte">
+          <div class="sur-titre">Classement {meta.saison}</div>
+          <div class="chiffre">{sc.rang}<sup style="font-size:0.9rem">e</sup></div>
+          <div class="discret">{st?.general.pts ?? 0} pts en {st?.general.j ?? 0} matchs{sc.zone && ` · ${LIBELLES_ZONES[sc.zone]}`}</div>
+        </div>
+        <div class="carte">
+          <div class="sur-titre">Note Elo</div>
+          <div class="chiffre">{fmt.ent(sc.elo)}</div>
+          <div class="discret">{sc.elo_rang}e note du championnat</div>
+        </div>
+        <div class="carte">
+          <div class="sur-titre">Forme (5 derniers)</div>
+          <div style="margin:6px 0"><Forme resultats={sc.forme.derniers.map((x) => x.resultat)} /></div>
+          <div class="discret">{sc.forme.points_5_derniers} pts sur 15</div>
+        </div>
+        {sc.simulation && (
+          <div class="carte">
+            <div class="sur-titre">Projection fin de saison</div>
+            <div class="chiffre">{fmt.num(sc.simulation.points_attendus, 0)} pts</div>
+            <div class="discret">entre {fmt.num(sc.simulation.points_p10, 0)} et {fmt.num(sc.simulation.points_p90, 0)} (80 % des simulations) · rang moyen {fmt.num(sc.simulation.rang_moyen, 1)}</div>
+          </div>
+        )}
+      </div>
+
+      {sc.simulation && (
+        <section>
+          <h2>Chances en fin de saison</h2>
+          <div class="tableau"><table>
+            <thead><tr><th class="g">Titre</th>{zones.map((z) => <th>{LIBELLES_ZONES[z.code] ?? z.nom}</th>)}</tr></thead>
+            <tbody><tr><td class="g"><b>{fmt.pct(sc.simulation.titre)}</b></td>{zones.map((z) => <td>{fmt.pct(sc.simulation.zones[z.code] ?? 0)}</td>)}</tr></tbody>
+          </table></div>
+          <GraphLignes titre={`Probabilité de chaque place finale pour ${c}`} hauteur={160}
+            etiquettesX={sc.simulation.positions.map((_, i) => `${i + 1}e`)} yMin={0}
+            yMax={Math.max(...sc.simulation.positions, 0.1)} formatY={(v) => fmt.pct(v)}
+            series={[{ nom: c, couleur: "var(--serie-1)", sansEtiquette: true,
+              points: sc.simulation.positions.map((p, i) => ({ i, y: p, tip: `${i + 1}e : ${fmt.pct(p, 1)}` })) }]} />
+        </section>
+      )}
+
+      {st && (
+        <section>
+          <h2>Statistiques {meta.saison}</h2>
+          <div class="grille">
+            <div class="carte">
+              <h3 style="margin-top:0">Attaque et défense</h3>
+              <p>Buts marqués : <b>{st.general.bp}</b> ({fmt.num(pm(st.general.bp, st.general.j), 2)} par match)<br />
+                 Buts encaissés : <b>{st.general.bc}</b> ({fmt.num(pm(st.general.bc, st.general.j), 2)} par match)<br />
+                 Matchs sans encaisser : <b>{st.clean_sheets}</b> · sans marquer : <b>{st.sans_marquer}</b></p>
+              {sc.io && <p class="discret">Indice d'occasions : {fmt.num(sc.io.pour_par_match, 2)} créé · {fmt.num(sc.io.contre_par_match, 2)} concédé par match</p>}
+            </div>
+            <div class="carte">
+              <h3 style="margin-top:0">Domicile / extérieur</h3>
+              <div class="tableau"><table>
+                <thead><tr><th class="g"></th><th>J</th><th>G</th><th>N</th><th>P</th><th>BP</th><th>BC</th><th>Pts</th></tr></thead>
+                <tbody>
+                  {[["Domicile", st.domicile], ["Extérieur", st.exterieur]].map(([l, b]) => (
+                    <tr><td class="g">{l}</td><td>{b.j}</td><td>{b.g}</td><td>{b.n}</td><td>{b.p}</td><td>{b.bp}</td><td>{b.bc}</td><td><b>{b.pts}</b></td></tr>
+                  ))}
+                </tbody>
+              </table></div>
+            </div>
+            {st.mi_temps && (
+              <div class="carte">
+                <h3 style="margin-top:0">Par mi-temps</h3>
+                <p>1re période : {st.mi_temps.bp_1} marqués, {st.mi_temps.bc_1} encaissés<br />
+                   2de période : {st.mi_temps.bp_2} marqués, {st.mi_temps.bc_2} encaissés</p>
+                <p class="discret">Mené à la pause {st.mi_temps.mene_a_la_pause} fois : <b>{st.mi_temps.points_gagnes_apres_avoir_ete_mene}</b> pts repris.<br />
+                   En tête à la pause {st.mi_temps.menant_a_la_pause} fois : <b>{st.mi_temps.points_perdus_en_menant}</b> pts perdus.</p>
+              </div>
+            )}
+            {st.tirs && (
+              <div class="carte">
+                <h3 style="margin-top:0">Tirs</h3>
+                <p>{fmt.num(st.tirs.tirs_par_match)} tirs par match dont {fmt.num(st.tirs.cadres_par_match)} cadrés<br />
+                   Concédés : {fmt.num(st.tirs.tirs_concedes_par_match)} tirs, {fmt.num(st.tirs.cadres_concedes_par_match)} cadrés</p>
+                <p class="discret">Précision {fmt.pct(st.tirs.precision)} · buts par tir cadré {fmt.pct(st.tirs.conversion)} · part des tirs du match {fmt.pct(st.tirs.part_des_tirs)}</p>
+              </div>
+            )}
+            {(st.corners || st.discipline) && (
+              <div class="carte">
+                <h3 style="margin-top:0">Corners et discipline</h3>
+                {st.corners && <p>Corners : {fmt.num(st.corners.pour_par_match)} obtenus, {fmt.num(st.corners.contre_par_match)} concédés par match</p>}
+                {st.discipline && <p class="discret">Fautes : {fmt.num(st.discipline.fautes_par_match)} par match · {fmt.ent(st.discipline.jaunes)} jaunes · {fmt.ent(st.discipline.rouges)} rouges</p>}
+              </div>
+            )}
+            {series && (
+              <div class="carte">
+                <h3 style="margin-top:0">Séries</h3>
+                <ul style="margin:0;padding-left:18px">
+                  {Object.entries(libSeries).filter(([k]) => series.en_cours[k] >= 2).map(([k, l]) => <li>En cours : <b>{series.en_cours[k]}</b> {l}</li>)}
+                  {Object.entries(libSeries).filter(([k]) => series.record[k] >= 2).map(([k, l]) => <li class="discret">Record de la saison : {series.record[k]} {l}</li>)}
+                </ul>
+              </div>
+            )}
+          </div>
+        </section>
+      )}
+
+      {sc.attendu && (
+        <section>
+          <h2>Points réels et points attendus</h2>
+          <div class="tableau"><table>
+            <thead><tr><th class="g">Référence</th><th>Points attendus</th><th>Écart</th></tr></thead>
+            <tbody>
+              <tr><td class="g">Points réels</td><td><b>{sc.attendu.points}</b></td><td></td></tr>
+              {sc.attendu.points_io != null && <tr><td class="g">D'après la qualité des occasions</td><td>{fmt.num(sc.attendu.points_io)}</td><td class={sc.attendu.ecart_io >= 0 ? "positif" : "negatif"}>{fmt.signe(sc.attendu.ecart_io)}</td></tr>}
+              {sc.attendu.points_marche != null && <tr><td class="g">D'après les bookmakers</td><td>{fmt.num(sc.attendu.points_marche)}</td><td class={sc.attendu.ecart_marche >= 0 ? "positif" : "negatif"}>{fmt.signe(sc.attendu.ecart_marche)}</td></tr>}
+              <tr><td class="g">D'après notre modèle (avant chaque match)</td><td>{fmt.num(sc.attendu.points_modele)}</td><td class={sc.attendu.ecart_modele >= 0 ? "positif" : "negatif"}>{fmt.signe(sc.attendu.ecart_modele)}</td></tr>
+            </tbody>
+          </table></div>
+        </section>
+      )}
+
+      {sc.calendrier_restant.matchs.length > 0 && (
+        <section>
+          <h2>Calendrier restant</h2>
+          <p class="discret">
+            Difficulté : {sc.calendrier_restant.rang}e calendrier le plus difficile sur {meta.equipes_saison.length} (Elo moyen des
+            adversaires, ajusté domicile/extérieur : {fmt.ent(sc.calendrier_restant.indice)}). Points attendus sur ces matchs :
+            <b> {fmt.num(sc.calendrier_restant.points_attendus, 1)}</b>.
+          </p>
+          <div class="tableau"><table>
+            <thead><tr><th class="g">J</th><th class="g">Date</th><th class="g">Adversaire</th><th class="g">Lieu</th><th>Elo adv.</th><th>Victoire</th><th>Nul</th><th>Défaite</th></tr></thead>
+            <tbody>
+              {sc.calendrier_restant.matchs.map((x) => {
+                const dom = x.lieu === "domicile";
+                return (
+                  <tr>
+                    <td class="g">{x.journee}</td><td class="g">{fmt.date(x.date)}</td>
+                    <td class="g"><a href={ctx.lienMatch(x.match_id)}>{ctx.court(x.adversaire)}</a></td>
+                    <td class="g">{dom ? "Dom." : "Ext."}</td><td>{fmt.ent(x.elo_adversaire_ajuste)}</td>
+                    <td>{x.p ? fmt.pct(dom ? x.p[0] : x.p[2]) : "—"}</td><td>{x.p ? fmt.pct(x.p[1]) : "—"}</td><td>{x.p ? fmt.pct(dom ? x.p[2] : x.p[0]) : "—"}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table></div>
+        </section>
+      )}
+
+      {sc.elo_historique.length > 1 && (
+        <section>
+          <h2>Évolution de la note Elo cette saison</h2>
+          <GraphLignes titre={`Note Elo de ${c}`} hauteur={200} formatY={(v) => fmt.ent(v)}
+            etiquettesX={sc.elo_historique.map((x) => fmt.date(x.date).replace(/ \d{4}$/, ""))}
+            series={[{ nom: c, couleur: "var(--serie-1)", sansEtiquette: true,
+              points: sc.elo_historique.map((x, i) => ({ i, y: x.elo, tip: `${fmt.date(x.date)} : ${fmt.ent(x.elo)}` })) }]} />
+        </section>
+      )}
+
+      <section>
+        <h2>Matchs de la saison</h2>
+        <div class="tableau"><table>
+          <tbody>
+            {sc.matchs.map((id) => {
+              const m = ctx.parId[id];
+              const dom = m.dom === eq.id;
+              const res = m.score ? (m.score[0] === m.score[1] ? "N" : (m.score[0] > m.score[1]) === dom ? "V" : "D") : null;
+              return (
+                <tr>
+                  <td class="g">{m.journee && `J${m.journee}`}</td><td class="g">{fmt.date(m.date)}</td>
+                  <td class="g">{dom ? "Dom." : "Ext."}</td>
+                  <td class="g"><a href={ctx.lienMatch(id)}>{ctx.court(m.dom)} {m.score ? `${m.score[0]}-${m.score[1]}` : "–"} {ctx.court(m.ext)}</a></td>
+                  <td>{res ? <Forme resultats={[res]} /> : m.prediction && <span class="tres-discret">{fmt.pct(dom ? m.prediction.p[0] : m.prediction.p[2])} de victoire</span>}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table></div>
+      </section>
+    </>
+  ) : (
+    <p class="discret">{eq.nom} ne dispute pas la saison {meta.saison} de {meta.competition.nom}. Voici son parcours depuis 1993-94.</p>
+  )}
+
+  <h2>Historique en {meta.competition.nom}</h2>
+  <p class="discret">
+    {evo.length} saison{evo.length > 1 && "s"} depuis 1993-94{eq.titres.length > 0 && <> · <b>{eq.titres.length} titre{eq.titres.length > 1 && "s"}</b> ({eq.titres.join(", ")})</>}.
+    Records de séries (matchs de championnat consécutifs) : {eq.series_toutes_saisons.victoires} victoires, {eq.series_toutes_saisons.invincibilite} matchs sans défaite.
+  </p>
+  <GraphLignes titre={`Classement final de ${c} par saison`} hauteur={220} inverse yMin={1} yMax={maxEquipes}
+    ticksY={[1, 5, 10, 15, maxEquipes]} formatY={(v) => `${v}e`}
+    etiquettesX={saisons.map((s) => s.slice(2))}
+    series={[{ nom: c, couleur: "var(--serie-1)", sansEtiquette: true,
+      points: saisons.map((s, i) => rangParSaison[s] ? { i, y: rangParSaison[s].rang, tip: `${s} : ${rangParSaison[s].rang}e sur ${rangParSaison[s].equipes} (${rangParSaison[s].pts} pts)` } : { i, y: null }) }]} />
+  <p class="tres-discret">Les saisons sans point : l'équipe ne jouait pas dans ce championnat.</p>
+
+  <details>
+    <summary>Statistiques saison par saison</summary>
+    <div class="tableau" style="margin-top:8px"><table>
+      <thead><tr><th class="g">Saison</th><th>Rang</th><th>J</th><th>Pts</th><th>BP</th><th>BC</th><th>Dom. pts</th><th>Ext. pts</th><th>Tirs/m</th><th>Précision</th><th>Jaunes</th></tr></thead>
+      <tbody>
+        {eq.stats_par_saison.slice().reverse().map((x) => (
+          <tr>
+            <td class="g">{x.saison}</td><td>{x.rang}</td><td>{x.general.j}</td><td><b>{x.general.pts}</b></td><td>{x.general.bp}</td><td>{x.general.bc}</td>
+            <td>{x.domicile.pts}</td><td>{x.exterieur.pts}</td>
+            <td>{x.tirs ? fmt.num(x.tirs.tirs_par_match) : "—"}</td><td>{x.tirs ? fmt.pct(x.tirs.precision) : "—"}</td>
+            <td>{x.discipline?.jaunes != null ? fmt.ent(x.discipline.jaunes) : "—"}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table></div>
+  </details>
+
+  <h3>Bilan face à chaque adversaire</h3>
+  <div class="tableau"><table>
+    <thead><tr><th class="g">Adversaire</th><th>J</th><th>V</th><th>N</th><th>D</th><th>BP</th><th>BC</th><th class="g cache-mobile">Derniers</th></tr></thead>
+    <tbody>
+      {eq.confrontations.slice(0, 40).map((x) => (
+        <tr>
+          <td class="g"><a href={ctx.lienEquipe(x.adversaire)}>{ctx.court(x.adversaire)}</a></td>
+          <td>{x.j}</td><td>{x.v}</td><td>{x.n}</td><td>{x.d}</td><td>{x.bp}</td><td>{x.bc}</td>
+          <td class="g cache-mobile"><Forme resultats={x.derniers.slice().reverse().map((d) => d.resultat)} /></td>
+        </tr>
+      ))}
+    </tbody>
+  </table></div>
+</Base>

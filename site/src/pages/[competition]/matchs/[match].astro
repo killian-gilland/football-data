@@ -1,0 +1,114 @@
+---
+import Base from "../../../layouts/Base.astro";
+import ProbaBarre from "../../../components/ProbaBarre.astro";
+import { competitions, contexte, fmt, LIBELLES_MODELES } from "../../../lib/donnees.js";
+
+export function getStaticPaths() {
+  return competitions().flatMap((meta) => {
+    const ctx = contexte(meta.competition.slug);
+    return ctx.matchs.map((m) => ({ params: { competition: ctx.slug, match: m.id } }));
+  });
+}
+const ctx = contexte(Astro.params.competition);
+const { meta } = ctx;
+const m = ctx.parId[Astro.params.match];
+const D = ctx.nom(m.dom), E = ctx.nom(m.ext);
+const d = ctx.court(m.dom), e = ctx.court(m.ext);
+const pred = m.prediction;
+const joue = m.statut === "joue";
+const issue = joue ? (m.score[0] > m.score[1] ? 0 : m.score[0] === m.score[1] ? 1 : 2) : null;
+const statsLib = { tirs: "Tirs", cadres: "Tirs cadrés", io: "Indice d'occasions", corners: "Corners", fautes: "Fautes", jaunes: "Cartons jaunes", rouges: "Cartons rouges" };
+const typePred = { direct: "Prédiction publiée avant le match", retro: "Prédiction du modèle avant le match (recalculée sans connaître le résultat)", prevision: "Prévision actuelle" };
+const h = m.confrontations;
+const titre = joue ? `${D} ${m.score[0]}-${m.score[1]} ${E}` : `${D} – ${E} : pronostic et probabilités`;
+const jsonld = {
+  "@context": "https://schema.org",
+  "@type": "SportsEvent",
+  name: `${D} – ${E}`,
+  startDate: m.heure ? `${m.date}T${m.heure}` : m.date,
+  sport: "Football",
+  homeTeam: { "@type": "SportsTeam", name: D },
+  awayTeam: { "@type": "SportsTeam", name: E },
+  eventStatus: "https://schema.org/EventScheduled",
+};
+---
+<Base
+  titre={`${titre} (${meta.competition.nom}, ${m.journee ? `J${m.journee}` : meta.saison})`}
+  description={joue
+    ? `${D} ${m.score[0]}-${m.score[1]} ${E} : statistiques du match, prédiction d'avant-match et historique des confrontations.`
+    : `${D} – ${E} le ${fmt.dateLongue(m.date)} : probabilités de victoire, scores les plus probables et historique des confrontations.`}
+  slug={ctx.slug}
+  actif="matchs"
+  jsonld={jsonld}
+>
+  <p class="sur-titre">{meta.competition.nom} · {m.journee ? `${m.journee}e journée` : meta.saison} · {fmt.majuscule(fmt.dateLongue(m.date))}{m.heure && ` · ${m.heure}`}</p>
+  <div class="carte" style="margin:8px 0 16px">
+    <div class="match" style="font-size:1.15rem">
+      <a class="dom" href={ctx.lienEquipe(m.dom)}><h1 style="font-size:1.15rem;margin:0;display:inline">{d}</h1></a>
+      <span class="score" style="font-size:1.4rem">{joue ? `${m.score[0]} - ${m.score[1]}` : "vs"}</span>
+      <a class="ext" href={ctx.lienEquipe(m.ext)} style="font-weight:700">{e}</a>
+    </div>
+    {m.mi_temps && <p class="tres-discret" style="text-align:center;margin:6px 0 0">Mi-temps : {m.mi_temps[0]} - {m.mi_temps[1]}</p>}
+  </div>
+
+  <div class="grille-2">
+    {pred && (
+      <section class="carte">
+        <h2 style="margin-top:0">{joue ? "Notre prédiction" : "Nos probabilités"}</h2>
+        <p class="tres-discret">{typePred[pred.type]}{pred.horodatage && ` le ${new Date(pred.horodatage).toLocaleString("fr-FR", { timeZone: "Europe/Paris" })}`} · modèle : {LIBELLES_MODELES[pred.modele] ?? pred.modele}</p>
+        <ProbaBarre p={pred.p} dom={d} ext={e} />
+        {joue && <p class="discret" style="margin-top:8px">Résultat : {["victoire de " + d, "match nul", "victoire de " + e][issue]}, auquel nous donnions {fmt.pct(pred.p[issue])}.</p>}
+        {pred.scores?.length > 0 && (
+          <>
+            <h3>Scores les plus probables</h3>
+            <div class="tableau"><table>
+              <tbody>{pred.scores.map((s) => <tr><td class="g">{d} {s.score} {e}</td><td>{fmt.pct(s.proba, 1)}</td></tr>)}</tbody>
+            </table></div>
+          </>
+        )}
+        {pred.lambda && <p class="tres-discret" style="margin-top:8px">Buts attendus : {d} {fmt.num(pred.lambda[0], 2)} · {e} {fmt.num(pred.lambda[1], 2)}</p>}
+        {pred.p_elo && (
+          <details style="margin-top:8px">
+            <summary>Détail par modèle</summary>
+            <p class="discret">Elo seul : {pred.p_elo.map((x) => fmt.pct(x)).join(" / ")} · Dixon-Coles seul : {pred.p_dixon_coles.map((x) => fmt.pct(x)).join(" / ")}</p>
+          </details>
+        )}
+      </section>
+    )}
+    {m.marche && (
+      <section class="carte">
+        <h2 style="margin-top:0">Ce qu'en pensent les bookmakers</h2>
+        <p class="tres-discret">Probabilités implicites des cotes moyennes d'avant-match, marge retirée.</p>
+        <ProbaBarre p={m.marche.p} dom={d} ext={e} />
+        <p class="tres-discret">Cotes moyennes : {m.marche.cotes.map((c) => fmt.num(c, 2)).join(" · ")}</p>
+        {pred && <p class="discret">Écart avec notre modèle sur la victoire de {d} : {fmt.signe((pred.p[0] - m.marche.p[0]) * 100, 0)} points de %.</p>}
+      </section>
+    )}
+    {m.stats && (
+      <section class="carte">
+        <h2 style="margin-top:0">Statistiques du match</h2>
+        <div class="tableau"><table>
+          <thead><tr><th>{d}</th><th class="g" style="text-align:center"></th><th class="g">{e}</th></tr></thead>
+          <tbody>
+            {Object.entries(statsLib).filter(([k]) => m.stats[k]).map(([k, lib]) => (
+              <tr><td><b>{fmt.num(m.stats[k][0], k === "io" ? 2 : 0)}</b></td><td class="g" style="text-align:center;color:var(--texte-2)">{lib}</td><td class="g"><b>{fmt.num(m.stats[k][1], k === "io" ? 2 : 0)}</b></td></tr>
+            ))}
+          </tbody>
+        </table></div>
+        <p class="tres-discret" style="margin-top:6px">L'indice d'occasions n'est pas un xG : il ne repose que sur le nombre de tirs cadrés et non cadrés.</p>
+      </section>
+    )}
+    <section class="carte">
+      <h2 style="margin-top:0">Confrontations en championnat</h2>
+      {h.j === 0 ? <p class="discret">Aucune confrontation entre ces deux équipes dans nos données (depuis 1993-94).</p> : (
+        <>
+          <p>Avant cette saison : <b>{h.v_dom}</b> victoire{h.v_dom > 1 && "s"} de {d}, <b>{h.n}</b> nul{h.n > 1 && "s"}, <b>{h.v_ext}</b> victoire{h.v_ext > 1 && "s"} de {e} ({h.j} matchs depuis 1993-94).</p>
+          <ul style="padding-left:18px;margin:0">
+            {h.derniers.map((x) => <li>{x.saison} : {ctx.court(x.dom)} {x.score} {ctx.court(x.ext)}</li>)}
+          </ul>
+        </>
+      )}
+    </section>
+  </div>
+  <p style="margin-top:20px"><a href={`/${ctx.slug}/matchs/`}>← Tous les matchs</a></p>
+</Base>

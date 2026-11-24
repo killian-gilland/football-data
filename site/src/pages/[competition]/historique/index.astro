@@ -1,0 +1,100 @@
+---
+import Base from "../../../layouts/Base.astro";
+import { chemins, contexte, fmt } from "../../../lib/donnees.js";
+
+export function getStaticPaths() {
+  return chemins();
+}
+const ctx = contexte(Astro.params.competition);
+const { meta } = ctx;
+const h = ctx.lire("historique.json");
+const premiere = h.saisons[0].saison;
+const titres = {};
+for (const p of h.palmares) titres[p.champion] = (titres[p.champion] || 0) + 1;
+const classementTitres = Object.entries(titres).sort((a, b) => b[1] - a[1]);
+const r = h.records;
+const libSeries = { victoires: "Victoires consécutives", invincibilite: "Matchs sans défaite", sans_victoire: "Matchs sans victoire", defaites: "Défaites consécutives" };
+---
+<Base
+  titre={`Historique de la ${meta.competition.nom} depuis ${premiere} : palmarès, classements et records`}
+  description={`${h.saisons.length} saisons de ${meta.competition.nom} : palmarès, classement de chaque saison, classement cumulé, plus gros scores et séries records.`}
+  slug={ctx.slug}
+  actif="historique"
+>
+  <h1>Historique et records</h1>
+  <p class="discret">Toutes les saisons depuis {premiere}, calculées à partir des résultats match par match.</p>
+
+  <h2>Classements de chaque saison</h2>
+  <div class="puces">
+    {h.saisons.slice().reverse().map((s) => <a class="puce" href={`/${ctx.slug}/historique/${s.saison}/`}>{s.saison}</a>)}
+  </div>
+
+  <div class="grille-2">
+    <section>
+      <h2>Palmarès</h2>
+      <div class="tableau"><table>
+        <thead><tr><th class="g">Saison</th><th class="g">Champion</th><th>Pts</th><th class="g">2e</th><th>Écart</th></tr></thead>
+        <tbody>
+          {h.palmares.slice().reverse().map((p) => (
+            <tr><td class="g"><a href={`/${ctx.slug}/historique/${p.saison}/`}>{p.saison}</a></td>
+              <td class="g"><a href={ctx.lienEquipe(p.champion)}>{ctx.court(p.champion)}</a></td><td>{p.pts}</td>
+              <td class="g">{ctx.court(p.deuxieme)}</td><td>{p.ecart}</td></tr>
+          ))}
+        </tbody>
+      </table></div>
+    </section>
+    <section>
+      <h2>Titres depuis {premiere}</h2>
+      <div class="tableau"><table>
+        <tbody>{classementTitres.map(([e, n]) => <tr><td class="g"><a href={ctx.lienEquipe(e)}>{ctx.nom(e)}</a></td><td><b>{n}</b></td></tr>)}</tbody>
+      </table></div>
+      <h2>Séries records</h2>
+      <p class="tres-discret">En matchs de championnat consécutifs, toutes saisons confondues.</p>
+      {Object.entries(libSeries).map(([k, l]) => (
+        <p><b>{l}</b> : {r.series[k].slice(0, 3).map((x) => `${ctx.court(x.equipe)} (${x.longueur})`).join(", ")}</p>
+      ))}
+    </section>
+  </div>
+
+  <h2>Classement cumulé depuis {premiere}</h2>
+  <p class="tres-discret">Barème uniforme de 3 points par victoire pour comparer les époques (1993-94 se jouait à 2 points).</p>
+  <div class="tableau"><table>
+    <thead><tr><th class="g">#</th><th class="g">Équipe</th><th>Saisons</th><th>J</th><th>G</th><th>N</th><th>P</th><th>BP</th><th>BC</th><th>Pts</th><th>Pts/m</th></tr></thead>
+    <tbody>
+      {h.all_time.map((x) => (
+        <tr><td class="g">{x.rang}</td><td class="equipe"><a href={ctx.lienEquipe(x.equipe)}>{ctx.court(x.equipe)}</a></td>
+          <td>{x.saisons}</td><td>{x.j}</td><td>{x.g}</td><td>{x.n}</td><td>{x.p}</td><td>{x.bp}</td><td>{x.bc}</td>
+          <td><b>{fmt.ent(x.pts)}</b></td><td>{fmt.num(x.ppm, 2)}</td></tr>
+      ))}
+    </tbody>
+  </table></div>
+
+  <div class="grille-2">
+    <section>
+      <h2>Plus larges victoires</h2>
+      <div class="tableau"><table><tbody>
+        {r.plus_larges_victoires.map((m) => <tr><td class="g">{m.saison}</td><td class="g">{ctx.court(m.dom)} <b>{m.score}</b> {ctx.court(m.ext)}</td></tr>)}
+      </tbody></table></div>
+    </section>
+    <section>
+      <h2>Matchs les plus prolifiques</h2>
+      <div class="tableau"><table><tbody>
+        {r.matchs_les_plus_prolifiques.map((m) => <tr><td class="g">{m.saison}</td><td class="g">{ctx.court(m.dom)} <b>{m.score}</b> {ctx.court(m.ext)}</td></tr>)}
+      </tbody></table></div>
+    </section>
+  </div>
+
+  <h2>Records sur une saison</h2>
+  <div class="grille">
+    {[["meilleur_ratio_points", "Meilleur ratio de points", (x) => `${fmt.num(x.ppm, 2)} pts/match (${x.pts} pts)`],
+      ["pire_ratio_points", "Pire ratio de points", (x) => `${fmt.num(x.ppm, 2)} pts/match (${x.pts} pts)`],
+      ["meilleure_attaque", "Meilleure attaque", (x) => `${x.bp} buts (${fmt.num(x.bp_pm, 2)}/match)`],
+      ["meilleure_defense", "Meilleure défense", (x) => `${x.bc} buts encaissés (${fmt.num(x.bc_pm, 2)}/match)`]].map(([k, l, f]) => (
+      <div class="carte">
+        <h3 style="margin-top:0">{l}</h3>
+        <ol style="margin:0;padding-left:20px">{r.saison[k].slice(0, 5).map((x) => <li>{ctx.court(x.equipe)} {x.saison} : {f(x)}</li>)}</ol>
+      </div>
+    ))}
+  </div>
+  <p class="tres-discret">Ratios de points calculés avec le barème de chaque saison (2 points par victoire en 1993-94).</p>
+</Base>

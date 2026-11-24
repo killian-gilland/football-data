@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+donnees/rejets/
+donnees/cache/
+site/node_modules/
+site/dist/
+site/.astro/
+site/src/donnees/
+.env
+.venv/

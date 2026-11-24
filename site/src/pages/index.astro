@@ -1,0 +1,86 @@
+---
+import Base from "../layouts/Base.astro";
+import CarteMatch from "../components/CarteMatch.astro";
+import Forme from "../components/Forme.astro";
+import { competitions, contexte, fmt, LIBELLES_ZONES } from "../lib/donnees.js";
+
+const meta = competitions()[0];
+const ctx = contexte(meta.competition.slug);
+const accueil = ctx.lire("accueil.json");
+const classement = ctx.lire("classement.json");
+const simulation = ctx.lire("simulation.json");
+const s = ctx.slug;
+const matchsJournee = accueil.matchs_journee.map((id) => ctx.parId[id]);
+const resultats = accueil.derniers_resultats.map((id) => ctx.parId[id]);
+const top = classement.lignes.slice(0, 6);
+const titre = simulation.equipes.slice().sort((a, b) => b.titre - a.titre).slice(0, 3);
+const releg = simulation.equipes.slice().sort((a, b) => (b.zones.relegation ?? 0) - (a.zones.relegation ?? 0)).slice(0, 3);
+const lienTF = (t) => (t.equipe ? ctx.lienEquipe(t.equipe) : t.match_id ? ctx.lienMatch(t.match_id) : null);
+---
+<Base
+  titre={`${meta.competition.nom} ${meta.saison} : stats, prédictions et simulations`}
+  description={`${meta.competition.nom} ${meta.saison} par les données : classement, probabilités de chaque match, simulation de fin de saison, stats d'équipes et historique depuis 1993.`}
+  slug={s}
+  actif="accueil"
+>
+  <p class="sur-titre">{meta.competition.nom} · saison {meta.saison}</p>
+  <h1>{accueil.journee_courante ? `${accueil.journee_courante}e journée` : "Saison en cours"}</h1>
+
+  <div class="grille-2">
+    <section>
+      <h2 style="margin-top:0.4em">Les matchs à venir et nos probabilités</h2>
+      <div class="liste-matchs">
+        {matchsJournee.map((m) => <CarteMatch m={m} ctx={ctx} />)}
+      </div>
+    </section>
+    <section>
+      <h2 style="margin-top:0.4em">Temps forts</h2>
+      <div class="carte">
+        <ul style="margin:0;padding-left:18px">
+          {accueil.temps_forts.map((t) => {
+            const l = lienTF(t);
+            return <li style="margin-bottom:6px">{l ? <a href={l}>{t.texte}</a> : t.texte}</li>;
+          })}
+        </ul>
+      </div>
+
+      <h2>Classement</h2>
+      <div class="tableau">
+        <table>
+          <thead><tr><th class="g">#</th><th class="g">Équipe</th><th>J</th><th>Diff</th><th>Pts</th><th class="g">Forme</th></tr></thead>
+          <tbody>
+            {top.map((l) => (
+              <tr>
+                <td class="g"><span class={`zone zone-${l.zone}`}></span>{l.rang}</td>
+                <td class="g"><a href={ctx.lienEquipe(l.equipe)}>{ctx.court(l.equipe)}</a></td>
+                <td>{l.j}</td><td>{fmt.signe(l.diff, 0)}</td><td><b>{l.pts}</b></td>
+                <td class="g"><Forme resultats={l.forme} /></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p style="margin-top:8px"><a href={`/${s}/`}>Classement complet et simulations →</a></p>
+
+      <div class="grille" style="margin-top:12px">
+        <div class="carte">
+          <div class="sur-titre">Chances de titre</div>
+          {titre.map((e) => <div><a href={ctx.lienEquipe(e.equipe)}>{ctx.court(e.equipe)}</a> <b style="float:right">{fmt.pct(e.titre)}</b></div>)}
+        </div>
+        <div class="carte">
+          <div class="sur-titre">Risque de relégation directe</div>
+          {releg.map((e) => <div><a href={ctx.lienEquipe(e.equipe)}>{ctx.court(e.equipe)}</a> <b style="float:right">{fmt.pct(e.zones.relegation)}</b></div>)}
+        </div>
+      </div>
+    </section>
+  </div>
+
+  {resultats.length > 0 && (
+    <section>
+      <h2>Derniers résultats ({accueil.derniere_journee}e journée)</h2>
+      <div class="grille">
+        {resultats.map((m) => <CarteMatch m={m} ctx={ctx} />)}
+      </div>
+    </section>
+  )}
+</Base>

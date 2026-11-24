@@ -1,0 +1,35 @@
+# Règles de la Ligue 1 par saison.
+# « defaut » s'applique à toutes les saisons ; une entrée de « saisons » le surcharge.
+# Chaque règle non triviale cite sa source (vérifiée le 24/11/2026).
+
+defaut:
+  points: {victoire: 3, nul: 1, defaite: 0}
+  # Critères de départage, dans l'ordre (règlement LFP cité par Wikipédia, saison 2026-27).
+  # Les confrontations directes ne s'appliquent que si les deux matchs ont été joués.
+  departage: [diff, confrontations_points, confrontations_diff, buts_pour, victoires, victoires_exterieur]
+  classement_par: points   # ou points_par_match
+  zones: []
+  penalites: {}            # {id_equipe: points retirés}
+
+saisons:
+  "1993-94":
+    # « Victoire à 2 points » — fr.wikipedia.org/wiki/Championnat_de_France_de_football_1993-1994
+    points: {victoire: 2, nul: 1, defaite: 0}
+
+  "2019-20":
+    # Saison arrêtée (COVID) : 279 matchs sur 380, classement à l'indice points/match.
+    # fr.wikipedia.org/wiki/Championnat_de_France_de_football_2019-2020
+    classement_par: points_par_match
+    note: "Saison arrêtée en mars 2020 (COVID-19) : classement final au quotient points par match."
+
+  "2026-27":
+    equipes: 18
+    # fr.wikipedia.org/wiki/Championnat_de_France_de_football_2026-2027
+    zones:
+      - {code: c1, nom: "Ligue des champions", positions: [1, 2, 3]}
+      - {code: c1q, nom: "Ligue des champions (qualifications)", positions: [4]}
+      - {code: c3, nom: "Ligue Europa", positions: [5]}
+      - {code: c4, nom: "Ligue Conférence (barrages)", positions: [6]}
+      - {code: barrage, nom: "Barrage de relégation", positions: [16]}
+      - {code: relegation, nom: "Relégation", positions: [17, 18]}
+    note: "La 5e place européenne peut changer selon le vainqueur de la Coupe de France."

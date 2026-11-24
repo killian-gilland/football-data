@@ -1,0 +1,29 @@
+---
+import Base from "../../../layouts/Base.astro";
+import { chemins, contexte } from "../../../lib/donnees.js";
+
+export function getStaticPaths() {
+  return chemins();
+}
+const ctx = contexte(Astro.params.competition);
+const { meta } = ctx;
+const enCours = meta.equipes_saison.slice().sort((a, b) => ctx.court(a).localeCompare(ctx.court(b), "fr"));
+const historique = ctx.lire("historique.json");
+const anciens = historique.all_time.filter((r) => !meta.equipes_saison.includes(r.equipe));
+---
+<Base
+  titre={`Équipes de ${meta.competition.nom} : stats et historique`}
+  description={`Les ${enCours.length} équipes de ${meta.competition.nom} ${meta.saison} et les ${anciens.length} autres clubs passés par le championnat depuis 1993 : statistiques, forme, historique.`}
+  slug={ctx.slug}
+  actif="equipes"
+>
+  <h1>Équipes</h1>
+  <h2 style="margin-top:0.6em">Saison {meta.saison}</h2>
+  <div class="puces">
+    {enCours.map((e) => <a class="puce" href={ctx.lienEquipe(e)}>{ctx.nom(e)}</a>)}
+  </div>
+  <h2>Anciens pensionnaires (depuis 1993-94)</h2>
+  <div class="puces">
+    {anciens.map((r) => <a class="puce" href={ctx.lienEquipe(r.equipe)}>{ctx.nom(r.equipe)} <span class="tres-discret">({r.saisons} saison{r.saisons > 1 && "s"})</span></a>)}
+  </div>
+</Base>

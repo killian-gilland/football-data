@@ -1,0 +1,9 @@
+[project]
+name = "ligue1-data"
+version = "1.0.0"
+description = "Pipeline de données et modèles du site d'analyse de la Ligue 1 (open data)"
+requires-python = ">=3.9"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
