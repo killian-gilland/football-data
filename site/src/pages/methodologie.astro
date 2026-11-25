@@ -101,6 +101,12 @@ const alertes = q.controles.filter((c) => !c.ok);
     probabilités sur {bt.simulation?.saisons.length} saisons passées, simulées depuis la mi-saison. Les places européennes
     suivent le format officiel de la saison ; elles peuvent changer selon les coupes (vainqueur de la Coupe de France).
   </p>
+  <p>
+    <b>Ce qui se joue</b> : pour les matchs des deux prochaines journées, les 10 000 saisons simulées sont regroupées
+    selon le résultat du match (victoire, nul, défaite) ; on compare les chances de chaque équipe dans chacun de ces
+    groupes. <b>Les chances au fil des journées</b> sont recalculées après chaque journée avec le modèle réajusté à
+    cette date et 4 000 simulations, sans utiliser les résultats postérieurs (J0 : pronostic d'avant-saison).
+  </p>
 
   {io && (
     <>

@@ -1,7 +1,7 @@
 ---
 import Base from "../../../layouts/Base.astro";
 import ProbaBarre from "../../../components/ProbaBarre.astro";
-import { competitions, contexte, fmt, LIBELLES_MODELES } from "../../../lib/donnees.js";
+import { competitions, contexte, fmt, LIBELLES_MODELES, LIBELLES_GROUPES_COURTS, principalEnjeu, phraseEnjeu } from "../../../lib/donnees.js";
 
 export function getStaticPaths() {
   return competitions().flatMap((meta) => {
@@ -20,6 +20,11 @@ const issue = joue ? (m.score[0] > m.score[1] ? 0 : m.score[0] === m.score[1] ? 
 const statsLib = { tirs: "Tirs", cadres: "Tirs cadrés", io: "Indice d'occasions", corners: "Corners", fautes: "Fautes", jaunes: "Cartons jaunes", rouges: "Cartons rouges" };
 const typePred = { direct: "Prédiction publiée avant le match", retro: "Prédiction du modèle avant le match (recalculée sans connaître le résultat)", prevision: "Prévision actuelle" };
 const h = m.confrontations;
+const enjeu = !joue ? ctx.enjeux[m.id] : null;
+const lignesEnjeu = enjeu ? ["dom", "ext"].flatMap((cote) => Object.entries(enjeu[cote])
+  .filter(([g, v]) => g !== "points" && v.every((x) => x != null) && Math.max(...v) - Math.min(...v) >= 0.02)
+  .map(([g, v]) => ({ cote, g, v }))) : [];
+const principal = enjeu ? principalEnjeu(enjeu, m) : null;
 const titre = joue ? `${D} ${m.score[0]}-${m.score[1]} ${E}` : `${D} – ${E} : pronostic et probabilités`;
 const jsonld = {
   "@context": "https://schema.org",
@@ -97,6 +102,24 @@ const jsonld = {
           </tbody>
         </table></div>
         <p class="tres-discret" style="margin-top:6px">L'indice d'occasions n'est pas un xG : il ne repose que sur le nombre de tirs cadrés et non cadrés.</p>
+      </section>
+    )}
+    {lignesEnjeu.length > 0 && (
+      <section class="carte">
+        <h2>Ce qui se joue</h2>
+        {principal && <p class="discret">{phraseEnjeu(principal, ctx.court)}</p>}
+        <div class="tableau"><table>
+          <thead><tr><th class="g">Équipe</th><th class="g">Objectif</th><th>Si {d} gagne</th><th>Si nul</th><th>Si {e} gagne</th></tr></thead>
+          <tbody>
+            {lignesEnjeu.map(({ cote, g, v }) => (
+              <tr>
+                <td class="g">{ctx.court(m[cote])}</td><td class="g">{LIBELLES_GROUPES_COURTS[g]}</td>
+                {v.map((x) => <td>{fmt.pct(x)}</td>)}
+              </tr>
+            ))}
+          </tbody>
+        </table></div>
+        <p class="tres-discret">D'après nos 10 000 simulations de la fin de saison, regroupées selon le résultat de ce match.</p>
       </section>
     )}
     <section class="carte">

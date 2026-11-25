@@ -104,6 +104,7 @@
 
 /* ---------- Base ---------- */
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 html { -webkit-text-size-adjust: 100%; }
 body {
   margin: 0;
@@ -296,6 +297,7 @@ details summary { cursor: pointer; color: var(--lien); font-weight: 600; font-si
 
 /* ---------- Îlots interactifs (React) ---------- */
 .outil { display: grid; gap: 14px; }
+.outil > .bascule { justify-self: start; }
 .outil-barre { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; }
 .bascule { display: inline-flex; border: 1px solid var(--trait-fort); border-radius: var(--rayon); overflow: hidden; }
 .bascule button { font: 600 var(--t-s) var(--f-texte); padding: 6px 12px; background: var(--papier); color: var(--encre-2); border: 0; cursor: pointer; }
@@ -344,3 +346,26 @@ details summary { cursor: pointer; color: var(--lien); font-weight: 600; font-si
 tr.en-jeu td.equipe a::after { content: ""; display: inline-block; width: 7px; height: 7px; margin-left: 6px; border-radius: 50%; background: var(--mauvais); vertical-align: 1px; }
 @keyframes pulsation { 50% { opacity: 0.3; } }
 @media (prefers-reduced-motion: reduce) { .puce-direct::before { animation: none; } }
+
+/* ---------- Enjeux, issue probable, tri ---------- */
+.enjeu { display: inline-block; margin-top: 4px; padding: 2px 7px; border-radius: 3px; font: 700 0.68rem/1.2 var(--f-texte); text-transform: uppercase; letter-spacing: 0.05em; color: #0a0e13; background: var(--projecteur); }
+.ligne-enjeu { display: grid; grid-template-columns: minmax(0, 190px) minmax(0, 1fr) 90px; gap: 6px 14px; align-items: center; padding: 10px 14px; border-bottom: 1px solid var(--trait); color: inherit; }
+.ligne-enjeu:last-child { border-bottom: none; }
+.ligne-enjeu:hover { background: color-mix(in srgb, var(--papier-2) 60%, transparent); text-decoration: none; }
+.affiche-courte { font-weight: 700; }
+.jauge-enjeu { height: 6px; background: var(--papier-2); border-radius: 3px; overflow: hidden; }
+.jauge-enjeu span { display: block; height: 100%; background: var(--projecteur); border-radius: 3px; }
+@media (max-width: 640px) { .ligne-enjeu { grid-template-columns: minmax(0, 1fr) 70px; } .ligne-enjeu .discret { grid-column: 1 / -1; grid-row: 2; } }
+.issue { display: flex; gap: 2px; height: 12px; min-width: 140px; }
+.issue .seg { border-radius: 3px; min-width: 3px; }
+.seg-c1 { background: var(--zone-c1); }
+.seg-c3 { background: var(--zone-c3); }
+.seg-milieu { background: var(--nul); }
+.seg-barrage { background: var(--zone-barrage); }
+.seg-relegation { background: var(--zone-relegation); }
+.barre-simple { display: block; height: 8px; background: var(--papier-2); border-radius: 4px; overflow: hidden; min-width: 120px; }
+.barre-simple span { display: block; height: 100%; border-radius: 4px; }
+th.triable { cursor: pointer; user-select: none; }
+th.triable:hover { color: var(--encre); }
+th[aria-sort="descending"]::after { content: " ▼"; }
+th[aria-sort="ascending"]::after { content: " ▲"; }

@@ -36,9 +36,11 @@ export function contexte(slug) {
   const cid = meta.competition.id;
   const matchs = lire(cid, "matchs.json") || [];
   const parId = Object.fromEntries(matchs.map((m) => [m.id, m]));
+  const enjeux = lire(cid, "simulation.json")?.enjeux ?? {};
   return {
     meta,
     cid,
+    enjeux,
     slug,
     matchs,
     parId,
@@ -92,3 +94,37 @@ export const LIBELLES_MODELES = {
   marche: "Bookmakers (avant-match)",
   cloture: "Bookmakers (clôture)",
 };
+
+// ---------- « Ce qui se joue » ----------
+export const LIBELLES_GROUPES = {
+  titre: "chances de titre",
+  c1: "chances de Ligue des champions",
+  europe: "chances de coupe d'Europe",
+  danger: "risque de zone rouge (barrage ou relégation)",
+  relegation: "risque de relégation directe",
+};
+export const LIBELLES_GROUPES_COURTS = {
+  titre: "Titre", c1: "Ligue des champions", europe: "Coupe d'Europe", danger: "Zone rouge", relegation: "Relégation directe",
+};
+
+/** Le plus gros écart en jeu pour un match : quelle équipe, quel objectif, entre victoire et défaite. */
+export function principalEnjeu(e, m) {
+  if (!e) return null;
+  let meilleur = null;
+  for (const cote of ["dom", "ext"]) {
+    for (const [g, vals] of Object.entries(e[cote])) {
+      if (g === "points" || !vals) continue;
+      const [v, n, d] = cote === "dom" ? vals : [vals[2], vals[1], vals[0]];
+      if (v == null || d == null) continue;
+      const ecart = Math.abs(v - d);
+      if (!meilleur || ecart > meilleur.ecart) meilleur = { cote, equipe: m[cote], groupe: g, victoire: v, nul: n, defaite: d, ecart };
+    }
+  }
+  return meilleur;
+}
+
+export function phraseEnjeu(p, court) {
+  if (!p) return "";
+  const lib = LIBELLES_GROUPES[p.groupe];
+  return `${court(p.equipe)} : ${lib} de ${fmt.pct(p.victoire)} en cas de victoire, ${fmt.pct(p.defaite)} en cas de défaite.`;
+}

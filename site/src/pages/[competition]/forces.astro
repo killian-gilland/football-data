@@ -1,0 +1,77 @@
+---
+import Base from "../../layouts/Base.astro";
+import { chemins, contexte, fmt } from "../../lib/donnees.js";
+
+export function getStaticPaths() {
+  return chemins();
+}
+const ctx = contexte(Astro.params.competition);
+const { meta } = ctx;
+const f = ctx.lire("forces.json");
+const eqs = f.equipes;
+const maxPour = Math.max(...eqs.map((e) => e.buts_pour));
+const maxContre = Math.max(...eqs.map((e) => e.buts_contre));
+const leader = eqs[0];
+const progression = eqs.filter((e) => e.elo_avant != null).sort((a, b) => (b.elo - b.elo_avant) - (a.elo - a.elo_avant));
+const plusForte = progression[0], plusFaible = progression.at(-1);
+const attaque = [...eqs].sort((a, b) => b.buts_pour - a.buts_pour)[0];
+const defense = [...eqs].sort((a, b) => a.buts_contre - b.buts_contre)[0];
+---
+<Base
+  titre={`Classement de puissance ${meta.competition.nom} ${meta.saison} : note Elo, attaque et défense`}
+  description={`La force réelle de chaque équipe de ${meta.competition.nom} : note Elo, progression sur la dernière journée, buts attendus marqués et encaissés contre un adversaire moyen.`}
+  slug={ctx.slug}
+  actif="forces"
+>
+  <Fragment slot="tete">
+    <div style="display:grid;gap:6px">
+      <span class="sur-titre">{meta.competition.nom} · {meta.saison}</span>
+      <h1>Classement de puissance</h1>
+      <p>Le classement dit ce qui s'est passé ; la puissance estime ce que vaut chaque équipe aujourd'hui.</p>
+    </div>
+    <div class="affichage">
+      <div><span class="etiquette">Équipe la plus forte</span><a class="valeur" href={ctx.lienEquipe(leader.equipe)}>{ctx.court(leader.equipe)}</a><span class="detail">Elo {fmt.ent(leader.elo)}</span></div>
+      <div><span class="etiquette">Meilleure attaque</span><span class="valeur">{fmt.num(attaque.buts_pour, 2)}</span><span class="detail">{ctx.court(attaque.equipe)}, buts attendus par match</span></div>
+      <div><span class="etiquette">Meilleure défense</span><span class="valeur">{fmt.num(defense.buts_contre, 2)}</span><span class="detail">{ctx.court(defense.equipe)}, buts encaissés attendus</span></div>
+      {plusForte && <div><span class="etiquette">Plus forte hausse</span><span class="valeur">{fmt.signe(plusForte.elo - plusForte.elo_avant, 0)}</span><span class="detail">{ctx.court(plusForte.equipe)} sur la dernière journée</span></div>}
+    </div>
+  </Fragment>
+
+  <section class="section">
+    <div class="tableau">
+      <table data-triable>
+        <thead>
+          <tr>
+            <th class="g">#</th><th class="g">Équipe</th><th data-tip="Note Elo maison">Elo</th>
+            <th data-tip="Variation de la note sur la dernière journée">Dernière journée</th>
+            <th class="g sans-tri" style="min-width:150px">Attaque</th><th data-tip="Buts marqués attendus par match contre un adversaire moyen, terrain neutre">Buts pour</th>
+            <th class="g sans-tri" style="min-width:150px">Défense (plus court = mieux)</th><th data-tip="Buts encaissés attendus par match contre un adversaire moyen, terrain neutre">Buts contre</th>
+          </tr>
+        </thead>
+        <tbody>
+          {eqs.map((e, i) => {
+            const delta = e.elo_avant != null ? e.elo - e.elo_avant : null;
+            return (
+              <tr>
+                <td class="g rang">{i + 1}</td>
+                <td class="equipe"><a href={ctx.lienEquipe(e.equipe)}>{ctx.court(e.equipe)}</a></td>
+                <td class="pts">{fmt.ent(e.elo)}</td>
+                <td class={delta > 0.5 ? "positif" : delta < -0.5 ? "negatif" : ""} data-v={delta ?? ""}>{delta == null ? "—" : Math.abs(delta) < 0.5 ? "=" : fmt.signe(delta, 0)}</td>
+                <td class="g"><span class="barre-simple"><span style={`width:${(e.buts_pour / maxPour * 100).toFixed(1)}%;background:var(--dom)`}></span></span></td>
+                <td>{fmt.num(e.buts_pour, 2)}</td>
+                <td class="g"><span class="barre-simple"><span style={`width:${(e.buts_contre / maxContre * 100).toFixed(1)}%;background:var(--zone-relegation)`}></span></span></td>
+                <td>{fmt.num(e.buts_contre, 2)}</td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+    <p class="tres-discret">
+      Cliquez sur un en-tête de colonne pour trier. « Buts pour / contre » : buts attendus par match face à une équipe
+      moyenne du championnat, sur terrain neutre, d'après notre modèle Dixon-Coles. Recevoir multiplie les buts attendus par
+      {" "}{fmt.num(f.avantage_domicile_buts, 2)} environ (avantage du terrain estimé).
+      {plusFaible && <> Plus forte baisse sur la dernière journée : {ctx.court(plusFaible.equipe)} ({fmt.signe(plusFaible.elo - plusFaible.elo_avant, 0)}).</>}
+    </p>
+  </section>
+</Base>

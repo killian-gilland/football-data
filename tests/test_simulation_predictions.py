@@ -72,3 +72,28 @@ def test_export_propre_et_ecriture_atomique(tmp_path):
     fichiers = sorted(f.name for f in (tmp_path / "c").iterdir())
     assert fichiers == ["b.json"]  # remplacement complet, pas de mélange
     assert json.loads((tmp_path / "c" / "b.json").read_text()) == {"v": 2}
+
+
+def test_enjeux_coherents_avec_le_resultat():
+    eq = ["a", "b", "c", "d"]
+    m = faire_saison(eq, a_venir=4)
+    suivi = m[m["statut"] == "a_venir"]["match_id"].iloc[0]
+    res = simuler(m, _modele(eq, [0.2, 0.0, 0.0, -0.2]), FMT, n_sims=6000, suivis=[suivi])
+    e = res["enjeux"][suivi]
+    titre_dom = e["dom"]["titre"]          # [si victoire dom, si nul, si victoire ext]
+    assert titre_dom[0] >= titre_dom[2]     # gagner ne peut pas faire baisser ses chances de titre
+    assert e["dom"]["points"][0] > e["dom"]["points"][2]
+    assert 0 <= e["importance"] <= 1
+
+
+def test_evolution_des_chances_une_valeur_par_journee(comp_test):
+    from pipeline.simulation import evolution_chances
+    s1 = faire_saison(["a", "b", "c", "d"], saison="2023-24", graine=1)
+    s2 = faire_saison(["a", "b", "c", "d"], saison="2024-25", graine=2, a_venir=4)
+    m = pd.concat([s1, s2], ignore_index=True)
+    evo = evolution_chances(m, comp_test, "2024-25", n_sims=500)
+    assert evo["journees"][0] == 0                     # pronostic d'avant-saison
+    for e in evo["equipes"]:
+        assert len(e["titre"]) == len(evo["journees"])
+    total = [sum(e["titre"][k] for e in evo["equipes"]) for k in range(len(evo["journees"]))]
+    np.testing.assert_allclose(total, 1, atol=1e-9)    # un seul champion par saison simulée

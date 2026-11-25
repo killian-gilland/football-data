@@ -22,6 +22,7 @@ const liens = s
       ["classement", `/${s}/`, "Classement"],
       ["matchs", `/${s}/matchs/`, "Matchs"],
       ["equipes", `/${s}/equipes/`, "Équipes"],
+      ["forces", `/${s}/forces/`, "Puissance"],
       ["historique", `/${s}/historique/`, "Historique"],
       ["comparateur", `/${s}/comparateur/`, "Comparateur"],
       ["cotes", `/${s}/cotes/`, "Cotes"],
@@ -116,6 +117,7 @@ if (urlDirect && comp) {
     {configDirect && <script type="application/json" id="config-direct" set:html={JSON.stringify(configDirect)} />}
     <script>
       import "../scripts/direct.js";
+      import "../scripts/tri.js";
     </script>
     <script is:inline>
       document.getElementById("bouton-theme")?.addEventListener("click", () => {

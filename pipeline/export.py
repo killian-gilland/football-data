@@ -137,7 +137,32 @@ def construire(comp: Competition, matchs: pd.DataFrame, rapport: dict, alertes: 
 
     # ---------- Simulation Monte-Carlo ----------
     bt_sim = sim_mod.backtest_simulation(matchs, comp, [x for x in saisons_test if x != s])
-    simulation = sim_mod.simuler(cur, modele_dc, fmt, n_sims=10000, sigma=bt_sim["sigma_retenu"])
+    # « Ce qui se joue » : suivi des matchs des deux prochaines journées
+    suivis = []
+    if len(a_venir) and a_venir["journee"].notna().any():
+        j0 = a_venir["journee"].min()
+        suivis = list(a_venir.loc[a_venir["journee"] <= j0 + 1, "match_id"])
+    simulation = sim_mod.simuler(cur, modele_dc, fmt, n_sims=10000, sigma=bt_sim["sigma_retenu"], suivis=suivis)
+    chances = sim_mod.evolution_chances(matchs, comp, s, sigma=bt_sim["sigma_retenu"])
+
+    # ---------- Forces : Elo (avec variation sur la dernière journée) + attaque / défense du modèle ----------
+    forces = []
+    if len(joues_cur):
+        derniere_j = joues_cur["journee"].max()
+        debut_dern = joues_cur.loc[joues_cur["journee"] == derniere_j, "date"].min()
+    for e in equipes_cur:
+        elo_avant = None
+        if len(joues_cur):
+            h = hist_elo[(hist_elo["date"] < debut_dern) & ((hist_elo["dom"] == e) | (hist_elo["ext"] == e))]
+            if len(h):
+                r = h.iloc[-1]
+                elo_avant = float(r["elo_dom_apres"] if r["dom"] == e else r["elo_ext_apres"])
+        i = modele_dc.index[e]
+        neutre = modele_dc.mu + modele_dc.gamma / 2
+        forces.append({"equipe": e, "elo": float(notes[e]), "elo_avant": elo_avant,
+                       "buts_pour": float(np.exp(neutre + modele_dc.attaque[i])),
+                       "buts_contre": float(np.exp(neutre + modele_dc.defense[i]))})
+    forces.sort(key=lambda f: -f["elo"])
     sim_par_eq = {e["equipe"]: e for e in simulation["equipes"]}
 
     # ---------- Indice d'occasions ----------
@@ -392,7 +417,8 @@ def construire(comp: Competition, matchs: pd.DataFrame, rapport: dict, alertes: 
     fichiers = {"meta.json": meta, "classement.json": {"saison": s, "lignes": lignes, "attendu": sorted(
         attendu.values(), key=lambda a: -a["points"])}, "simulation.json": simulation, "matchs.json": liste_matchs,
         "accueil.json": accueil, "historique.json": historique, "backtest.json": backtest,
-        "comparateur.json": comparateur, "evolution.json": evolution_par_journee(cur, fmt), "predictions.json": journal_mod.evaluer(journal, matchs),
+        "comparateur.json": comparateur, "evolution.json": evolution_par_journee(cur, fmt),
+        "chances.json": chances, "forces.json": {"equipes": forces, "avantage_domicile_buts": float(np.exp(modele_dc.gamma))}, "predictions.json": journal_mod.evaluer(journal, matchs),
         **fichiers_equipes}
     if cotes is not None:
         fichiers["cotes.json"] = cotes

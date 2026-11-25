@@ -6,7 +6,7 @@ export function GET({ site }) {
   for (const meta of competitions()) {
     const ctx = contexte(meta.competition.slug);
     const s = ctx.slug;
-    urls.push(`/${s}/`, `/${s}/matchs/`, `/${s}/equipes/`, `/${s}/historique/`, `/${s}/comparateur/`, `/${s}/predictions/`);
+    urls.push(`/${s}/`, `/${s}/matchs/`, `/${s}/equipes/`, `/${s}/historique/`, `/${s}/comparateur/`, `/${s}/predictions/`, `/${s}/forces/`);
     if (ctx.lire("cotes.json")) urls.push(`/${s}/cotes/`);
     for (const id of Object.keys(meta.equipes)) if (lire(meta.competition.id, `equipes/${id}.json`)) urls.push(`/${s}/equipes/${id}/`);
     for (const m of ctx.matchs) urls.push(`/${s}/matchs/${m.id}/`);

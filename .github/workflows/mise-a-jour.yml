@@ -8,6 +8,10 @@ on:
     - cron: "0 5 * * *"              # chaque matin (UTC)
     - cron: "15 13-23/2 * * 5,6,0,1"  # jours de match : toutes les 2 h de 13 h 15 à 23 h 15 UTC (résultats du soir)
   workflow_dispatch:
+  # Mise en ligne automatique après une modification du code (pas des données, pour éviter les boucles)
+  push:
+    branches: [main]
+    paths: ["site/**", "pipeline/**", "config/**", "requirements.txt"]
 
 permissions:
   contents: write

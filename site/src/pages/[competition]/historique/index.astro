@@ -62,8 +62,8 @@ const libSeries = { victoires: "Victoires consécutives", invincibilite: "Matchs
   </div>
 
   <h2>Classement cumulé depuis {premiere}</h2>
-  <p class="tres-discret">Barème uniforme de 3 points par victoire pour comparer les époques (1993-94 se jouait à 2 points).</p>
-  <div class="tableau"><table>
+  <p class="tres-discret">Barème uniforme de 3 points par victoire pour comparer les époques (1993-94 se jouait à 2 points). Cliquez sur un en-tête pour trier.</p>
+  <div class="tableau"><table data-triable>
     <thead><tr><th class="g">#</th><th class="g">Équipe</th><th>Saisons</th><th>J</th><th>G</th><th>N</th><th>P</th><th>BP</th><th>BC</th><th>Pts</th><th>Pts/m</th></tr></thead>
     <tbody>
       {h.all_time.map((x) => (

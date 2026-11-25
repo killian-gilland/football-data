@@ -1,12 +1,14 @@
 ---
 // Une ligne de match : heure | domicile | score | extérieur | probabilités.
 import ProbaBarre from "./ProbaBarre.astro";
-import { fmt } from "../lib/donnees.js";
+import { fmt, principalEnjeu, phraseEnjeu } from "../lib/donnees.js";
 const { m, ctx, avecDate = false } = Astro.props;
 const pred = m.prediction;
 const joue = m.statut === "joue";
 const res = joue ? Math.sign(m.score[0] - m.score[1]) : null;
 const cls = (cote) => (res == null || res === 0 ? "" : (res > 0) === (cote === "dom") ? "gagnant" : "perdant");
+const enjeu = m.statut === "a_venir" ? ctx.enjeux?.[m.id] : null;
+const grosEnjeu = enjeu && enjeu.importance >= 0.15 ? principalEnjeu(enjeu, m) : null;
 const quand = avecDate ? `${fmt.date(m.date).replace(/ \d{4}$/, "")}${m.heure ? ` · ${m.heure}` : ""}` : m.heure ?? "";
 ---
 <a class="match" href={ctx.lienMatch(m.id)} data-match={m.id}>
@@ -16,5 +18,6 @@ const quand = avecDate ? `${fmt.date(m.date).replace(/ \d{4}$/, "")}${m.heure ? 
   <span class={`ext ${cls("ext")}`}>{ctx.court(m.ext)}</span>
   <span class="pred">
     {pred && <ProbaBarre p={pred.p} dom={ctx.court(m.dom)} ext={ctx.court(m.ext)} compact />}
+    {grosEnjeu && <span class="enjeu" data-tip={phraseEnjeu(grosEnjeu, ctx.court)}>Gros enjeu</span>}
   </span>
 </a>

@@ -3,7 +3,8 @@ import Base from "../../layouts/Base.astro";
 import Forme from "../../components/Forme.astro";
 import BarresDivergentes from "../../components/BarresDivergentes.astro";
 import EvolutionClassement from "../../components/react/EvolutionClassement.jsx";
-import { chemins, contexte, fmt, LIBELLES_ZONES } from "../../lib/donnees.js";
+import EvolutionChances from "../../components/react/EvolutionChances.jsx";
+import { chemins, contexte, fmt, LIBELLES_ZONES, principalEnjeu, phraseEnjeu } from "../../lib/donnees.js";
 
 export function getStaticPaths() {
   return chemins();
@@ -30,6 +31,29 @@ const evolution = ctx.lire("evolution.json");
 const equipesEvo = (evolution?.equipes ?? []).map((e) => ({ id: e.equipe, court: ctx.court(e.equipe), rangs: e.rangs, points: e.points }));
 const base = classement.lignes.map((l) => ({ equipe: l.equipe, rang: l.rang, pts: l.pts, diff: l.diff, bp: l.bp, g: l.g, j: l.j }));
 const zonesParRang = Object.fromEntries(classement.lignes.map((l) => [l.rang, l.zone ?? ""]));
+const chances = ctx.lire("chances.json");
+const equipesChances = (chances?.equipes ?? []).map((e) => ({ ...e, id: e.equipe, court: ctx.court(e.equipe) }));
+// Enjeux de la prochaine journée, du plus important au moins important
+const jProchaine = meta.journee_courante;
+const enjeuxJournee = ctx.matchs
+  .filter((m) => m.statut === "a_venir" && m.journee === jProchaine && ctx.enjeux[m.id])
+  .map((m) => ({ m, e: ctx.enjeux[m.id], p: principalEnjeu(ctx.enjeux[m.id], m) }))
+  .sort((a, b) => b.e.importance - a.e.importance);
+// Barre « issue probable » : Ligue des champions, autres coupes d'Europe, milieu, barrage, relégation
+const segments = (e) => {
+  const z = e.zones;
+  const c1 = (z.c1 ?? 0) + (z.c1q ?? 0);
+  const coupes = (z.c3 ?? 0) + (z.c4 ?? 0);
+  const barrage = z.barrage ?? 0;
+  const releg = z.relegation ?? 0;
+  return [
+    ["c1", "Ligue des champions", c1],
+    ["c3", "Ligue Europa / Conférence", coupes],
+    ["milieu", "Ni Europe ni zone rouge", Math.max(0, 1 - c1 - coupes - barrage - releg)],
+    ["barrage", "Barrage", barrage],
+    ["relegation", "Relégation", releg],
+  ];
+};
 const parDefaut = [...classement.lignes.slice(0, 4), ...classement.lignes.slice(-2)].map((l) => l.equipe);
 ---
 <Base
@@ -92,6 +116,34 @@ const parDefaut = [...classement.lignes.slice(0, 4), ...classement.lignes.slice(
     </section>
   )}
 
+  {enjeuxJournee.length > 0 && (
+    <section class="section">
+      <header>
+        <h2>Ce qui se joue lors de la {jProchaine}e journée</h2>
+        <p class="discret">Pour chaque match, l'objectif dont les chances bougent le plus selon le résultat (d'après nos simulations).</p>
+      </header>
+      <div class="matchs">
+        {enjeuxJournee.map(({ m, e, p }) => (
+          <a class="ligne-enjeu" href={ctx.lienMatch(m.id)}>
+            <span class="affiche-courte">{ctx.court(m.dom)} – {ctx.court(m.ext)}</span>
+            <span class="discret">{phraseEnjeu(p, ctx.court)}</span>
+            <span class="jauge-enjeu" title="Importance du match"><span style={`width:${Math.min(100, e.importance * 250).toFixed(0)}%`}></span></span>
+          </a>
+        ))}
+      </div>
+    </section>
+  )}
+
+  {chances?.journees.length > 1 && (
+    <section class="section">
+      <header>
+        <h2>Les chances au fil des journées</h2>
+        <p class="discret">Comment les probabilités de titre, d'Europe ou de zone rouge ont évolué depuis le début de la saison.</p>
+      </header>
+      <EvolutionChances client:visible journees={chances.journees} equipes={equipesChances} groupes={chances.groupes} />
+    </section>
+  )}
+
   <div class="grille-2">
     <section class="section">
       <header><h2>Course au titre et à l'Europe</h2><p class="discret">Barre : chances de finir à une place européenne (1re à 6e).</p></header>
@@ -126,10 +178,10 @@ const parDefaut = [...classement.lignes.slice(0, 4), ...classement.lignes.slice(
       </p>
     </header>
     <div class="tableau">
-      <table>
+      <table data-triable>
         <thead>
           <tr>
-            <th class="g">Équipe</th><th>Pts</th><th>Projection</th><th class="cache-mobile">Fourchette</th>
+            <th class="g">Équipe</th><th class="g sans-tri" style="min-width:160px">Issue probable</th><th>Pts</th><th>Projection</th><th class="cache-mobile">Fourchette</th>
             <th>Titre</th>
             {zones.map((z) => <th data-tip={z.nom}>{LIBELLES_ZONES[z.code] ?? z.nom}</th>)}
           </tr>
@@ -138,6 +190,9 @@ const parDefaut = [...classement.lignes.slice(0, 4), ...classement.lignes.slice(
           {parRang.map((e) => (
             <tr>
               <td class="equipe"><a href={ctx.lienEquipe(e.equipe)}>{ctx.court(e.equipe)}</a></td>
+              <td class="g"><span class="issue">{segments(e).map(([z, lib, p]) => p > 0.004 && (
+                <span class={`seg seg-${z}`} style={`flex:${p}`} data-tip={`${ctx.court(e.equipe)} · ${lib} : ${fmt.pct(p)}`}></span>
+              ))}</span></td>
               <td>{e.points_actuels}</td>
               <td class="pts">{fmt.num(e.points_attendus, 0)}</td>
               <td class="cache-mobile discret">{fmt.num(e.points_p10, 0)} – {fmt.num(e.points_p90, 0)}</td>
@@ -149,6 +204,13 @@ const parDefaut = [...classement.lignes.slice(0, 4), ...classement.lignes.slice(
       </table>
     </div>
   </section>
+
+  <div class="legende">
+    {[["c1", "Ligue des champions"], ["c3", "Ligue Europa / Conférence"], ["milieu", "Ni Europe ni zone rouge"], ["barrage", "Barrage"], ["relegation", "Relégation"]].map(([z, l]) => (
+      <span><i class={`pastille seg-${z}`}></i>{l}</span>
+    ))}
+    <span>· Cliquez sur un en-tête pour trier</span>
+  </div>
 
   <section class="section">
     <header><h2>Place finale : la distribution complète</h2><p class="discret">En %. Case vide : moins de 0,5 %.</p></header>

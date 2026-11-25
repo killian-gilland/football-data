@@ -230,6 +230,16 @@ const description = sc
     series={[{ nom: c, couleur: "var(--serie-1)", sansEtiquette: true,
       points: saisons.map((s, i) => rangParSaison[s] ? { i, y: rangParSaison[s].rang, tip: `${s} : ${rangParSaison[s].rang}e sur ${rangParSaison[s].equipes} (${rangParSaison[s].pts} pts)` } : { i, y: null }) }]} />
   <p class="tres-discret">Les saisons sans point : l'équipe ne jouait pas dans ce championnat.</p>
+  {eq.elo_fin_saison.length > 1 && (
+    <>
+      <h3>Note Elo en fin de saison</h3>
+      <GraphLignes titre={`Note Elo de ${c} en fin de saison`} hauteur={200} formatY={(v) => fmt.ent(v)}
+        etiquettesX={saisons.map((s) => s.slice(2))}
+        series={[{ nom: c, couleur: "var(--serie-1)", sansEtiquette: true,
+          points: saisons.map((s, i) => { const x = eq.elo_fin_saison.find((y) => y.saison === s); return x ? { i, y: x.elo, tip: `${s} : ${fmt.ent(x.elo)}` } : { i, y: null }; }) }]} />
+      <p class="tres-discret">1500 correspond environ au niveau moyen. Une saison sans point : l'équipe était en division inférieure (sa note n'évolue pas).</p>
+    </>
+  )}
 
   <details>
     <summary>Statistiques saison par saison</summary>
