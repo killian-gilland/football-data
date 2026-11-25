@@ -53,6 +53,11 @@ Code de sortie 2 = un contrôle bloquant a échoué : rien n'est écrit, la dern
    - variable : `SITE_URL` = `https://ligue1-data.<sous-domaine>.workers.dev`.
 4. Lancer une première fois le workflow « Mise à jour » à la main (*Actions > Mise à jour > Run workflow*).
 
+### Référencement
+
+Le site est masqué des moteurs de recherche par défaut (balise `noindex` et `robots.txt` qui bloque tout).
+Au lancement, ajouter la variable GitHub `INDEXABLE` = `true` puis relancer « Mise à jour ».
+
 ### Quasi-direct (scores pendant les matchs)
 
 5. Créer un compte gratuit sur [football-data.org](https://www.football-data.org/client/register) et récupérer

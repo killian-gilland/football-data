@@ -31,6 +31,8 @@ const liens = s
   : [];
 const maj = comp?.mis_a_jour;
 const aTete = Astro.slots.has("tete");
+// Référencement : masqué tant que la variable PUBLIC_INDEXABLE ne vaut pas "true" (à activer au lancement)
+const indexable = import.meta.env.PUBLIC_INDEXABLE === "true";
 // Quasi-direct : actif seulement si l'adresse du Worker est fournie au build (variable PUBLIC_URL_DIRECT)
 const urlDirect = import.meta.env.PUBLIC_URL_DIRECT;
 let configDirect = null;
@@ -51,6 +53,7 @@ if (urlDirect && comp) {
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>{titreComplet}</title>
     <meta name="description" content={description} />
+    {!indexable && <meta name="robots" content="noindex, nofollow" />}
     <meta name="theme-color" content="#0e1620" />
     <link rel="canonical" href={canonique} />
     <meta property="og:type" content="website" />

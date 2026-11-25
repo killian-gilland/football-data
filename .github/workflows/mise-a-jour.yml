@@ -61,6 +61,7 @@ jobs:
         env:
           SITE_URL: ${{ vars.SITE_URL }}
           PUBLIC_URL_DIRECT: ${{ vars.URL_DIRECT }}
+          PUBLIC_INDEXABLE: ${{ vars.INDEXABLE }}
         run: |
           npm ci
           npm run build
