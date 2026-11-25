@@ -1,51 +1,54 @@
 # Référentiel des clubs français : un identifiant stable par club, quelle que soit la source.
-# « alias » = toutes les graphies rencontrées dans les sources (football-data.co.uk, openfootball).
+# C'EST LE SEUL ENDROIT OÙ LES NOMS AFFICHÉS SONT DÉFINIS (pipeline, site, textes générés) :
+#   nom   = nom complet du club (titres de page, sélecteurs)
+#   court = nom usuel du club, celui de la presse sportive (tableaux, listes, graphiques)
+# « alias » = toutes les graphies rencontrées dans les sources (football-data.co.uk, openfootball, football-data.org).
 # Un nom inconnu bloque le pipeline : il faut l'ajouter ici.
 
 equipes:
-  ac-ajaccio: {nom: AC Ajaccio, court: Ajaccio, alias: [Ajaccio, AC Ajaccio]}
+  ac-ajaccio: {nom: AC Ajaccio, court: AC Ajaccio, alias: [Ajaccio, AC Ajaccio]}
   gfc-ajaccio: {nom: GFC Ajaccio, court: GFC Ajaccio, alias: [Ajaccio GFCO, GFC Ajaccio, Gazélec Ajaccio]}
-  amiens: {nom: Amiens SC, court: Amiens, alias: [Amiens, Amiens SC]}
-  angers: {nom: Angers SCO, court: Angers, alias: [Angers, Angers SCO]}
-  arles-avignon: {nom: AC Arles-Avignon, court: Arles-Avignon, alias: [Arles, AC Arles-Avignon]}
-  auxerre: {nom: AJ Auxerre, court: Auxerre, alias: [Auxerre, AJ Auxerre]}
-  bastia: {nom: SC Bastia, court: Bastia, alias: [Bastia, SC Bastia]}
-  bordeaux: {nom: Girondins de Bordeaux, court: Bordeaux, alias: [Bordeaux, FC Girondins de Bordeaux, Girondins de Bordeaux]}
-  boulogne: {nom: US Boulogne, court: Boulogne, alias: [Boulogne, US Boulogne]}
-  brest: {nom: Stade brestois 29, court: Brest, alias: [Brest, Stade Brestois 29, Stade Brestois]}
-  caen: {nom: SM Caen, court: Caen, alias: [Caen, SM Caen, Stade Malherbe Caen]}
-  cannes: {nom: AS Cannes, court: Cannes, alias: [Cannes, AS Cannes]}
-  chateauroux: {nom: LB Châteauroux, court: Châteauroux, alias: [Chateauroux, LB Châteauroux]}
-  clermont: {nom: Clermont Foot 63, court: Clermont, alias: [Clermont, Clermont Foot, Clermont Foot 63]}
-  dijon: {nom: Dijon FCO, court: Dijon, alias: [Dijon, Dijon FCO]}
+  amiens: {nom: Amiens SC, court: Amiens SC, alias: [Amiens, Amiens SC]}
+  angers: {nom: Angers SCO, court: Angers SCO, alias: [Angers, Angers SCO]}
+  arles-avignon: {nom: AC Arles-Avignon, court: AC Arles-Avignon, alias: [Arles, AC Arles-Avignon]}
+  auxerre: {nom: AJ Auxerre, court: AJ Auxerre, alias: [Auxerre, AJ Auxerre]}
+  bastia: {nom: SC Bastia, court: SC Bastia, alias: [Bastia, SC Bastia]}
+  bordeaux: {nom: Girondins de Bordeaux, court: Girondins de Bordeaux, alias: [Bordeaux, FC Girondins de Bordeaux, Girondins de Bordeaux]}
+  boulogne: {nom: US Boulogne, court: US Boulogne, alias: [Boulogne, US Boulogne]}
+  brest: {nom: Stade brestois 29, court: Stade brestois, alias: [Brest, Stade Brestois 29, Stade Brestois]}
+  caen: {nom: SM Caen, court: SM Caen, alias: [Caen, SM Caen, Stade Malherbe Caen]}
+  cannes: {nom: AS Cannes, court: AS Cannes, alias: [Cannes, AS Cannes]}
+  chateauroux: {nom: LB Châteauroux, court: LB Châteauroux, alias: [Chateauroux, LB Châteauroux]}
+  clermont: {nom: Clermont Foot 63, court: Clermont Foot, alias: [Clermont, Clermont Foot, Clermont Foot 63]}
+  dijon: {nom: Dijon FCO, court: Dijon FCO, alias: [Dijon, Dijon FCO]}
   evian: {nom: Évian Thonon Gaillard, court: Évian TG, alias: [Evian Thonon Gaillard, Évian Thonon Gaillard FC]}
-  grenoble: {nom: Grenoble Foot 38, court: Grenoble, alias: [Grenoble, Grenoble Foot 38]}
-  gueugnon: {nom: FC Gueugnon, court: Gueugnon, alias: [Gueugnon, FC Gueugnon]}
-  guingamp: {nom: EA Guingamp, court: Guingamp, alias: [Guingamp, EA Guingamp]}
-  istres: {nom: FC Istres, court: Istres, alias: [Istres, FC Istres]}
-  le-havre: {nom: Le Havre AC, court: Le Havre, alias: [Le Havre, Le Havre AC]}
-  le-mans: {nom: Le Mans FC, court: Le Mans, alias: [Le Mans, Le Mans FC, Le Mans UC72]}
-  lens: {nom: RC Lens, court: Lens, alias: [Lens, RC Lens, Racing Club de Lens, RCL]}
-  lille: {nom: LOSC Lille, court: Lille, alias: [Lille, Lille OSC, LOSC Lille]}
-  lorient: {nom: FC Lorient, court: Lorient, alias: [Lorient, FC Lorient]}
-  lyon: {nom: Olympique lyonnais, court: Lyon, alias: [Lyon, Olympique Lyonnais, OL]}
-  marseille: {nom: Olympique de Marseille, court: Marseille, alias: [Marseille, Olympique de Marseille, OM]}
-  martigues: {nom: FC Martigues, court: Martigues, alias: [Martigues, FC Martigues]}
-  metz: {nom: FC Metz, court: Metz, alias: [Metz, FC Metz]}
-  monaco: {nom: AS Monaco, court: Monaco, alias: [Monaco, AS Monaco FC, AS Monaco, ASM]}
-  montpellier: {nom: Montpellier HSC, court: Montpellier, alias: [Montpellier, Montpellier HSC]}
-  nancy: {nom: AS Nancy-Lorraine, court: Nancy, alias: [Nancy, AS Nancy-Lorraine, AS Nancy Lorraine]}
-  nantes: {nom: FC Nantes, court: Nantes, alias: [Nantes, FC Nantes]}
-  nice: {nom: OGC Nice, court: Nice, alias: [Nice, OGC Nice]}
-  nimes: {nom: Nîmes Olympique, court: Nîmes, alias: [Nimes, Nîmes Olympique]}
+  grenoble: {nom: Grenoble Foot 38, court: Grenoble Foot, alias: [Grenoble, Grenoble Foot 38]}
+  gueugnon: {nom: FC Gueugnon, court: FC Gueugnon, alias: [Gueugnon, FC Gueugnon]}
+  guingamp: {nom: EA Guingamp, court: EA Guingamp, alias: [Guingamp, EA Guingamp]}
+  istres: {nom: FC Istres, court: FC Istres, alias: [Istres, FC Istres]}
+  le-havre: {nom: Le Havre AC, court: Le Havre AC, alias: [Le Havre, Le Havre AC]}
+  le-mans: {nom: Le Mans FC, court: Le Mans FC, alias: [Le Mans, Le Mans FC, Le Mans UC72]}
+  lens: {nom: RC Lens, court: RC Lens, alias: [Lens, RC Lens, Racing Club de Lens, RCL]}
+  lille: {nom: LOSC Lille, court: LOSC, alias: [Lille, Lille OSC, LOSC Lille]}
+  lorient: {nom: FC Lorient, court: FC Lorient, alias: [Lorient, FC Lorient]}
+  lyon: {nom: Olympique lyonnais, court: OL, alias: [Lyon, Olympique Lyonnais, OL]}
+  marseille: {nom: Olympique de Marseille, court: OM, alias: [Marseille, Olympique de Marseille, OM]}
+  martigues: {nom: FC Martigues, court: FC Martigues, alias: [Martigues, FC Martigues]}
+  metz: {nom: FC Metz, court: FC Metz, alias: [Metz, FC Metz]}
+  monaco: {nom: AS Monaco, court: AS Monaco, alias: [Monaco, AS Monaco FC, AS Monaco, ASM]}
+  montpellier: {nom: Montpellier HSC, court: Montpellier HSC, alias: [Montpellier, Montpellier HSC]}
+  nancy: {nom: AS Nancy-Lorraine, court: AS Nancy, alias: [Nancy, AS Nancy-Lorraine, AS Nancy Lorraine]}
+  nantes: {nom: FC Nantes, court: FC Nantes, alias: [Nantes, FC Nantes]}
+  nice: {nom: OGC Nice, court: OGC Nice, alias: [Nice, OGC Nice]}
+  nimes: {nom: Nîmes Olympique, court: Nîmes Olympique, alias: [Nimes, Nîmes Olympique]}
   paris-fc: {nom: Paris FC, court: Paris FC, alias: [Paris FC]}
-  psg: {nom: Paris Saint-Germain, court: Paris SG, alias: [Paris SG, Paris Saint-Germain FC, Paris Saint-Germain, PSG]}
-  reims: {nom: Stade de Reims, court: Reims, alias: [Reims, Stade de Reims]}
-  rennes: {nom: Stade rennais FC, court: Rennes, alias: [Rennes, Stade Rennais FC 1901, Stade Rennais FC]}
-  sedan: {nom: CS Sedan Ardennes, court: Sedan, alias: [Sedan, CS Sedan Ardennes]}
-  sochaux: {nom: FC Sochaux-Montbéliard, court: Sochaux, alias: [Sochaux, FC Sochaux-Montbéliard]}
-  saint-etienne: {nom: AS Saint-Étienne, court: Saint-Étienne, alias: [St Etienne, AS Saint-Étienne, AS Saint-Etienne]}
-  strasbourg: {nom: RC Strasbourg Alsace, court: Strasbourg, alias: [Strasbourg, RC Strasbourg Alsace, RC Strasbourg, RCS]}
-  toulouse: {nom: Toulouse FC, court: Toulouse, alias: [Toulouse, Toulouse FC]}
-  troyes: {nom: ESTAC Troyes, court: Troyes, alias: [Troyes, ES Troyes AC, ESTAC Troyes, ESTAC]}
-  valenciennes: {nom: Valenciennes FC, court: Valenciennes, alias: [Valenciennes, Valenciennes FC]}
+  psg: {nom: Paris Saint-Germain, court: PSG, alias: [Paris SG, Paris Saint-Germain FC, Paris Saint-Germain, PSG]}
+  reims: {nom: Stade de Reims, court: Stade de Reims, alias: [Reims, Stade de Reims]}
+  rennes: {nom: Stade rennais FC, court: Stade rennais, alias: [Rennes, Stade Rennais FC 1901, Stade Rennais FC]}
+  sedan: {nom: CS Sedan Ardennes, court: CS Sedan, alias: [Sedan, CS Sedan Ardennes]}
+  sochaux: {nom: FC Sochaux-Montbéliard, court: FC Sochaux, alias: [Sochaux, FC Sochaux-Montbéliard]}
+  saint-etienne: {nom: AS Saint-Étienne, court: AS Saint-Étienne, alias: [St Etienne, AS Saint-Étienne, AS Saint-Etienne]}
+  strasbourg: {nom: RC Strasbourg Alsace, court: RC Strasbourg, alias: [Strasbourg, RC Strasbourg Alsace, RC Strasbourg, RCS]}
+  toulouse: {nom: Toulouse FC, court: Toulouse FC, alias: [Toulouse, Toulouse FC]}
+  troyes: {nom: ESTAC Troyes, court: ESTAC Troyes, alias: [Troyes, ES Troyes AC, ESTAC Troyes, ESTAC]}
+  valenciennes: {nom: Valenciennes FC, court: Valenciennes FC, alias: [Valenciennes, Valenciennes FC]}

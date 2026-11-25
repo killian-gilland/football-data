@@ -1,0 +1,32 @@
+---
+// Une statistique replacée dans le championnat sous forme de jauge de classement :
+// barre pleine = 1re du championnat sur ce critère, vide = dernière. Couleur selon le tiers.
+// En dessous : moyenne du championnat et meilleure équipe, en clair.
+const { libelle, equipe, valeurs = [], format = (v) => String(v), inverse = false } = Astro.props;
+const vals = valeurs.filter((d) => d.v != null);
+const moi = vals.find((d) => d.equipe === equipe);
+const tri = [...vals].sort((a, b) => (inverse ? a.v - b.v : b.v - a.v));
+const rang = moi ? tri.findIndex((d) => d.equipe === equipe) + 1 : null;
+const n = vals.length;
+const remplissage = n > 1 && rang ? Math.max(4, ((n - rang) / (n - 1)) * 100) : 50;
+const tiers = Math.ceil(n / 3);
+const ton = rang == null ? "" : rang <= tiers ? "haut" : rang > n - tiers ? "bas" : "milieu";
+const moyenne = vals.reduce((s, d) => s + d.v, 0) / Math.max(n, 1);
+const meilleur = tri[0];
+const devant = n - rang;
+---
+{moi && (
+  <div class="rang-ligue">
+    <div class="rl-tete">
+      <span class="rl-lib">{libelle}</span>
+      <span class="rl-val"><b>{format(moi.v)}</b><span class={`rl-rang ${ton}`}>{rang}<sup>e</sup>/{n}</span></span>
+    </div>
+    <div class={`rl-jauge ${ton}`} role="img" aria-label={`${libelle} : ${rang}e sur ${n} équipes`}
+         data-tip={rang === 1 ? `Meilleure équipe du championnat sur ce critère` : `Mieux que ${devant} équipe${devant > 1 ? "s" : ""} sur ${n - 1}`}>
+      <span style={`width:${remplissage.toFixed(1)}%`}></span>
+    </div>
+    <div class="rl-contexte">
+      Moyenne {format(moyenne)}{meilleur.equipe !== equipe && <> · meilleur : {meilleur.court} {format(meilleur.v)}</>}
+    </div>
+  </div>
+)}

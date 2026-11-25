@@ -2,6 +2,8 @@
 import Base from "../../../layouts/Base.astro";
 import Forme from "../../../components/Forme.astro";
 import GraphLignes from "../../../components/GraphLignes.astro";
+import RangLigue from "../../../components/RangLigue.astro";
+import BarreVND from "../../../components/BarreVND.astro";
 import { competitions, contexte, fmt, lire, LIBELLES_ZONES } from "../../../lib/donnees.js";
 
 export function getStaticPaths() {
@@ -24,6 +26,17 @@ const rangParSaison = Object.fromEntries(evo.map((x) => [x.saison, x]));
 const maxEquipes = Math.max(...evo.map((x) => x.equipes), 20);
 const zones = meta.zones;
 const series = sc?.series;
+// Comparaison avec tout le championnat (statistiques compactes de chaque équipe)
+const ligue = (ctx.lire("comparateur.json") ?? []).map((x) => ({ ...x, court: ctx.court(x.equipe) }));
+const ligueDe = (acces) => ligue.map((x) => ({ equipe: x.equipe, court: x.court, v: acces(x) ?? null }));
+const maxMT = st?.mi_temps ? Math.max(1, st.mi_temps.bp_1, st.mi_temps.bc_1, st.mi_temps.bp_2, st.mi_temps.bc_2) : 1;
+const maxTirs = st?.tirs ? Math.max(st.tirs.tirs_par_match, st.tirs.tirs_concedes_par_match) : 1;
+const resultatsSaison = (sc?.matchs ?? []).map((id) => ctx.parId[id]).filter((m) => m?.statut === "joue").map((m) => {
+  const dom = m.dom === eq.id;
+  const [p, cn] = dom ? m.score : [m.score[1], m.score[0]];
+  const res = p > cn ? "V" : p === cn ? "N" : "D";
+  return { id: m.id, j: m.journee, res, tip: `J${m.journee} · ${ctx.court(m.dom)} ${m.score[0]}-${m.score[1]} ${ctx.court(m.ext)}` };
+});
 const libSeries = { victoires: "victoires de suite", invincibilite: "matchs sans défaite", sans_victoire: "matchs sans victoire", defaites: "défaites de suite" };
 const description = sc
   ? `${eq.nom} en ${meta.competition.nom} ${meta.saison} : ${sc.rang}e avec ${st?.general.pts ?? 0} points. Statistiques, forme, calendrier restant, chances de qualification et historique depuis 1993.`
@@ -84,60 +97,101 @@ const description = sc
 
       {st && (
         <section>
-          <h2>Statistiques {meta.saison}</h2>
-          <div class="grille">
+          <header>
+            <h2>Statistiques {meta.saison}</h2>
+            <p class="discret">Chaque statistique est replacée parmi les {ligue.length} équipes : la barre est pleine si {c} est la meilleure sur ce critère, vide si elle est la dernière (vert : premier tiers, rouge : dernier tiers).</p>
+          </header>
+          <div class="grille-stats">
             <div class="carte">
-              <h3>Attaque et défense</h3>
-              <p>Buts marqués : <b>{st.general.bp}</b> ({fmt.num(pm(st.general.bp, st.general.j), 2)} par match)<br />
-                 Buts encaissés : <b>{st.general.bc}</b> ({fmt.num(pm(st.general.bc, st.general.j), 2)} par match)<br />
-                 Matchs sans encaisser : <b>{st.clean_sheets}</b> · sans marquer : <b>{st.sans_marquer}</b></p>
-              {sc.io && <p class="discret">Indice d'occasions : {fmt.num(sc.io.pour_par_match, 2)} créé · {fmt.num(sc.io.contre_par_match, 2)} concédé par match</p>}
+              <h3>Attaque</h3>
+              <RangLigue libelle="Buts marqués par match" equipe={eq.id} valeurs={ligueDe((x) => x.bp_pm)} format={(v) => fmt.num(v, 2)} />
+              <RangLigue libelle="Occasions créées par match" equipe={eq.id} valeurs={ligueDe((x) => x.io?.pour_par_match)} format={(v) => fmt.num(v, 2)} />
+              <RangLigue libelle="Tirs par match" equipe={eq.id} valeurs={ligueDe((x) => x.tirs?.tirs_par_match)} format={(v) => fmt.num(v, 1)} />
+              <RangLigue libelle="Précision des tirs" equipe={eq.id} valeurs={ligueDe((x) => x.tirs?.precision)} format={(v) => fmt.pct(v)} />
+              <RangLigue libelle="Buts par tir cadré" equipe={eq.id} valeurs={ligueDe((x) => x.tirs?.conversion)} format={(v) => fmt.pct(v)} />
             </div>
             <div class="carte">
-              <h3>Domicile / extérieur</h3>
-              <div class="tableau"><table>
-                <thead><tr><th class="g"></th><th>J</th><th>G</th><th>N</th><th>P</th><th>BP</th><th>BC</th><th>Pts</th></tr></thead>
-                <tbody>
-                  {[["Domicile", st.domicile], ["Extérieur", st.exterieur]].map(([l, b]) => (
-                    <tr><td class="g">{l}</td><td>{b.j}</td><td>{b.g}</td><td>{b.n}</td><td>{b.p}</td><td>{b.bp}</td><td>{b.bc}</td><td><b>{b.pts}</b></td></tr>
-                  ))}
-                </tbody>
-              </table></div>
+              <h3>Défense</h3>
+              <RangLigue libelle="Buts encaissés par match" equipe={eq.id} valeurs={ligueDe((x) => x.bc_pm)} format={(v) => fmt.num(v, 2)} inverse />
+              <RangLigue libelle="Occasions concédées par match" equipe={eq.id} valeurs={ligueDe((x) => x.io?.contre_par_match)} format={(v) => fmt.num(v, 2)} inverse />
+              <RangLigue libelle="Tirs concédés par match" equipe={eq.id} valeurs={ligueDe((x) => x.tirs?.tirs_concedes_par_match)} format={(v) => fmt.num(v, 1)} inverse />
+              <RangLigue libelle="Matchs sans encaisser" equipe={eq.id} valeurs={ligueDe((x) => x.clean_sheets)} format={(v) => fmt.ent(v)} />
+              <RangLigue libelle="Fautes par match" equipe={eq.id} valeurs={ligueDe((x) => x.discipline?.fautes_par_match)} format={(v) => fmt.num(v, 1)} inverse />
+            </div>
+            <div class="carte">
+              <h3>Domicile et extérieur</h3>
+              <BarreVND libelle="À domicile" b={st.domicile} />
+              <BarreVND libelle="À l'extérieur" b={st.exterieur} />
+              <RangLigue libelle="Points à domicile" equipe={eq.id} valeurs={ligueDe((x) => x.dom?.pts)} format={(v) => `${fmt.ent(v)} pt${v > 1 ? "s" : ""}`} />
+              <RangLigue libelle="Points à l'extérieur" equipe={eq.id} valeurs={ligueDe((x) => x.ext?.pts)} format={(v) => `${fmt.ent(v)} pt${v > 1 ? "s" : ""}`} />
             </div>
             {st.mi_temps && (
               <div class="carte">
                 <h3>Par mi-temps</h3>
-                <p>1re période : {st.mi_temps.bp_1} marqués, {st.mi_temps.bc_1} encaissés<br />
-                   2de période : {st.mi_temps.bp_2} marqués, {st.mi_temps.bc_2} encaissés</p>
-                <p class="discret">Mené à la pause {st.mi_temps.mene_a_la_pause} fois : <b>{st.mi_temps.points_gagnes_apres_avoir_ete_mene}</b> pts repris.<br />
-                   En tête à la pause {st.mi_temps.menant_a_la_pause} fois : <b>{st.mi_temps.points_perdus_en_menant}</b> pts perdus.</p>
+                <div class="miroir">
+                  <span class="tres-discret" style="text-align:right">Encaissés</span><span></span><span class="tres-discret">Marqués</span>
+                  {[["1re période", st.mi_temps.bc_1, st.mi_temps.bp_1], ["2de période", st.mi_temps.bc_2, st.mi_temps.bp_2]].map(([lib, contre, pour]) => (
+                    <>
+                      <span class="miroir-g"><b>{contre}</b><span class="barre" style={`width:${(contre / maxMT * 100).toFixed(0)}%`} data-tip={`${lib} : ${contre} buts encaissés`}></span></span>
+                      <span class="miroir-lib">{lib}</span>
+                      <span class="miroir-d"><span class="barre" style={`width:${(pour / maxMT * 100).toFixed(0)}%`} data-tip={`${lib} : ${pour} buts marqués`}></span><b>{pour}</b></span>
+                    </>
+                  ))}
+                </div>
+                <div class="tuiles">
+                  <div><span class="chiffre-moyen">{st.mi_temps.points_gagnes_apres_avoir_ete_mene}</span><span class="tres-discret">pts repris après avoir été mené à la pause ({st.mi_temps.mene_a_la_pause} fois)</span></div>
+                  <div><span class="chiffre-moyen">{st.mi_temps.points_perdus_en_menant}</span><span class="tres-discret">pts perdus en menant à la pause ({st.mi_temps.menant_a_la_pause} fois)</span></div>
+                </div>
               </div>
             )}
             {st.tirs && (
               <div class="carte">
-                <h3>Tirs</h3>
-                <p>{fmt.num(st.tirs.tirs_par_match)} tirs par match dont {fmt.num(st.tirs.cadres_par_match)} cadrés<br />
-                   Concédés : {fmt.num(st.tirs.tirs_concedes_par_match)} tirs, {fmt.num(st.tirs.cadres_concedes_par_match)} cadrés</p>
-                <p class="discret">Précision {fmt.pct(st.tirs.precision)} · buts par tir cadré {fmt.pct(st.tirs.conversion)} · part des tirs du match {fmt.pct(st.tirs.part_des_tirs)}</p>
+                <h3>De la frappe au but</h3>
+                <div class="entonnoirs">
+                  {[["Pour", st.tirs.tirs_par_match, st.tirs.cadres_par_match, st.general.bp / st.general.j, "var(--dom)"],
+                    ["Contre", st.tirs.tirs_concedes_par_match, st.tirs.cadres_concedes_par_match, st.general.bc / st.general.j, "var(--zone-relegation)"]].map(([lib, t, ca, b, coul]) => (
+                    <div class="entonnoir">
+                      <span class="tres-discret">{lib}, par match</span>
+                      {[["Tirs", t], ["Cadrés", ca], ["Buts", b]].map(([l, v]) => (
+                        <div class="etage"><span class="barre" style={`width:${(v / maxTirs * 100).toFixed(1)}%;background:${coul}`}></span><span>{l} <b>{fmt.num(v, 1)}</b></span></div>
+                      ))}
+                    </div>
+                  ))}
+                </div>
+                <p class="tres-discret">{c} réalise {fmt.pct(st.tirs.part_des_tirs)} des tirs de ses matchs.</p>
               </div>
             )}
             {(st.corners || st.discipline) && (
               <div class="carte">
-                <h3>Corners et discipline</h3>
-                {st.corners && <p>Corners : {fmt.num(st.corners.pour_par_match)} obtenus, {fmt.num(st.corners.contre_par_match)} concédés par match</p>}
-                {st.discipline && <p class="discret">Fautes : {fmt.num(st.discipline.fautes_par_match)} par match · {fmt.ent(st.discipline.jaunes)} jaunes · {fmt.ent(st.discipline.rouges)} rouges</p>}
-              </div>
-            )}
-            {series && (
-              <div class="carte">
-                <h3>Séries</h3>
-                <ul style="margin:0;padding-left:18px">
-                  {Object.entries(libSeries).filter(([k]) => series.en_cours[k] >= 2).map(([k, l]) => <li>En cours : <b>{series.en_cours[k]}</b> {l}</li>)}
-                  {Object.entries(libSeries).filter(([k]) => series.record[k] >= 2).map(([k, l]) => <li class="discret">Record de la saison : {series.record[k]} {l}</li>)}
-                </ul>
+                <h3>Corners et cartons</h3>
+                <RangLigue libelle="Corners obtenus par match" equipe={eq.id} valeurs={ligueDe((x) => x.corners?.pour_par_match)} format={(v) => fmt.num(v, 1)} />
+                <RangLigue libelle="Corners concédés par match" equipe={eq.id} valeurs={ligueDe((x) => x.corners?.contre_par_match)} format={(v) => fmt.num(v, 1)} inverse />
+                {st.discipline && (
+                  <div class="cartons">
+                    <span class="carton jaune" aria-hidden="true"></span><span><b>{fmt.ent(st.discipline.jaunes)}</b> jaunes</span>
+                    <span class="carton rouge" aria-hidden="true"></span><span><b>{fmt.ent(st.discipline.rouges)}</b> rouge{st.discipline.rouges > 1 && "s"}</span>
+                  </div>
+                )}
               </div>
             )}
           </div>
+
+          {sc.matchs && (
+            <div class="carte" style="margin-top:14px">
+              <h3>La saison match par match</h3>
+              <div class="frise">
+                {resultatsSaison.map((r) => (
+                  <a class={`frise-match ${r.res}`} href={ctx.lienMatch(r.id)} data-tip={r.tip}><b>{r.res}</b><span>J{r.j}</span></a>
+                ))}
+              </div>
+              {series && (
+                <div class="puces" style="margin-top:4px">
+                  {Object.entries(libSeries).filter(([k]) => series.en_cours[k] >= 2).map(([k, l]) => <span class="puce" aria-current="true">En cours : {series.en_cours[k]} {l}</span>)}
+                  {Object.entries(libSeries).filter(([k]) => series.record[k] >= 2).map(([k, l]) => <span class="puce">Record : {series.record[k]} {l}</span>)}
+                </div>
+              )}
+            </div>
+          )}
         </section>
       )}
 

@@ -230,7 +230,7 @@ tr.separateur td { border-bottom: 2px solid var(--trait-fort); }
 .jour > h3 { font: 600 var(--t-xs)/1 var(--f-texte); text-transform: uppercase; letter-spacing: 0.1em; color: var(--encre-3); padding: 12px 0 8px; }
 .matchs { border: 1px solid var(--trait); border-radius: var(--rayon); background: var(--papier); overflow: hidden; }
 .match {
-  display: grid; grid-template-columns: 52px minmax(0, 190px) auto minmax(0, 190px) minmax(150px, 300px); justify-content: start;
+  display: grid; grid-template-columns: 50px minmax(0, 210px) auto minmax(0, 210px) minmax(130px, 200px); justify-content: start;
   align-items: center; gap: 6px 12px; padding: 10px 14px; border-bottom: 1px solid var(--trait); color: inherit;
 }
 .match:last-child { border-bottom: none; }
@@ -238,6 +238,7 @@ tr.separateur td { border-bottom: 2px solid var(--trait-fort); }
 .match .heure { color: var(--encre-3); font-size: var(--t-s); }
 .match .dom { text-align: right; font-weight: 600; }
 .match .ext { font-weight: 600; }
+.match .dom, .match .ext { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .match .gagnant { font-weight: 700; }
 .match .perdant { font-weight: 500; color: var(--encre-2); }
 .match .pred { min-width: 0; }
@@ -369,3 +370,62 @@ th.triable { cursor: pointer; user-select: none; }
 th.triable:hover { color: var(--encre); }
 th[aria-sort="descending"]::after { content: " ▼"; }
 th[aria-sort="ascending"]::after { content: " ▲"; }
+
+/* ---------- Statistiques d'équipe en graphiques ---------- */
+.grille-stats { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); }
+.grille-stats > * { min-width: 0; }
+.grille-stats .carte { gap: 14px; }
+.rang-ligue, .vnd { display: grid; gap: 6px; }
+.rl-tete { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; font-size: var(--t-s); }
+.rl-lib { color: var(--encre-2); }
+.rl-val { display: inline-flex; align-items: baseline; gap: 8px; white-space: nowrap; }
+.rl-val b { font: 800 1.15rem/1 var(--f-titre); color: var(--encre); letter-spacing: 0.02em; }
+.rl-rang { font-size: var(--t-xs); color: var(--encre-3); }
+.rl-rang.haut { color: var(--bon-texte); }
+.rl-jauge { height: 8px; border-radius: 4px; background: var(--papier-2); overflow: hidden; }
+.rl-jauge span { display: block; height: 100%; border-radius: 4px; background: var(--encre-3); }
+.rl-jauge.haut span { background: var(--bon); }
+.rl-jauge.bas span { background: var(--mauvais); }
+.rl-contexte { font-size: var(--t-xs); color: var(--encre-3); }
+.rl-rang.bas { color: var(--mauvais-texte); }
+.rl-rang sup { font-size: 0.7em; }
+.rl-piste { position: relative; height: 16px; margin: 0 6px; }
+.rl-piste::before { content: ""; position: absolute; left: 0; right: 0; top: 7px; height: 2px; border-radius: 1px; background: linear-gradient(90deg, color-mix(in srgb, var(--zone-relegation) 45%, var(--trait)), var(--trait) 50%, color-mix(in srgb, var(--zone-c3) 45%, var(--trait))); }
+.rl-moy { position: absolute; top: 1px; width: 2px; height: 14px; margin-left: -1px; background: var(--encre-3); border-radius: 1px; }
+.rl-point { position: absolute; top: 4px; width: 8px; height: 8px; margin-left: -4px; border-radius: 50%; background: var(--encre-3); opacity: 0.45; }
+.rl-point:hover { opacity: 1; }
+.rl-point.moi { top: 1px; width: 14px; height: 14px; margin-left: -7px; opacity: 1; background: var(--projecteur); box-shadow: 0 0 0 2px var(--papier); z-index: 1; }
+.vnd-barre { display: flex; gap: 2px; height: 22px; }
+.vnd-barre span { display: grid; place-items: center; border-radius: 3px; font: 700 0.72rem/1 var(--f-texte); color: #fff; min-width: 26px; }
+.vnd-V { background: var(--bon); }
+.vnd-N { background: var(--nul); color: var(--encre) !important; }
+.vnd-D { background: var(--mauvais); }
+.miroir { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 6px 10px; align-items: center; }
+.miroir-g, .miroir-d { display: flex; align-items: center; gap: 6px; }
+.miroir-g { justify-content: flex-end; }
+.miroir-g .barre, .miroir-d .barre { height: 14px; border-radius: 3px; min-width: 2px; }
+.miroir-g .barre { background: var(--zone-relegation); }
+.miroir-d .barre { background: var(--dom); }
+.miroir-lib { font-size: var(--t-xs); color: var(--encre-2); text-align: center; white-space: nowrap; }
+.tuiles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.tuiles > div { display: grid; gap: 2px; padding: 10px; border-radius: var(--rayon); background: var(--papier-2); }
+.chiffre-moyen { font: 800 1.6rem/1 var(--f-titre); }
+.entonnoirs { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.entonnoir { display: grid; gap: 6px; }
+.etage { display: grid; gap: 3px; font-size: var(--t-s); }
+.etage .barre { height: 10px; border-radius: 3px; min-width: 3px; }
+.cartons { display: flex; align-items: center; gap: 8px; font-size: var(--t-s); }
+.carton { width: 14px; height: 19px; border-radius: 2px; transform: rotate(-8deg); }
+.carton.jaune { background: #f5c518; }
+.carton.rouge { background: var(--mauvais); margin-left: 10px; }
+.frise { display: flex; flex-wrap: wrap; gap: 4px; }
+.frise-match { display: grid; place-items: center; width: 40px; height: 44px; border-radius: 4px; color: #fff; text-decoration: none; }
+.frise-match:hover { text-decoration: none; outline: 2px solid var(--projecteur); }
+.frise-match b { font: 800 1.05rem/1 var(--f-titre); }
+.frise-match span { font-size: 0.62rem; opacity: 0.85; }
+.frise-match.V { background: var(--bon); }
+.frise-match.N { background: var(--nul); color: var(--encre); }
+.frise-match.D { background: var(--mauvais); }
+
+/* Accueil : la colonne des matchs un peu plus large que celle du classement */
+@media (min-width: 1000px) { .grille-accueil { grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); } }

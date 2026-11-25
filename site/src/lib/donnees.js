@@ -37,10 +37,19 @@ export function contexte(slug) {
   const matchs = lire(cid, "matchs.json") || [];
   const parId = Object.fromEntries(matchs.map((m) => [m.id, m]));
   const enjeux = lire(cid, "simulation.json")?.enjeux ?? {};
+  // « Gros enjeu » : les 3 matchs les plus décisifs de chaque journée (importance d'au moins 10 points)
+  const grosEnjeux = new Set();
+  const parJournee = {};
+  for (const m of matchs) if (enjeux[m.id]) (parJournee[m.journee] ??= []).push(m.id);
+  for (const ids of Object.values(parJournee)) {
+    ids.sort((a, b) => enjeux[b].importance - enjeux[a].importance);
+    ids.slice(0, 3).filter((id) => enjeux[id].importance >= 0.1).forEach((id) => grosEnjeux.add(id));
+  }
   return {
     meta,
     cid,
     enjeux,
+    grosEnjeux,
     slug,
     matchs,
     parId,
