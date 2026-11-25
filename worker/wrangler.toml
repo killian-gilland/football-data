@@ -7,4 +7,4 @@ compatibility_date = "2026-10-01"
 [vars]
 COMPETITION = "FL1"
 # Origines autorisées à interroger le Worker (séparées par des virgules)
-ORIGINES = "https://ligue1-data.pages.dev,http://localhost:4321"
+ORIGINES = "https://ligue1-data.killian-marseille.workers.dev,http://localhost:4321"

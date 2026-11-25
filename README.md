@@ -45,11 +45,12 @@ Code de sortie 2 = un contrôle bloquant a échoué : rien n'est écrit, la dern
 ## Mise en ligne (une seule fois)
 
 1. Créer un dépôt GitHub (privé recommandé : les fichiers bruts de football-data.co.uk y sont versionnés) et pousser.
-2. Cloudflare : créer un projet Pages en « Direct Upload » (par ex. `ligue1-data`), puis un jeton d'API avec la
-   permission *Cloudflare Pages : Edit*.
+2. Cloudflare : un compte gratuit avec un sous-domaine `workers.dev`, et un jeton d'API (modèle « Edit Cloudflare
+   Workers »). Rien d'autre à créer : le premier déploiement crée le Worker `ligue1-data` (défini dans
+   `site/wrangler.toml`), qui sert le site en fichiers statiques.
 3. Dans le dépôt GitHub, *Settings > Secrets and variables > Actions* :
    - secrets : `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` ;
-   - variables : `CF_PAGES_PROJET` (nom du projet Pages), `SITE_URL` (ex. `https://ligue1-data.pages.dev`).
+   - variable : `SITE_URL` = `https://ligue1-data.<sous-domaine>.workers.dev`.
 4. Lancer une première fois le workflow « Mise à jour » à la main (*Actions > Mise à jour > Run workflow*).
 
 ### Quasi-direct (scores pendant les matchs)

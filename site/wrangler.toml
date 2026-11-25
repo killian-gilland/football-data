@@ -1,0 +1,8 @@
+# Hébergement du site : Worker Cloudflare à fichiers statiques (le dossier dist produit par Astro).
+# Publié par le workflow « Mise à jour » : https://ligue1-data.<sous-domaine>.workers.dev
+name = "ligue1-data"
+compatibility_date = "2026-10-01"
+
+[assets]
+directory = "./dist"
+not_found_handling = "404-page"

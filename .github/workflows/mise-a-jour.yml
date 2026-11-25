@@ -67,12 +67,14 @@ jobs:
           test -f dist/index.html
           test -f dist/sitemap.xml
 
-      - name: Déploiement sur Cloudflare Pages
+      - name: Déploiement sur Cloudflare (Worker à fichiers statiques)
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy site/dist --project-name=${{ vars.CF_PAGES_PROJET }} --branch=main
+          workingDirectory: site
+          wranglerVersion: "4.158.0"
+          command: deploy
 
       - name: Ouvrir une issue en cas d'échec
         if: failure()

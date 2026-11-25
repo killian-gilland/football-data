@@ -5,7 +5,7 @@ import react from "@astrojs/react";
 // À définir dans GitHub Actions (variable SITE_URL) une fois le domaine connu.
 // React n'est chargé que sur les « îlots » interactifs (comparateur, évolution du classement).
 export default defineConfig({
-  site: process.env.SITE_URL || "https://ligue1-data.pages.dev",
+  site: process.env.SITE_URL || "https://ligue1-data.killian-marseille.workers.dev",
   trailingSlash: "ignore",
   build: { format: "directory" },
   integrations: [react()],
