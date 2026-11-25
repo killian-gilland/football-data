@@ -111,6 +111,7 @@ if (urlDirect && comp) {
             {maj && <> Dernière mise à jour : {new Date(maj).toLocaleString("fr-FR", { dateStyle: "long", timeStyle: "short", timeZone: "Europe/Paris" })}.</>}
           </p>
         )}
+        {comp?.logos_actifs && <p>Les logos sont la propriété de leurs clubs respectifs et ne sont utilisés que pour identifier les équipes. Ils sont retirés sur simple demande.</p>}
         <p><a href="/methodologie/">Méthodologie</a>{s && <> · <a href={`/${s}/predictions/`}>Précision de nos prédictions</a></>}</p>
       </div>
     </footer>

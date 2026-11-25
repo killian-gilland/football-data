@@ -1,0 +1,12 @@
+---
+// Nom d'un club, précédé (ou suivi, côté domicile d'une affiche) de son logo quand les logos sont activés.
+// Les noms viennent du référentiel unique (config/equipes/fr.yaml) via ctx.court / ctx.nom.
+const { id, ctx, complet = false, taille = 18, logoApres = false } = Astro.props;
+const logo = ctx.logo(id);
+const nom = complet ? ctx.nom(id) : ctx.court(id);
+---
+<span class="club">
+  {logo && !logoApres && <img class="logo-club" src={logo} alt="" width={taille} height={taille} loading="lazy" decoding="async" />}
+  <span class="club-nom">{nom}</span>
+  {logo && logoApres && <img class="logo-club" src={logo} alt="" width={taille} height={taille} loading="lazy" decoding="async" />}
+</span>

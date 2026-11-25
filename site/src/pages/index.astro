@@ -2,6 +2,7 @@
 import Base from "../layouts/Base.astro";
 import ListeMatchs from "../components/ListeMatchs.astro";
 import Forme from "../components/Forme.astro";
+import Club from "../components/Club.astro";
 import { competitions, contexte, fmt } from "../lib/donnees.js";
 
 const meta = competitions()[0];
@@ -81,7 +82,7 @@ const lienTF = (t) => (t.equipe ? ctx.lienEquipe(t.equipe) : t.match_id ? ctx.li
               {classement.lignes.map((l) => (
                 <tr data-equipe={l.equipe}>
                   <td class="g rang"><span class={`zone zone-${l.zone}`}></span><span class="n">{l.rang}</span></td>
-                  <td class="equipe"><a href={ctx.lienEquipe(l.equipe)}>{ctx.court(l.equipe)}</a></td>
+                  <td class="equipe"><a href={ctx.lienEquipe(l.equipe)}><Club id={l.equipe} ctx={ctx} /></a></td>
                   <td class="j">{l.j}</td><td class="diff">{fmt.signe(l.diff, 0)}</td><td class="pts">{l.pts}</td>
                   <td class="g cache-mobile"><Forme resultats={l.forme} /></td>
                 </tr>

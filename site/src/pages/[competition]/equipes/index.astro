@@ -1,5 +1,6 @@
 ---
 import Base from "../../../layouts/Base.astro";
+import Club from "../../../components/Club.astro";
 import { chemins, contexte } from "../../../lib/donnees.js";
 
 export function getStaticPaths() {
@@ -25,7 +26,7 @@ const anciens = historique.all_time.filter((r) => !meta.equipes_saison.includes(
   </Fragment>
   <h2 style="margin-top:0.6em">Saison {meta.saison}</h2>
   <div class="puces">
-    {enCours.map((e) => <a class="puce" href={ctx.lienEquipe(e)}>{ctx.nom(e)}</a>)}
+    {enCours.map((e) => <a class="puce" href={ctx.lienEquipe(e)}><Club id={e} ctx={ctx} complet /></a>)}
   </div>
   <h2>Anciens pensionnaires (depuis 1993-94)</h2>
   <div class="puces">

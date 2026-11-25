@@ -98,13 +98,13 @@ export default function Comparateur({ equipes }) {
   return (
     <div className="outil">
       <div className="duel">
-        <label className="duel-equipe"><i style={{ background: coulA }} />
+        <label className="duel-equipe"><i style={{ background: coulA }} />{A.logo && <img className="logo-club" src={A.logo} alt="" width={28} height={28} />}
           <select id="comparateur-a" value={a} onChange={(e) => setA(e.target.value)} aria-label="Première équipe">
             {tri.map((e) => <option key={e.equipe} value={e.equipe} disabled={e.equipe === b}>{e.nom}</option>)}
           </select>
         </label>
         <span className="contre">contre</span>
-        <label className="duel-equipe"><i style={{ background: coulB }} />
+        <label className="duel-equipe"><i style={{ background: coulB }} />{B.logo && <img className="logo-club" src={B.logo} alt="" width={28} height={28} />}
           <select id="comparateur-b" value={b} onChange={(e) => setB(e.target.value)} aria-label="Seconde équipe">
             {tri.map((e) => <option key={e.equipe} value={e.equipe} disabled={e.equipe === a}>{e.nom}</option>)}
           </select>

@@ -47,7 +47,7 @@ const description = sc
   <Fragment slot="tete">
     <div style="display:grid;gap:6px">
       <span class="sur-titre">{meta.competition.nom}{sc ? ` · ${meta.saison}` : ` · ${evo.length} saisons depuis 1993-94`}</span>
-      <h1>{eq.nom}</h1>
+      <h1 class="titre-club">{ctx.logo(eq.id) && <img class="logo-club grand" src={ctx.logo(eq.id)} alt="" width="64" height="64" />}{eq.nom}</h1>
       {eq.titres.length > 0 && <p>{eq.titres.length} titre{eq.titres.length > 1 && "s"} de champion depuis 1993-94 ({eq.titres.join(", ")})</p>}
     </div>
     {sc && (

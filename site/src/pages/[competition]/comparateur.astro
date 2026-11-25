@@ -8,7 +8,7 @@ export function getStaticPaths() {
 }
 const ctx = contexte(Astro.params.competition);
 const { meta } = ctx;
-const equipes = ctx.lire("comparateur.json").map((x) => ({ ...x, nom: ctx.court(x.equipe) }));
+const equipes = ctx.lire("comparateur.json").map((x) => ({ ...x, nom: ctx.court(x.equipe), logo: ctx.logo(x.equipe) }));
 ---
 <Base
   titre={`Comparateur d'équipes ${meta.competition.nom} ${meta.saison}`}

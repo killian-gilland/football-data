@@ -83,7 +83,8 @@ def _points_attendus_poisson(l1: np.ndarray, l2: np.ndarray, bareme: dict) -> tu
 
 
 def construire(comp: Competition, matchs: pd.DataFrame, rapport: dict, alertes: list[str],
-               maintenant: datetime | None = None, journal: list[dict] | None = None) -> Sortie:
+               maintenant: datetime | None = None, journal: list[dict] | None = None,
+               logos: dict[str, str] | None = None) -> Sortie:
     maintenant = maintenant or datetime.now(timezone.utc)
     ref = Referentiel(charger_referentiel(comp.referentiel_equipes))
     s = comp.saison_courante
@@ -387,7 +388,7 @@ def construire(comp: Competition, matchs: pd.DataFrame, rapport: dict, alertes: 
         "periode": [saisons_test[0], [x for x in saisons_test if x != s][-1]],
         "global": evaluation["global"], "par_saison": evaluation["par_saison"],
         "validation": evaluation["validation"], "calibration": evaluation["calibration"],
-        "modele_principal": principal, "saison_en_cours": eval_cur["global"] if eval_cur else None,
+        "modele_principal": principal, "logos_actifs": bool(logos), "saison_en_cours": eval_cur["global"] if eval_cur else None,
         "simulation": bt_sim,
         "indice_occasions": {"coef_cadre": modele_io.coef_cadre, "coef_non_cadre": modele_io.coef_non_cadre,
                              "saisons": [saisons_app[0], saisons_app[-1]], "validation": io_validation}
@@ -397,7 +398,8 @@ def construire(comp: Competition, matchs: pd.DataFrame, rapport: dict, alertes: 
     }
 
     # ---------- Méta ----------
-    equipes_meta = {e: {"nom": ref.nom(e), "court": ref.court(e)} for e in toutes}
+    logos = logos or {}
+    equipes_meta = {e: {"nom": ref.nom(e), "court": ref.court(e), "logo": logos.get(e)} for e in toutes}
     meta = {
         "competition": {"id": comp.id, "nom": comp.nom, "slug": comp.slug, "pays": comp.pays},
         "saison": s, "mis_a_jour": maintenant.isoformat(timespec="minutes"),

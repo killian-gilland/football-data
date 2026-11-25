@@ -55,6 +55,7 @@ export function contexte(slug) {
     parId,
     nom: (id) => meta.equipes[id]?.nom ?? id,
     court: (id) => meta.equipes[id]?.court ?? id,
+    logo: (id) => meta.equipes[id]?.logo ?? null,
     lienEquipe: (id) => `/${slug}/equipes/${id}/`,
     lienMatch: (id) => (parId[id] ? `/${slug}/matchs/${id}/` : null),
     lire: (f) => lire(cid, f),

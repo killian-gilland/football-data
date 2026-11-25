@@ -1,6 +1,7 @@
 ---
 import Base from "../../layouts/Base.astro";
 import Forme from "../../components/Forme.astro";
+import Club from "../../components/Club.astro";
 import BarresDivergentes from "../../components/BarresDivergentes.astro";
 import EvolutionClassement from "../../components/react/EvolutionClassement.jsx";
 import EvolutionChances from "../../components/react/EvolutionChances.jsx";
@@ -86,7 +87,7 @@ const parDefaut = [...classement.lignes.slice(0, 4), ...classement.lignes.slice(
           {classement.lignes.map((l) => (
             <tr class={finDeZone.has(l.rang) || l.rang === debutRel - 1 ? "separateur" : ""} data-equipe={l.equipe}>
               <td class="g rang"><span class={`zone zone-${l.zone}`} title={LIBELLES_ZONES[l.zone] ?? ""}></span><span class="n">{l.rang}</span></td>
-              <td class="equipe"><a href={ctx.lienEquipe(l.equipe)}>{ctx.court(l.equipe)}</a></td>
+              <td class="equipe"><a href={ctx.lienEquipe(l.equipe)}><Club id={l.equipe} ctx={ctx} /></a></td>
               <td class="j">{l.j}</td><td>{l.g}</td><td>{l.n}</td><td>{l.p}</td><td class="cache-mobile">{l.bp}</td><td class="cache-mobile">{l.bc}</td>
               <td class="diff">{fmt.signe(l.diff, 0)}</td><td class="pts">{l.pts}{l.penalite > 0 && <span class="negatif" title="Pénalité"> (−{l.penalite})</span>}</td>
               <td class="g"><Forme resultats={l.forme} /></td>
@@ -189,7 +190,7 @@ const parDefaut = [...classement.lignes.slice(0, 4), ...classement.lignes.slice(
         <tbody>
           {parRang.map((e) => (
             <tr>
-              <td class="equipe"><a href={ctx.lienEquipe(e.equipe)}>{ctx.court(e.equipe)}</a></td>
+              <td class="equipe"><a href={ctx.lienEquipe(e.equipe)}><Club id={e.equipe} ctx={ctx} /></a></td>
               <td class="g"><span class="issue">{segments(e).map(([z, lib, p]) => p > 0.004 && (
                 <span class={`seg seg-${z}`} style={`flex:${p}`} data-tip={`${ctx.court(e.equipe)} · ${lib} : ${fmt.pct(p)}`}></span>
               ))}</span></td>
@@ -220,7 +221,7 @@ const parDefaut = [...classement.lignes.slice(0, 4), ...classement.lignes.slice(
         <tbody>
           {parRang.map((e) => (
             <tr>
-              <td class="equipe">{ctx.court(e.equipe)}</td>
+              <td class="equipe"><Club id={e.equipe} ctx={ctx} taille={16} /></td>
               {e.positions.map((p, i) => (
                 <td style={`${fond(p)};text-align:center;padding:7px 4px`} data-tip={`${ctx.court(e.equipe)} ${i + 1}e : ${fmt.pct(p, 1)}`}>{p >= 0.005 ? Math.round(p * 100) : ""}</td>
               ))}

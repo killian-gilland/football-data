@@ -230,7 +230,7 @@ tr.separateur td { border-bottom: 2px solid var(--trait-fort); }
 .jour > h3 { font: 600 var(--t-xs)/1 var(--f-texte); text-transform: uppercase; letter-spacing: 0.1em; color: var(--encre-3); padding: 12px 0 8px; }
 .matchs { border: 1px solid var(--trait); border-radius: var(--rayon); background: var(--papier); overflow: hidden; }
 .match {
-  display: grid; grid-template-columns: 50px minmax(0, 210px) auto minmax(0, 210px) minmax(130px, 200px); justify-content: start;
+  display: grid; grid-template-columns: 44px minmax(0, 240px) auto minmax(0, 240px) minmax(120px, 180px); justify-content: start; column-gap: 10px;
   align-items: center; gap: 6px 12px; padding: 10px 14px; border-bottom: 1px solid var(--trait); color: inherit;
 }
 .match:last-child { border-bottom: none; }
@@ -429,3 +429,15 @@ th[aria-sort="ascending"]::after { content: " ▲"; }
 
 /* Accueil : la colonne des matchs un peu plus large que celle du classement */
 @media (min-width: 1000px) { .grille-accueil { grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); } }
+
+/* ---------- Logos des clubs ---------- */
+.club { display: inline-flex; align-items: center; gap: 7px; min-width: 0; max-width: 100%; vertical-align: middle; }
+.club-nom { overflow: hidden; text-overflow: ellipsis; }
+.logo-club { flex: none; object-fit: contain; }
+.titre-club { display: flex; align-items: center; gap: 16px; }
+.logo-club.grand { width: 64px; height: 64px; }
+.affiche .equipe-nom { display: inline-flex; align-items: center; gap: 14px; }
+.affiche .cote-dom { justify-content: flex-end; }
+.affiche-logo { width: 56px; height: 56px; }
+@media (max-width: 600px) { .affiche-logo { width: 36px; height: 36px; } .logo-club.grand { width: 44px; height: 44px; } }
+.match .dom .club { justify-content: flex-end; }

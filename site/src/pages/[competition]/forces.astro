@@ -1,5 +1,6 @@
 ---
 import Base from "../../layouts/Base.astro";
+import Club from "../../components/Club.astro";
 import { chemins, contexte, fmt } from "../../lib/donnees.js";
 
 export function getStaticPaths() {
@@ -54,7 +55,7 @@ const defense = [...eqs].sort((a, b) => a.buts_contre - b.buts_contre)[0];
             return (
               <tr>
                 <td class="g rang">{i + 1}</td>
-                <td class="equipe"><a href={ctx.lienEquipe(e.equipe)}>{ctx.court(e.equipe)}</a></td>
+                <td class="equipe"><a href={ctx.lienEquipe(e.equipe)}><Club id={e.equipe} ctx={ctx} /></a></td>
                 <td class="pts">{fmt.ent(e.elo)}</td>
                 <td class={delta > 0.5 ? "positif" : delta < -0.5 ? "negatif" : ""} data-v={delta ?? ""}>{delta == null ? "—" : Math.abs(delta) < 0.5 ? "=" : fmt.signe(delta, 0)}</td>
                 <td class="g"><span class="barre-simple"><span style={`width:${(e.buts_pour / maxPour * 100).toFixed(1)}%;background:var(--dom)`}></span></span></td>

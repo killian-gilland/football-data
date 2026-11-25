@@ -66,6 +66,7 @@ class Competition:
     enrichissements: bool
     sources: dict[str, Any]
     formats: dict[str, Any] = field(default_factory=dict)
+    logos: bool = False  # interrupteur des logos de clubs (voir pipeline/logos.py)
 
     @property
     def saisons(self) -> list[str]:

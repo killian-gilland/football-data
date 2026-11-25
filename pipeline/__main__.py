@@ -12,9 +12,10 @@ import sys
 import time
 from datetime import datetime, timezone
 
-from . import export, predictions, stockage
-from .config import DOSSIER_DONNEES, charger_competitions
+from . import export, logos as logos_mod, predictions, stockage
+from .config import DOSSIER_DONNEES, charger_competitions, charger_referentiel
 from .ingestion import ErreurIngestion, ingerer
+from .referentiel import Referentiel
 from .qualite import controle_croise, controle_croise_org, controler, matrice_disponibilite
 from .telechargement import ErreurSource
 
@@ -48,7 +49,11 @@ def executer(cid: str, hors_ligne: bool = False) -> int:
 
     maintenant = datetime.now(timezone.utc)
     journal = predictions.lire(cid)
-    sortie = export.construire(comp, res.matchs, rapport_dict, res.alertes, maintenant, journal)
+    logos, alertes_logos = logos_mod.mettre_a_jour(comp, Referentiel(charger_referentiel(comp.referentiel_equipes)), hors_ligne)
+    for a in alertes_logos:
+        print(f"[alerte] {a}")
+    print(f"Logos : {len(logos)} club(s)" if comp.logos else "Logos : désactivés")
+    sortie = export.construire(comp, res.matchs, rapport_dict, res.alertes, maintenant, journal, logos=logos)
     dossier = export.ecrire(cid, sortie.fichiers)
     ajoutees = predictions.enregistrer(cid, sortie.previsions, maintenant)
     print(f"Export : {len(sortie.fichiers)} fichiers dans {dossier}")

@@ -9,3 +9,4 @@ site/.astro/
 site/src/donnees/
 .env
 .venv/
+site/public/logos/
