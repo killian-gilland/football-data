@@ -242,7 +242,7 @@ const parDefaut = [...classement.lignes.slice(0, 4), ...classement.lignes.slice(
         <div class="carte">
           <h3>Selon la qualité des occasions</h3>
           <p class="tres-discret">Points mérités d'après notre indice d'occasions (tirs cadrés et non cadrés).</p>
-          <BarresDivergentes titre="Écart aux points attendus selon les occasions"
+          <BarresDivergentes gauche="Moins de points que mérité" droite="Plus que mérité" titre="Écart aux points attendus selon les occasions"
             items={attIO.map((a) => ({ label: ctx.court(a.equipe), valeur: a.ecart_io,
               tip: `${ctx.court(a.equipe)} : ${a.points} pts réels, ${fmt.num(a.points_io)} attendus` }))} />
         </div>
@@ -251,7 +251,7 @@ const parDefaut = [...classement.lignes.slice(0, 4), ...classement.lignes.slice(
         <div class="carte">
           <h3>Selon les bookmakers</h3>
           <p class="tres-discret">Points attendus d'après les cotes d'avant-match.</p>
-          <BarresDivergentes titre="Écart aux points attendus selon les cotes"
+          <BarresDivergentes gauche="Moins bien que prévu" droite="Mieux que prévu" titre="Écart aux points attendus selon les cotes"
             items={attMarche.map((a) => ({ label: ctx.court(a.equipe), valeur: a.ecart_marche,
               tip: `${ctx.court(a.equipe)} : ${a.points} pts réels, ${fmt.num(a.points_marche)} attendus` }))} />
         </div>

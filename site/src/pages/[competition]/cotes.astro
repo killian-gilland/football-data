@@ -12,6 +12,8 @@ const { meta } = ctx;
 const c = ctx.lire("cotes.json");
 const issueLib = (x) => (x.issue === "nul" ? "Match nul" : `Victoire de ${ctx.court(x.issue === "dom" ? x.dom : x.ext)}`);
 const favoris = c?.favoris_par_saison ?? [];
+// Exemple concret pour expliquer le calcul : l'équipe la plus au-dessus des attentes
+const ex = c?.equipes?.[0];
 ---
 <Base
   titre={`Lecture des cotes ${meta.competition.nom} ${meta.saison} : surprises et équipes sous-estimées`}
@@ -33,12 +35,33 @@ const favoris = c?.favoris_par_saison ?? [];
         Cette page ne donne aucun conseil de pari.
       </p>
 
-      <h2>Équipes sous-estimées et surestimées cette saison</h2>
-      <p class="discret">Points réels moins points attendus d'après les cotes. Positif : l'équipe fait mieux que ce que le marché prévoyait.</p>
+      <h2>Qui fait mieux, ou moins bien, que prévu par les bookmakers ?</h2>
+      <div class="grille-2" style="margin-top:14px">
+        <div class="colonne" style="gap:10px">
+          <p>
+            Avant chaque match, les cotes donnent les chances de victoire, de nul et de défaite de chaque équipe. On en
+            déduit les points qu'elle « devrait » prendre en moyenne, puis on additionne sur tous ses matchs joués et on
+            compare avec les points qu'elle a vraiment pris.
+          </p>
+          <p class="discret">
+            <b>Bleu, vers la droite</b> : l'équipe a pris plus de points que prévu, les bookmakers la sous-estimaient.<br />
+            <b>Rouge, vers la gauche</b> : elle en a pris moins, ils la surestimaient. Près de zéro : conforme aux attentes.
+          </p>
+        </div>
+        {ex && (
+          <div class="carte" style="gap:6px">
+            <span class="sur-titre">Exemple : {ctx.nom(ex.equipe)}</span>
+            <p>Les bookmakers attendaient <b>{fmt.num(ex.points_attendus_marche)} points</b> de ses {ex.matchs} premiers matchs. Elle en a pris <b>{ex.points}</b>.</p>
+            <p class="chiffre-moyen" style="color:var(--div-pos)">{fmt.signe(ex.ecart)} pts</p>
+            <p class="tres-discret">Survolez une barre pour voir le détail de chaque équipe.</p>
+          </div>
+        )}
+      </div>
       <div class="carte">
-        <BarresDivergentes titre="Écart entre points réels et points attendus par le marché"
+        <BarresDivergentes gauche="Moins bien que prévu" droite="Mieux que prévu"
+          titre="Écart entre points réels et points attendus par le marché"
           items={c.equipes.map((x) => ({ label: ctx.court(x.equipe), valeur: x.ecart,
-            tip: `${ctx.court(x.equipe)} : ${x.points} pts réels, ${fmt.num(x.points_attendus_marche)} attendus, favorite dans ${x.favori} matchs sur ${x.matchs}` }))} />
+            tip: `${ctx.court(x.equipe)} : ${x.points} pts pris, ${fmt.num(x.points_attendus_marche)} attendus par les bookmakers (favorite dans ${x.favori} matchs sur ${x.matchs})` }))} />
       </div>
 
       <div class="grille-2">
