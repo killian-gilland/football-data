@@ -1,9 +1,9 @@
 {
   "competition": "fr-ligue1",
-  "valide_le": "2026-11-27T21:57:10+00:00",
-  "empreinte": "a30b701072b1221a",
+  "valide_le": "2026-11-27T22:16:23+00:00",
+  "empreinte": "5e5dd2a7ab778122",
   "matchs": 12153,
-  "matchs_joues": 11946,
+  "matchs_joues": 11947,
   "rapport_qualite": {
     "valide": true,
     "controles": [
@@ -701,7 +701,7 @@
         "code": "ecart_matchs_joues",
         "niveau": "alerte",
         "ok": true,
-        "detail": "de 11 à 11 matchs joués selon les équipes"
+        "detail": "de 11 à 12 matchs joués selon les équipes"
       },
       {
         "code": "aucun_match_joue_disparu",
@@ -1133,15 +1133,15 @@
       },
       {
         "saison": "2026-27",
-        "matchs": 99,
+        "matchs": 100,
         "mi_temps": 1.0,
-        "tirs": 1.0,
-        "tirs_cadres": 1.0,
-        "corners": 1.0,
-        "fautes": 1.0,
-        "cartons": 1.0,
-        "cotes": 1.0,
-        "cotes_cloture": 1.0
+        "tirs": 0.99,
+        "tirs_cadres": 0.99,
+        "corners": 0.99,
+        "fautes": 0.99,
+        "cartons": 0.99,
+        "cotes": 0.99,
+        "cotes_cloture": 0.99
       }
     ]
   }

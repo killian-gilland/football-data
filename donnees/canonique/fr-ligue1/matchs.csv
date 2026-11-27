@@ -11945,7 +11945,7 @@ match_id,competition,saison,journee,date,heure,dom,ext,statut,buts_dom,buts_ext,
 2627-lorient-rennes,fr-ligue1,2026-27,11,2026-11-22,17:15,lorient,rennes,joue,1,1,1,1,12,13,3,3,7,5,11,19,2,2,0,1,2.81442,3.4045,2.40555,3.87298,3.33941,1.96651,7,football-data.co.uk
 2627-marseille-le-mans,fr-ligue1,2026-27,11,2026-11-22,20:45,marseille,le-mans,joue,2,3,2,0,11,19,5,9,2,5,14,11,3,4,0,0,1.44385,4.68733,6.19131,1.44899,4.57076,6.30589,7,football-data.co.uk
 2627-paris-fc-angers,fr-ligue1,2026-27,11,2026-11-22,15:00,paris-fc,angers,joue,4,0,0,0,18,9,9,1,10,2,17,12,1,1,0,0,1.31252,5.23087,8.74821,1.29213,5.47764,9.05749,7,football-data.co.uk
-2627-brest-paris-fc,fr-ligue1,2026-27,12,2026-11-27,20:45,brest,paris-fc,a_venir,,,,,,,,,,,,,,,,,3.35086,3.36895,2.14012,,,,7,openfootball (calendrier)
+2627-brest-paris-fc,fr-ligue1,2026-27,12,2026-11-27,20:45,brest,paris-fc,joue,1,0,1,0,,,,,,,,,,,,,,,,,,,,football-data.org
 2627-angers-lens,fr-ligue1,2026-27,12,2026-11-28,17:15,angers,lens,a_venir,,,,,,,,,,,,,,,,,4.60257,3.9458,1.68767,,,,7,openfootball (calendrier)
 2627-le-havre-strasbourg,fr-ligue1,2026-27,12,2026-11-28,20:45,le-havre,strasbourg,a_venir,,,,,,,,,,,,,,,,,3.12415,3.48374,2.1842,,,,7,openfootball (calendrier)
 2627-le-mans-lille,fr-ligue1,2026-27,12,2026-11-28,20:45,le-mans,lille,a_venir,,,,,,,,,,,,,,,,,3.64629,3.34811,2.02793,,,,7,openfootball (calendrier)
