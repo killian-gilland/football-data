@@ -58,9 +58,9 @@ const defense = [...eqs].sort((a, b) => a.buts_contre - b.buts_contre)[0];
                 <td class="equipe"><a href={ctx.lienEquipe(e.equipe)}><Club id={e.equipe} ctx={ctx} /></a></td>
                 <td class="pts">{fmt.ent(e.elo)}</td>
                 <td class={delta > 0.5 ? "positif" : delta < -0.5 ? "negatif" : ""} data-v={delta ?? ""}>{delta == null ? "—" : Math.abs(delta) < 0.5 ? "=" : fmt.signe(delta, 0)}</td>
-                <td class="g"><span class="barre-simple"><span style={`width:${(e.buts_pour / maxPour * 100).toFixed(1)}%;background:var(--dom)`}></span></span></td>
+                <td class="g"><span class="piste3" style="min-width:120px"><span class="b3" style={`height:10px;width:${(e.buts_pour / maxPour * 100).toFixed(1)}%;--c:${ctx.couleur(e.equipe) ?? "var(--dom)"};--i:${i}`} data-tip={`${ctx.court(e.equipe)} · attaque|${fmt.num(e.buts_pour, 2)} buts/match|contre une équipe moyenne, terrain neutre`}></span></span></td>
                 <td>{fmt.num(e.buts_pour, 2)}</td>
-                <td class="g"><span class="barre-simple"><span style={`width:${(e.buts_contre / maxContre * 100).toFixed(1)}%;background:var(--zone-relegation)`}></span></span></td>
+                <td class="g"><span class="piste3" style="min-width:120px"><span class="b3" style={`height:10px;width:${(e.buts_contre / maxContre * 100).toFixed(1)}%;--c:var(--zone-relegation);--i:${i}`} data-tip={`${ctx.court(e.equipe)} · défense|${fmt.num(e.buts_contre, 2)} buts encaissés/match|contre une équipe moyenne, terrain neutre`}></span></span></td>
                 <td>{fmt.num(e.buts_contre, 2)}</td>
               </tr>
             );

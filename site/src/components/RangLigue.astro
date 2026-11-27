@@ -21,9 +21,9 @@ const devant = n - rang;
       <span class="rl-lib">{libelle}</span>
       <span class="rl-val"><b>{format(moi.v)}</b><span class={`rl-rang ${ton}`}>{rang}<sup>e</sup>/{n}</span></span>
     </div>
-    <div class={`rl-jauge ${ton}`} role="img" aria-label={`${libelle} : ${rang}e sur ${n} équipes`}
-         data-tip={rang === 1 ? `Meilleure équipe du championnat sur ce critère` : `Mieux que ${devant} équipe${devant > 1 ? "s" : ""} sur ${n - 1}`}>
-      <span style={`width:${remplissage.toFixed(1)}%`}></span>
+    <div class="piste3 rl-piste3" role="img" aria-label={`${libelle} : ${rang}e sur ${n} équipes`}>
+      <span class="b3" style={`width:${remplissage.toFixed(1)}%;--c:${ton === "haut" ? "var(--bon)" : ton === "bas" ? "var(--mauvais)" : "#8b96a3"}`}
+        data-tip={`${libelle}|${rang}e sur ${n}|${rang === 1 ? "Meilleure équipe du championnat sur ce critère" : `Mieux que ${devant} équipe${devant > 1 ? "s" : ""} sur ${n - 1} · moyenne ${format(moyenne)}`}`}></span>
     </div>
     <div class="rl-contexte">
       Moyenne {format(moyenne)}{meilleur.equipe !== equipe && <> · meilleur : {meilleur.court} {format(meilleur.v)}</>}

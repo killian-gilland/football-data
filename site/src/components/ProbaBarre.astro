@@ -1,18 +1,32 @@
 ---
-// Barre 1N2 : domicile (bleu), nul (gris), extérieur (orange), valeurs toujours écrites.
-import { fmt } from "../lib/donnees.js";
-const { p, dom, ext, compact = false } = Astro.props;
+// Barre 1N2 en relief aux couleurs des clubs (domicile, nul en gris, extérieur), infobulle détaillée au survol.
+import { fmt, texteSur } from "../lib/donnees.js";
+const { p, dom, ext, compact = false, grande = false, couleurs = { dom: "var(--dom)", ext: "var(--ext)" }, source = "Notre modèle" } = Astro.props;
 const [a, n, b] = p;
+const segs = [
+  { v: a, c: couleurs.dom, lib: `Victoire de ${dom}`, court: dom },
+  { v: n, c: "var(--nul)", lib: "Match nul", court: "Nul" },
+  { v: b, c: couleurs.ext, lib: `Victoire de ${ext}`, court: ext },
+];
 ---
 <div>
-  <div class="proba" role="img" aria-label={`${dom} ${fmt.pct(a)}, nul ${fmt.pct(n)}, ${ext} ${fmt.pct(b)}`}>
-    <span class="p1" style={`flex:${a}`} data-tip={`Victoire ${dom} : ${fmt.pct(a, 1)}`}></span>
-    <span class="pn" style={`flex:${n}`} data-tip={`Match nul : ${fmt.pct(n, 1)}`}></span>
-    <span class="p2" style={`flex:${b}`} data-tip={`Victoire ${ext} : ${fmt.pct(b, 1)}`}></span>
+  <div class={`proba3 ${grande ? "grande" : ""}`} role="img" aria-label={`${dom} ${fmt.pct(a)}, nul ${fmt.pct(n)}, ${ext} ${fmt.pct(b)}`}>
+    {segs.map((s, i) => (
+      <span class="b3" style={`flex:${s.v};--c:${s.c};--i:${i}`} data-tip={`${s.lib}|${fmt.pct(s.v, 1)}|${source}`}>
+        {grande && s.v >= 0.12 && <span class="b3-lab" style={`color:${texteSur(s.c)}`}>{fmt.pct(s.v)}</span>}
+      </span>
+    ))}
   </div>
-  <div class="proba-legende">
-    <span>{!compact && `${dom} `}<b>{fmt.pct(a)}</b></span>
-    <span>{compact ? "nul " : "Nul "}<b>{fmt.pct(n)}</b></span>
-    <span>{!compact && `${ext} `}<b>{fmt.pct(b)}</b></span>
-  </div>
+  {!grande && (
+    <div class="proba-legende">
+      <span>{!compact && `${dom} `}<b>{fmt.pct(a)}</b></span>
+      <span>{compact ? "nul " : "Nul "}<b>{fmt.pct(n)}</b></span>
+      <span>{!compact && `${ext} `}<b>{fmt.pct(b)}</b></span>
+    </div>
+  )}
+  {grande && (
+    <div class="proba-legende">
+      <span>{dom}</span><span>Nul</span><span>{ext}</span>
+    </div>
+  )}
 </div>

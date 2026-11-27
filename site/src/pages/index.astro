@@ -1,30 +1,46 @@
 ---
 import Base from "../layouts/Base.astro";
-import ListeMatchs from "../components/ListeMatchs.astro";
-import Forme from "../components/Forme.astro";
+import CarteMatch from "../components/CarteMatch.astro";
 import Club from "../components/Club.astro";
-import { competitions, contexte, fmt } from "../lib/donnees.js";
+import Forme from "../components/Forme.astro";
+import ProbaBarre from "../components/ProbaBarre.astro";
+import { competitions, contexte, fmt, principalEnjeu, phraseEnjeu } from "../lib/donnees.js";
 
 const meta = competitions()[0];
 const ctx = contexte(meta.competition.slug);
 const accueil = ctx.lire("accueil.json");
 const classement = ctx.lire("classement.json");
 const simulation = ctx.lire("simulation.json");
+const chances = ctx.lire("chances.json");
 const pr = ctx.lire("predictions.json");
 const s = ctx.slug;
 const matchsJournee = accueil.matchs_journee.map((id) => ctx.parId[id]);
 const resultats = accueil.derniers_resultats.map((id) => ctx.parId[id]);
+const rangDe = Object.fromEntries(classement.lignes.map((l) => [l.equipe, l]));
 const leader = classement.lignes[0];
 const second = classement.lignes[1];
 const favori = simulation.equipes.slice().sort((a, b) => b.titre - a.titre)[0];
 const menace = simulation.equipes.slice().sort((a, b) => (b.zones.relegation ?? 0) - (a.zones.relegation ?? 0))[0];
+// Évolution depuis la journée précédente (courbe des chances)
+const evoChance = (eq, g) => {
+  const serie = chances?.equipes.find((e) => e.equipe === eq)?.[g];
+  return serie && serie.length > 1 ? serie.at(-1) - serie.at(-2) : null;
+};
+const fleche = (d) => (d == null || Math.abs(d) < 0.005 ? "" : d > 0 ? `▲ ${fmt.num(d * 100, 0)} pts` : `▼ ${fmt.num(-d * 100, 0)} pts`);
+const dTitre = evoChance(favori.equipe, "titre");
+const dReleg = evoChance(menace.equipe, "relegation");
+// Match phare : le plus gros enjeu de la journée (à défaut, le premier match)
+const aVenir = matchsJournee.filter((m) => m.statut === "a_venir");
+const phare = aVenir.slice().sort((a, b) => (ctx.enjeux[b.id]?.importance ?? 0) - (ctx.enjeux[a.id]?.importance ?? 0))[0] ?? matchsJournee[0];
+const enjeuPhare = phare && ctx.enjeux[phare.id] ? principalEnjeu(ctx.enjeux[phare.id], phare) : null;
+const autres = matchsJournee.filter((m) => m !== phare);
 const dates = matchsJournee.map((m) => m.date).sort();
 const periode = dates.length
   ? `${new Date(dates[0] + "T12:00").toLocaleDateString("fr-FR", { day: "numeric" })} – ${new Date(dates.at(-1) + "T12:00").toLocaleDateString("fr-FR", { day: "numeric", month: "long" })}`
   : "";
+const lienTF = (t) => (t.equipe ? ctx.lienEquipe(t.equipe) : t.match_id ? ctx.lienMatch(t.match_id) : null);
 const base = classement.lignes.map((l) => ({ equipe: l.equipe, rang: l.rang, pts: l.pts, diff: l.diff, bp: l.bp, g: l.g, j: l.j }));
 const zonesParRang = Object.fromEntries(classement.lignes.map((l) => [l.rang, l.zone ?? ""]));
-const lienTF = (t) => (t.equipe ? ctx.lienEquipe(t.equipe) : t.match_id ? ctx.lienMatch(t.match_id) : null);
 ---
 <Base
   titre={`${meta.competition.nom} ${meta.saison} : stats, prédictions et simulations`}
@@ -33,6 +49,18 @@ const lienTF = (t) => (t.equipe ? ctx.lienEquipe(t.equipe) : t.match_id ? ctx.li
   actif="accueil"
 >
   <Fragment slot="tete">
+    {resultats.length > 0 && (
+      <div class="bandeau-scores" aria-label={`Résultats de la ${accueil.derniere_journee}e journée`}>
+        <div class="defile">
+          {[0, 1].map((copie) => resultats.map((m, k) => (
+            <a href={ctx.lienMatch(m.id)} class="item-score" aria-hidden={copie === 1 ? "true" : undefined} tabindex={copie === 1 ? -1 : undefined}>
+              {k === 0 && <b class="etiquette-j">J{accueil.derniere_journee}</b>}
+              <Club id={m.dom} ctx={ctx} taille={16} logoApres /><span class="score">{m.score[0]}–{m.score[1]}</span><Club id={m.ext} ctx={ctx} taille={16} />
+            </a>
+          )))}
+        </div>
+      </div>
+    )}
     <div style="display:grid;gap:6px">
       <span class="sur-titre">{meta.competition.nom} · saison {meta.saison}</span>
       <h1>{accueil.journee_courante ? `${accueil.journee_courante}e journée` : "Saison en cours"}</h1>
@@ -41,34 +69,62 @@ const lienTF = (t) => (t.equipe ? ctx.lienEquipe(t.equipe) : t.match_id ? ctx.li
     <div class="affichage">
       <div>
         <span class="etiquette">Leader</span>
-        <a class="valeur" href={ctx.lienEquipe(leader.equipe)}>{ctx.court(leader.equipe)}</a>
+        <a class="valeur" href={ctx.lienEquipe(leader.equipe)}><Club id={leader.equipe} ctx={ctx} taille={26} /></a>
         <span class="detail">{leader.pts} pts · {leader.pts - second.pts} d'avance sur {ctx.court(second.equipe)}</span>
       </div>
       <div>
         <span class="etiquette">Favori pour le titre</span>
-        <span class="valeur">{fmt.pct(favori.titre)}</span>
-        <span class="detail">{ctx.court(favori.equipe)}, sur 10 000 simulations</span>
+        <span class="valeur" data-compteur>{fmt.pct(favori.titre)}</span>
+        <span class="detail">{ctx.court(favori.equipe)} {dTitre != null && <span class={dTitre >= 0 ? "positif" : "negatif"}>{fleche(dTitre)}</span>}</span>
       </div>
       <div>
         <span class="etiquette">Le plus menacé</span>
-        <span class="valeur">{fmt.pct(menace.zones.relegation)}</span>
-        <span class="detail">{ctx.court(menace.equipe)}, risque de relégation directe</span>
+        <span class="valeur" data-compteur>{fmt.pct(menace.zones.relegation)}</span>
+        <span class="detail">{ctx.court(menace.equipe)}, relégation directe {dReleg != null && <span class={dReleg <= 0 ? "positif" : "negatif"}>{fleche(dReleg)}</span>}</span>
       </div>
       <div>
         <span class="etiquette">Journal public</span>
-        <span class="valeur">{pr.n_predictions}</span>
+        <span class="valeur" data-compteur>{pr.n_predictions}</span>
         <span class="detail">prédictions publiées avant les matchs</span>
       </div>
     </div>
   </Fragment>
 
+  {phare && (
+    <section class="section">
+      <header><span class="sur-titre" style="color:var(--projecteur)">Le match à ne pas manquer · {fmt.majuscule(fmt.dateLongue(phare.date))}{phare.heure && ` · ${phare.heure}`}</span></header>
+      <a class="match-phare" href={ctx.lienMatch(phare.id)} data-match={phare.id}>
+        <div class="mp-affiche">
+          {[["dom", 0], ["centre"], ["ext", 2]].map(([cote, k]) => {
+            if (cote === "centre") return (
+              <div class="mp-centre"><span class={`score ${phare.statut === "joue" ? "" : "vide"}`}>{phare.statut === "joue" ? `${phare.score[0]} – ${phare.score[1]}` : "VS"}</span><span class="heure tres-discret">{phare.heure}</span></div>
+            );
+            const id = phare[cote];
+            return (
+              <div class={`mp-equipe ${cote}`}>
+                {ctx.logo(id) && <img class="logo-club" src={ctx.logo(id)} alt="" width="72" height="72" />}
+                <span class="mp-nom">{ctx.court(id)}</span>
+                <span class="tres-discret">{rangDe[id]?.rang}e · {rangDe[id]?.pts} pts</span>
+                {phare.prediction && <span class="mp-pct">{fmt.pct(phare.prediction.p[k])}</span>}
+              </div>
+            );
+          })}
+        </div>
+        {phare.prediction && <ProbaBarre p={phare.prediction.p} dom={ctx.court(phare.dom)} ext={ctx.court(phare.ext)} grande couleurs={ctx.paire(phare.dom, phare.ext)} />}
+        {enjeuPhare && <p class="mp-enjeu"><span class="enjeu">Ce qui se joue</span> {phraseEnjeu(enjeuPhare, ctx.court)}</p>}
+      </a>
+    </section>
+  )}
+
   <div class="grille-2 grille-accueil">
     <section class="section">
       <header>
-        <h2>Les matchs de la journée</h2>
-        <p class="discret">Probabilités 1 / N / 2 de notre modèle. Touchez un match pour le détail et les scores probables.</p>
+        <h2>Tous les matchs de la journée</h2>
+        <p class="discret">Survolez une barre pour le détail, touchez une carte pour les scores probables.</p>
       </header>
-      <ListeMatchs matchs={matchsJournee} ctx={ctx} />
+      <div class="grille-cartes">
+        {autres.map((m) => <CarteMatch m={m} ctx={ctx} avecJour />)}
+      </div>
     </section>
 
     <div class="colonne">
@@ -95,13 +151,11 @@ const lienTF = (t) => (t.equipe ? ctx.lienEquipe(t.equipe) : t.match_id ? ctx.li
 
       <section class="section">
         <header><h2>À retenir</h2></header>
-        <div class="carte">
-          <ul style="display:grid;gap:8px">
-            {accueil.temps_forts.map((t) => {
-              const l = lienTF(t);
-              return <li>{l ? <a href={l}>{t.texte}</a> : t.texte}</li>;
-            })}
-          </ul>
+        <div class="tendances">
+          {accueil.temps_forts.map((t) => {
+            const l = lienTF(t);
+            return <a class="tendance" href={l ?? undefined}><span class={`tendance-type ${t.type}`}></span>{t.texte}</a>;
+          })}
         </div>
       </section>
     </div>
@@ -113,7 +167,9 @@ const lienTF = (t) => (t.equipe ? ctx.lienEquipe(t.equipe) : t.match_id ? ctx.li
         <h2>Résultats de la {accueil.derniere_journee}e journée</h2>
         <p class="discret">Avec la prédiction que notre modèle faisait avant chaque match.</p>
       </header>
-      <ListeMatchs matchs={resultats} ctx={ctx} />
+      <div class="grille-cartes large">
+        {resultats.map((m) => <CarteMatch m={m} ctx={ctx} avecJour />)}
+      </div>
     </section>
   )}
 </Base>

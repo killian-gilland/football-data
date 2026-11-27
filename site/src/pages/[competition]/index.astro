@@ -152,7 +152,7 @@ const parDefaut = [...classement.lignes.slice(0, 4), ...classement.lignes.slice(
         {europe.slice(0, 8).map(({ e, p }) => (
           <div>
             <div class="nom"><a href={ctx.lienEquipe(e.equipe)}>{ctx.court(e.equipe)}</a><span class="discret">titre {fmt.pct(e.titre)}</span></div>
-            <div class="jauge"><div class="piste"><span style={`width:${(p * 100).toFixed(1)}%`}></span></div><b>{fmt.pct(p)}</b></div>
+            <div class="jauge"><div class="piste3"><span class="b3" style={`height:12px;width:${Math.max(1, p * 100).toFixed(1)}%;--c:${ctx.couleur(e.equipe) ?? "var(--dom)"}`} data-tip={`${ctx.court(e.equipe)}|${fmt.pct(p)}|Chances de finir à une place européenne · titre ${fmt.pct(e.titre)}`}></span></div><b>{fmt.pct(p)}</b></div>
           </div>
         ))}
       </div>
@@ -163,7 +163,7 @@ const parDefaut = [...classement.lignes.slice(0, 4), ...classement.lignes.slice(
         {parRang.slice().sort((a, b) => pctZone(b, ["barrage", "relegation"]) - pctZone(a, ["barrage", "relegation"])).slice(0, 8).map((e) => (
           <div>
             <div class="nom"><a href={ctx.lienEquipe(e.equipe)}>{ctx.court(e.equipe)}</a><span class="discret">barrage {fmt.pct(e.zones.barrage ?? 0)}</span></div>
-            <div class="jauge alerte-rouge"><div class="piste"><span style={`width:${((e.zones.relegation ?? 0) * 100).toFixed(1)}%`}></span></div><b>{fmt.pct(e.zones.relegation ?? 0)}</b></div>
+            <div class="jauge"><div class="piste3"><span class="b3" style={`height:12px;width:${Math.max(1, (e.zones.relegation ?? 0) * 100).toFixed(1)}%;--c:var(--zone-relegation)`} data-tip={`${ctx.court(e.equipe)}|${fmt.pct(e.zones.relegation ?? 0)}|Risque de relégation directe · barrage ${fmt.pct(e.zones.barrage ?? 0)}`}></span></div><b>{fmt.pct(e.zones.relegation ?? 0)}</b></div>
           </div>
         ))}
       </div>
@@ -191,8 +191,8 @@ const parDefaut = [...classement.lignes.slice(0, 4), ...classement.lignes.slice(
           {parRang.map((e) => (
             <tr>
               <td class="equipe"><a href={ctx.lienEquipe(e.equipe)}><Club id={e.equipe} ctx={ctx} /></a></td>
-              <td class="g"><span class="issue">{segments(e).map(([z, lib, p]) => p > 0.004 && (
-                <span class={`seg seg-${z}`} style={`flex:${p}`} data-tip={`${ctx.court(e.equipe)} · ${lib} : ${fmt.pct(p)}`}></span>
+              <td class="g"><span class="issue">{segments(e).map(([z, lib, p], i) => p > 0.004 && (
+                <span class={`b3 seg-${z}`} style={`flex:${p};--i:${i};--c:var(--zone-${z === "milieu" ? "milieu" : z})`} data-tip={`${ctx.court(e.equipe)}|${fmt.pct(p)}|${lib}`}></span>
               ))}</span></td>
               <td>{e.points_actuels}</td>
               <td class="pts">{fmt.num(e.points_attendus, 0)}</td>
@@ -244,7 +244,7 @@ const parDefaut = [...classement.lignes.slice(0, 4), ...classement.lignes.slice(
           <p class="tres-discret">Points mérités d'après notre indice d'occasions (tirs cadrés et non cadrés).</p>
           <BarresDivergentes gauche="Moins de points que mérité" droite="Plus que mérité" titre="Écart aux points attendus selon les occasions"
             items={attIO.map((a) => ({ label: ctx.court(a.equipe), valeur: a.ecart_io,
-              tip: `${ctx.court(a.equipe)} : ${a.points} pts réels, ${fmt.num(a.points_io)} attendus` }))} />
+              tip: `${ctx.court(a.equipe)}|${fmt.signe(a.ecart_io)} pts|${a.points} pts pris, ${fmt.num(a.points_io)} mérités d'après les occasions` }))} />
         </div>
       )}
       {attMarche.length > 0 && (
@@ -253,7 +253,7 @@ const parDefaut = [...classement.lignes.slice(0, 4), ...classement.lignes.slice(
           <p class="tres-discret">Points attendus d'après les cotes d'avant-match.</p>
           <BarresDivergentes gauche="Moins bien que prévu" droite="Mieux que prévu" titre="Écart aux points attendus selon les cotes"
             items={attMarche.map((a) => ({ label: ctx.court(a.equipe), valeur: a.ecart_marche,
-              tip: `${ctx.court(a.equipe)} : ${a.points} pts réels, ${fmt.num(a.points_marche)} attendus` }))} />
+              tip: `${ctx.court(a.equipe)}|${fmt.signe(a.ecart_marche)} pts|${a.points} pts pris, ${fmt.num(a.points_marche)} attendus par les bookmakers` }))} />
         </div>
       )}
     </div>

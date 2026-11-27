@@ -399,7 +399,8 @@ def construire(comp: Competition, matchs: pd.DataFrame, rapport: dict, alertes: 
 
     # ---------- Méta ----------
     logos = logos or {}
-    equipes_meta = {e: {"nom": ref.nom(e), "court": ref.court(e), "logo": logos.get(e)} for e in toutes}
+    equipes_meta = {e: {"nom": ref.nom(e), "court": ref.court(e), "logo": logos.get(e),
+                        "couleur": ref.couleurs(e)[0], "couleur2": ref.couleurs(e)[1]} for e in toutes}
     meta = {
         "competition": {"id": comp.id, "nom": comp.nom, "slug": comp.slug, "pays": comp.pays},
         "saison": s, "mis_a_jour": maintenant.isoformat(timespec="minutes"),

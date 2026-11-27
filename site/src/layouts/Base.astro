@@ -119,6 +119,7 @@ if (urlDirect && comp) {
     <script>
       import "../scripts/direct.js";
       import "../scripts/tri.js";
+      import "../scripts/compteur.js";
     </script>
     <script is:inline>
       document.getElementById("bouton-theme")?.addEventListener("click", () => {
@@ -141,7 +142,16 @@ if (urlDirect && comp) {
       document.addEventListener("pointerover", (e) => {
         const t = e.target.closest?.("[data-tip]");
         if (!t) { tip.hidden = true; return; }
-        tip.textContent = t.getAttribute("data-tip");
+        // « titre|valeur|détail » -> infobulle riche ; sinon texte simple
+        const morceaux = t.getAttribute("data-tip").split("|");
+        if (morceaux.length > 1) {
+          tip.replaceChildren(...morceaux.map((txt, k) => {
+            const d = document.createElement("div");
+            d.className = ["tip-titre", "tip-valeur", "tip-detail"][Math.min(k, 2)];
+            d.textContent = txt;
+            return d;
+          }));
+        } else tip.textContent = morceaux[0];
         tip.hidden = false;
         placer(e);
       });

@@ -37,3 +37,7 @@ class Referentiel:
 
     def court(self, eid: str) -> str:
         return self.equipes.get(eid, {}).get("court", self.nom(eid))
+
+    def couleurs(self, eid: str) -> tuple[str | None, str | None]:
+        info = self.equipes.get(eid, {})
+        return info.get("couleur"), info.get("couleur2")

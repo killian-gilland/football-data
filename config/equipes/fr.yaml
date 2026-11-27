@@ -2,53 +2,54 @@
 # C'EST LE SEUL ENDROIT OÙ LES NOMS AFFICHÉS SONT DÉFINIS (pipeline, site, textes générés) :
 #   nom   = nom complet du club (titres de page, sélecteurs)
 #   court = nom usuel du club, celui de la presse sportive (tableaux, listes, graphiques)
+#   couleur / couleur2 = couleurs principales du maillot (barres et graphiques aux couleurs du club)
 # « alias » = toutes les graphies rencontrées dans les sources (football-data.co.uk, openfootball, football-data.org).
 # Un nom inconnu bloque le pipeline : il faut l'ajouter ici.
 
 equipes:
-  ac-ajaccio: {nom: AC Ajaccio, court: AC Ajaccio, alias: [Ajaccio, AC Ajaccio]}
-  gfc-ajaccio: {nom: GFC Ajaccio, court: GFC Ajaccio, alias: [Ajaccio GFCO, GFC Ajaccio, Gazélec Ajaccio]}
-  amiens: {nom: Amiens SC, court: Amiens SC, alias: [Amiens, Amiens SC]}
-  angers: {nom: Angers SCO, court: Angers SCO, alias: [Angers, Angers SCO]}
-  arles-avignon: {nom: AC Arles-Avignon, court: AC Arles-Avignon, alias: [Arles, AC Arles-Avignon]}
-  auxerre: {nom: AJ Auxerre, court: AJ Auxerre, alias: [Auxerre, AJ Auxerre]}
-  bastia: {nom: SC Bastia, court: SC Bastia, alias: [Bastia, SC Bastia]}
-  bordeaux: {nom: Girondins de Bordeaux, court: Girondins de Bordeaux, alias: [Bordeaux, FC Girondins de Bordeaux, Girondins de Bordeaux]}
-  boulogne: {nom: US Boulogne, court: US Boulogne, alias: [Boulogne, US Boulogne]}
-  brest: {nom: Stade brestois 29, court: Stade brestois, alias: [Brest, Stade Brestois 29, Stade Brestois]}
-  caen: {nom: SM Caen, court: SM Caen, alias: [Caen, SM Caen, Stade Malherbe Caen]}
-  cannes: {nom: AS Cannes, court: AS Cannes, alias: [Cannes, AS Cannes]}
-  chateauroux: {nom: LB Châteauroux, court: LB Châteauroux, alias: [Chateauroux, LB Châteauroux]}
-  clermont: {nom: Clermont Foot 63, court: Clermont Foot, alias: [Clermont, Clermont Foot, Clermont Foot 63]}
-  dijon: {nom: Dijon FCO, court: Dijon FCO, alias: [Dijon, Dijon FCO]}
-  evian: {nom: Évian Thonon Gaillard, court: Évian TG, alias: [Evian Thonon Gaillard, Évian Thonon Gaillard FC]}
-  grenoble: {nom: Grenoble Foot 38, court: Grenoble Foot, alias: [Grenoble, Grenoble Foot 38]}
-  gueugnon: {nom: FC Gueugnon, court: FC Gueugnon, alias: [Gueugnon, FC Gueugnon]}
-  guingamp: {nom: EA Guingamp, court: EA Guingamp, alias: [Guingamp, EA Guingamp]}
-  istres: {nom: FC Istres, court: FC Istres, alias: [Istres, FC Istres]}
-  le-havre: {nom: Le Havre AC, court: Le Havre AC, alias: [Le Havre, Le Havre AC]}
-  le-mans: {nom: Le Mans FC, court: Le Mans FC, alias: [Le Mans, Le Mans FC, Le Mans UC72]}
-  lens: {nom: RC Lens, court: RC Lens, alias: [Lens, RC Lens, Racing Club de Lens, RCL]}
-  lille: {nom: LOSC Lille, court: LOSC, alias: [Lille, Lille OSC, LOSC Lille]}
-  lorient: {nom: FC Lorient, court: FC Lorient, alias: [Lorient, FC Lorient]}
-  lyon: {nom: Olympique lyonnais, court: OL, alias: [Lyon, Olympique Lyonnais, OL]}
-  marseille: {nom: Olympique de Marseille, court: OM, alias: [Marseille, Olympique de Marseille, OM]}
-  martigues: {nom: FC Martigues, court: FC Martigues, alias: [Martigues, FC Martigues]}
-  metz: {nom: FC Metz, court: FC Metz, alias: [Metz, FC Metz]}
-  monaco: {nom: AS Monaco, court: AS Monaco, alias: [Monaco, AS Monaco FC, AS Monaco, ASM]}
-  montpellier: {nom: Montpellier HSC, court: Montpellier HSC, alias: [Montpellier, Montpellier HSC]}
-  nancy: {nom: AS Nancy-Lorraine, court: AS Nancy, alias: [Nancy, AS Nancy-Lorraine, AS Nancy Lorraine]}
-  nantes: {nom: FC Nantes, court: FC Nantes, alias: [Nantes, FC Nantes]}
-  nice: {nom: OGC Nice, court: OGC Nice, alias: [Nice, OGC Nice]}
-  nimes: {nom: Nîmes Olympique, court: Nîmes Olympique, alias: [Nimes, Nîmes Olympique]}
-  paris-fc: {nom: Paris FC, court: Paris FC, alias: [Paris FC]}
-  psg: {nom: Paris Saint-Germain, court: PSG, alias: [Paris SG, Paris Saint-Germain FC, Paris Saint-Germain, PSG]}
-  reims: {nom: Stade de Reims, court: Stade de Reims, alias: [Reims, Stade de Reims]}
-  rennes: {nom: Stade rennais FC, court: Stade rennais, alias: [Rennes, Stade Rennais FC 1901, Stade Rennais FC]}
-  sedan: {nom: CS Sedan Ardennes, court: CS Sedan, alias: [Sedan, CS Sedan Ardennes]}
-  sochaux: {nom: FC Sochaux-Montbéliard, court: FC Sochaux, alias: [Sochaux, FC Sochaux-Montbéliard]}
-  saint-etienne: {nom: AS Saint-Étienne, court: AS Saint-Étienne, alias: [St Etienne, AS Saint-Étienne, AS Saint-Etienne]}
-  strasbourg: {nom: RC Strasbourg Alsace, court: RC Strasbourg, alias: [Strasbourg, RC Strasbourg Alsace, RC Strasbourg, RCS]}
-  toulouse: {nom: Toulouse FC, court: Toulouse FC, alias: [Toulouse, Toulouse FC]}
-  troyes: {nom: ESTAC Troyes, court: ESTAC Troyes, alias: [Troyes, ES Troyes AC, ESTAC Troyes, ESTAC]}
-  valenciennes: {nom: Valenciennes FC, court: Valenciennes FC, alias: [Valenciennes, Valenciennes FC]}
+  ac-ajaccio: {nom: AC Ajaccio, court: AC Ajaccio, couleur: '#D2001F', couleur2: '#E8EEF3', alias: [Ajaccio, AC Ajaccio]}
+  gfc-ajaccio: {nom: GFC Ajaccio, court: GFC Ajaccio, couleur: '#D2001F', couleur2: '#0055A4', alias: [Ajaccio GFCO, GFC Ajaccio, Gazélec Ajaccio]}
+  amiens: {nom: Amiens SC, court: Amiens SC, couleur: '#C9CDD2', couleur2: '#2B2B2B', alias: [Amiens, Amiens SC]}
+  angers: {nom: Angers SCO, court: Angers SCO, couleur: '#C9CDD2', couleur2: '#2B2B2B', alias: [Angers, Angers SCO]}
+  arles-avignon: {nom: AC Arles-Avignon, court: AC Arles-Avignon, couleur: '#0067B1', couleur2: '#E8EEF3', alias: [Arles, AC Arles-Avignon]}
+  auxerre: {nom: AJ Auxerre, court: AJ Auxerre, couleur: '#1E5BB8', couleur2: '#E8EEF3', alias: [Auxerre, AJ Auxerre]}
+  bastia: {nom: SC Bastia, court: SC Bastia, couleur: '#0055A4', couleur2: '#E8EEF3', alias: [Bastia, SC Bastia]}
+  bordeaux: {nom: Girondins de Bordeaux, court: Girondins de Bordeaux, couleur: '#1C3F7A', couleur2: '#E8EEF3', alias: [Bordeaux, FC Girondins de Bordeaux, Girondins de Bordeaux]}
+  boulogne: {nom: US Boulogne, court: US Boulogne, couleur: '#D50000', couleur2: '#2B2B2B', alias: [Boulogne, US Boulogne]}
+  brest: {nom: Stade brestois 29, court: Stade brestois, couleur: '#E30613', couleur2: '#E8EEF3', alias: [Brest, Stade Brestois 29, Stade Brestois]}
+  caen: {nom: SM Caen, court: SM Caen, couleur: '#1565B8', couleur2: '#D2001F', alias: [Caen, SM Caen, Stade Malherbe Caen]}
+  cannes: {nom: AS Cannes, court: AS Cannes, couleur: '#D50000', couleur2: '#E8EEF3', alias: [Cannes, AS Cannes]}
+  chateauroux: {nom: LB Châteauroux, court: LB Châteauroux, couleur: '#0B4DA2', couleur2: '#E8EEF3', alias: [Chateauroux, LB Châteauroux]}
+  clermont: {nom: Clermont Foot 63, court: Clermont Foot, couleur: '#C8102E', couleur2: '#1B3C8E', alias: [Clermont, Clermont Foot, Clermont Foot 63]}
+  dijon: {nom: Dijon FCO, court: Dijon FCO, couleur: '#C8102E', couleur2: '#E8EEF3', alias: [Dijon, Dijon FCO]}
+  evian: {nom: Évian Thonon Gaillard, court: Évian TG, couleur: '#E5007E', couleur2: '#E8EEF3', alias: [Evian Thonon Gaillard, Évian Thonon Gaillard FC]}
+  grenoble: {nom: Grenoble Foot 38, court: Grenoble Foot, couleur: '#0055A4', couleur2: '#E8EEF3', alias: [Grenoble, Grenoble Foot 38]}
+  gueugnon: {nom: FC Gueugnon, court: FC Gueugnon, couleur: '#C8102E', couleur2: '#E8EEF3', alias: [Gueugnon, FC Gueugnon]}
+  guingamp: {nom: EA Guingamp, court: EA Guingamp, couleur: '#CC0000', couleur2: '#2B2B2B', alias: [Guingamp, EA Guingamp]}
+  istres: {nom: FC Istres, court: FC Istres, couleur: '#0055A4', couleur2: '#F2C500', alias: [Istres, FC Istres]}
+  le-havre: {nom: Le Havre AC, court: Le Havre AC, couleur: '#5FA8DD', couleur2: '#00205B', alias: [Le Havre, Le Havre AC]}
+  le-mans: {nom: Le Mans FC, court: Le Mans FC, couleur: '#E2001A', couleur2: '#F2B705', alias: [Le Mans, Le Mans FC, Le Mans UC72]}
+  lens: {nom: RC Lens, court: RC Lens, couleur: '#E0001B', couleur2: '#F5C400', alias: [Lens, RC Lens, Racing Club de Lens, RCL]}
+  lille: {nom: LOSC Lille, court: LOSC, couleur: '#E01E13', couleur2: '#24216A', alias: [Lille, Lille OSC, LOSC Lille]}
+  lorient: {nom: FC Lorient, court: FC Lorient, couleur: '#F58113', couleur2: '#2B2B2B', alias: [Lorient, FC Lorient]}
+  lyon: {nom: Olympique lyonnais, court: OL, couleur: '#1B4A9C', couleur2: '#DA001A', alias: [Lyon, Olympique Lyonnais, OL]}
+  marseille: {nom: Olympique de Marseille, court: OM, couleur: '#2FAEE0', couleur2: '#E8EEF3', alias: [Marseille, Olympique de Marseille, OM]}
+  martigues: {nom: FC Martigues, court: FC Martigues, couleur: '#D50000', couleur2: '#E8EEF3', alias: [Martigues, FC Martigues]}
+  metz: {nom: FC Metz, court: FC Metz, couleur: '#8A1F35', couleur2: '#E8EEF3', alias: [Metz, FC Metz]}
+  monaco: {nom: AS Monaco, court: AS Monaco, couleur: '#E51B22', couleur2: '#E8EEF3', alias: [Monaco, AS Monaco FC, AS Monaco, ASM]}
+  montpellier: {nom: Montpellier HSC, court: Montpellier HSC, couleur: '#F28C28', couleur2: '#003C71', alias: [Montpellier, Montpellier HSC]}
+  nancy: {nom: AS Nancy-Lorraine, court: AS Nancy, couleur: '#E4002B', couleur2: '#E8EEF3', alias: [Nancy, AS Nancy-Lorraine, AS Nancy Lorraine]}
+  nantes: {nom: FC Nantes, court: FC Nantes, couleur: '#FCD405', couleur2: '#00873E', alias: [Nantes, FC Nantes]}
+  nice: {nom: OGC Nice, court: OGC Nice, couleur: '#C8102E', couleur2: '#2B2B2B', alias: [Nice, OGC Nice]}
+  nimes: {nom: Nîmes Olympique, court: Nîmes Olympique, couleur: '#D50032', couleur2: '#E8EEF3', alias: [Nimes, Nîmes Olympique]}
+  paris-fc: {nom: Paris FC, court: Paris FC, couleur: '#4A7FC1', couleur2: '#1B2A4E', alias: [Paris FC]}
+  psg: {nom: Paris Saint-Germain, court: PSG, couleur: '#1D4FA3', couleur2: '#DA291C', alias: [Paris SG, Paris Saint-Germain FC, Paris Saint-Germain, PSG]}
+  reims: {nom: Stade de Reims, court: Stade de Reims, couleur: '#E4002B', couleur2: '#E8EEF3', alias: [Reims, Stade de Reims]}
+  rennes: {nom: Stade rennais FC, court: Stade rennais, couleur: '#E13327', couleur2: '#2B2B2B', alias: [Rennes, Stade Rennais FC 1901, Stade Rennais FC]}
+  sedan: {nom: CS Sedan Ardennes, court: CS Sedan, couleur: '#00843D', couleur2: '#D2001F', alias: [Sedan, CS Sedan Ardennes]}
+  sochaux: {nom: FC Sochaux-Montbéliard, court: FC Sochaux, couleur: '#FFD200', couleur2: '#003DA5', alias: [Sochaux, FC Sochaux-Montbéliard]}
+  saint-etienne: {nom: AS Saint-Étienne, court: AS Saint-Étienne, couleur: '#00A04A', couleur2: '#E8EEF3', alias: [St Etienne, AS Saint-Étienne, AS Saint-Etienne]}
+  strasbourg: {nom: RC Strasbourg Alsace, court: RC Strasbourg, couleur: '#0A6BC4', couleur2: '#E8EEF3', alias: [Strasbourg, RC Strasbourg Alsace, RC Strasbourg, RCS]}
+  toulouse: {nom: Toulouse FC, court: Toulouse FC, couleur: '#6A35A0', couleur2: '#E8EEF3', alias: [Toulouse, Toulouse FC]}
+  troyes: {nom: ESTAC Troyes, court: ESTAC Troyes, couleur: '#0B63B5', couleur2: '#E8EEF3', alias: [Troyes, ES Troyes AC, ESTAC Troyes, ESTAC]}
+  valenciennes: {nom: Valenciennes FC, court: Valenciennes FC, couleur: '#D50000', couleur2: '#E8EEF3', alias: [Valenciennes, Valenciennes FC]}

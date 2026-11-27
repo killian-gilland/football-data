@@ -61,7 +61,7 @@ const ex = c?.equipes?.[0];
         <BarresDivergentes gauche="Moins bien que prévu" droite="Mieux que prévu"
           titre="Écart entre points réels et points attendus par le marché"
           items={c.equipes.map((x) => ({ label: ctx.court(x.equipe), valeur: x.ecart,
-            tip: `${ctx.court(x.equipe)} : ${x.points} pts pris, ${fmt.num(x.points_attendus_marche)} attendus par les bookmakers (favorite dans ${x.favori} matchs sur ${x.matchs})` }))} />
+            tip: `${ctx.court(x.equipe)}|${fmt.signe(x.ecart)} pts|${x.points} pts pris, ${fmt.num(x.points_attendus_marche)} attendus par les bookmakers` }))} />
       </div>
 
       <div class="grille-2">

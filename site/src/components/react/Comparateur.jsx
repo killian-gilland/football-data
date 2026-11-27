@@ -151,12 +151,12 @@ export default function Comparateur({ equipes }) {
             <div className="ligne-duel" role="row" key={cle}>
               <div className={`val a ${mieuxA ? "mieux" : ""}`} role="cell">
                 <b>{fmt(va)}</b>
-                {cle !== "rang" && <div className="piste"><span style={{ width: `${(Math.abs(va ?? 0) / max) * 100}%`, background: coulA }} /></div>}
+                {cle !== "rang" && <div className="piste"><span className="b3" style={{ width: `${(Math.abs(va ?? 0) / max) * 100}%`, "--c": coulA, height: 8 }} data-tip={`${A.nom}|${fmt(va)}|${lib}`} /></div>}
               </div>
               <div className="lib" role="cell">{lib}</div>
               <div className={`val ${mieuxB ? "mieux" : ""}`} role="cell">
                 <b>{fmt(vb)}</b>
-                {cle !== "rang" && <div className="piste"><span style={{ width: `${(Math.abs(vb ?? 0) / max) * 100}%`, background: coulB }} /></div>}
+                {cle !== "rang" && <div className="piste"><span className="b3" style={{ width: `${(Math.abs(vb ?? 0) / max) * 100}%`, "--c": coulB, height: 8 }} data-tip={`${B.nom}|${fmt(vb)}|${lib}`} /></div>}
               </div>
             </div>
           );

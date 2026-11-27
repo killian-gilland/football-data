@@ -271,7 +271,7 @@ details summary { cursor: pointer; color: var(--lien); font-weight: 600; font-si
 .graph .grille-l { stroke: var(--trait); stroke-width: 1; }
 .graph text { fill: var(--encre-3); font: 500 11px var(--f-texte); }
 .legende { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: var(--t-xs); color: var(--encre-2); }
-.tip { position: fixed; z-index: 50; pointer-events: none; background: var(--encre); color: var(--craie); padding: 6px 9px; border-radius: 4px; font-size: var(--t-xs); max-width: 260px; }
+.tip { position: fixed; z-index: 50; pointer-events: none; background: #18212c; color: #e6ebf0; border: 1px solid var(--projecteur); padding: 7px 10px; border-radius: 8px; font-size: var(--t-xs); max-width: 260px; box-shadow: 0 10px 24px rgb(0 0 0 / 0.4); transition: opacity 0.12s; }
 
 /* Barre horizontale simple (probabilités dans une liste) */
 .jauge { display: grid; grid-template-columns: minmax(0, 1fr) 56px; align-items: center; gap: 10px; }
@@ -359,6 +359,7 @@ tr.en-jeu td.equipe a::after { content: ""; display: inline-block; width: 7px; h
 @media (max-width: 640px) { .ligne-enjeu { grid-template-columns: minmax(0, 1fr) 70px; } .ligne-enjeu .discret { grid-column: 1 / -1; grid-row: 2; } }
 .issue { display: flex; gap: 2px; height: 12px; min-width: 140px; }
 .issue .seg { border-radius: 3px; min-width: 3px; }
+:root { --zone-milieu: #6b7684; }
 .seg-c1 { background: var(--zone-c1); }
 .seg-c3 { background: var(--zone-c3); }
 .seg-milieu { background: var(--nul); }
@@ -441,3 +442,103 @@ th[aria-sort="ascending"]::after { content: " ▲"; }
 .affiche-logo { width: 56px; height: 56px; }
 @media (max-width: 600px) { .affiche-logo { width: 36px; height: 36px; } .logo-club.grand { width: 44px; height: 44px; } }
 .match .dom .club { justify-content: flex-end; }
+
+/* ---------- Barres en relief (« b3 ») : volume, apparition, soulèvement et ondulation au survol ---------- */
+.b3 {
+  --c: var(--dom);
+  position: relative; display: block; border-radius: 6px; min-width: 4px;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--c) 62%, #fff) 0%, var(--c) 42%, color-mix(in srgb, var(--c) 72%, #000) 100%);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.4), inset 0 -2px 0 rgb(0 0 0 / 0.22), 0 5px 12px -6px rgb(0 0 0 / 0.75);
+  transform-origin: left center;
+  transition: transform 0.35s cubic-bezier(0.34, 1.8, 0.5, 1), filter 0.2s;
+  animation: b3-entree 0.9s cubic-bezier(0.2, 0.9, 0.3, 1.15) both;
+  animation-delay: calc(var(--i, 0) * 80ms);
+}
+.b3:hover { transform: translateY(-3px) scaleY(1.25); filter: brightness(1.15) saturate(1.1); z-index: 3;
+  animation: b3-entree 0.9s cubic-bezier(0.2, 0.9, 0.3, 1.15) both, b3-ondule 0.45s ease; }
+.b3.vertical { transform-origin: center bottom; animation-name: b3-monte; }
+.b3.vertical:hover { transform: translateY(-5px) scale(1.08); animation: b3-monte 0.9s both, b3-ondule 0.45s ease; }
+@keyframes b3-entree { from { scale: 0 1; } }
+@keyframes b3-monte { from { scale: 1 0; } }
+@keyframes b3-ondule { 0% { rotate: 0deg; } 30% { rotate: -1.4deg; } 65% { rotate: 0.9deg; } 100% { rotate: 0deg; } }
+.b3-lab { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font: 700 0.72rem/1 var(--f-texte); color: #fff; text-shadow: 0 1px 2px rgb(0 0 0 / 0.55); white-space: nowrap; overflow: hidden; }
+.piste3 { display: flex; border-radius: 6px; background: var(--papier-2); box-shadow: inset 0 2px 4px rgb(0 0 0 / 0.35); }
+.piste3 > .b3 { flex: none; }
+.proba3 { display: flex; gap: 3px; }
+.proba3 .b3 { height: 12px; }
+.proba3.grande .b3 { height: 24px; }
+@media (prefers-reduced-motion: reduce) { .b3, .b3:hover { animation: none !important; transition: none; } }
+
+/* Infobulle riche : « titre|valeur|détail » */
+.tip .tip-titre { color: var(--sur-gazon-2); font-size: 0.72rem; }
+.tip .tip-valeur { font: 800 1.25rem/1.1 var(--f-titre); color: var(--projecteur); letter-spacing: 0.02em; }
+.tip .tip-detail { color: var(--sur-gazon-2); font-size: 0.72rem; }
+
+/* Divergentes en HTML */
+.divergent { display: grid; gap: 4px; }
+.dv-ligne { display: grid; grid-template-columns: minmax(90px, 140px) minmax(0, 1fr) minmax(0, 1fr); align-items: center; gap: 0 2px; min-height: 26px; }
+.dv-entete { font: 700 var(--t-xs)/1 var(--f-texte); min-height: 20px; }
+.dv-lab { text-align: right; padding-right: 10px; font-size: var(--t-s); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dv-g { display: flex; justify-content: flex-end; align-items: center; gap: 6px; border-right: 1px solid var(--trait-fort); padding-right: 2px; min-height: 26px; }
+.dv-d { display: flex; justify-content: flex-start; align-items: center; gap: 6px; padding-left: 2px; }
+.dv-g em, .dv-d em { font-style: normal; font-size: var(--t-xs); color: var(--encre-2); white-space: nowrap; }
+.dv-barre { height: 14px; }
+.b3.gauche, .dv-barre.gauche { transform-origin: right center; }
+.dv-entete .dv-g { border-right: none; }
+.issue { gap: 3px; height: 14px; }
+.issue .b3 { height: 14px; }
+.seg-milieu { --c: #6b7684; }
+.frise-match.b3 { border-radius: 5px; }
+.vnd-barre .b3 { height: 24px; }
+.ligne-duel .piste .b3 { border-radius: 4px; }
+
+/* ---------- Accueil dynamique ---------- */
+.bandeau-scores { overflow: hidden; border: 1px solid var(--gazon-2); border-radius: var(--rayon); background: color-mix(in srgb, var(--gazon) 70%, #000); mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent); }
+.defile { display: flex; width: max-content; animation: defile 40s linear infinite; }
+.bandeau-scores:hover .defile { animation-play-state: paused; }
+@keyframes defile { to { transform: translateX(-50%); } }
+.item-score { display: inline-flex; align-items: center; gap: 8px; padding: 8px 18px; color: var(--sur-gazon); font-size: var(--t-s); font-weight: 600; white-space: nowrap; border-right: 1px solid var(--gazon-2); }
+.item-score:hover { text-decoration: none; background: var(--gazon-2); }
+.item-score .score { min-width: 0; padding: 2px 7px; font-size: 0.95rem; }
+.etiquette-j { color: var(--projecteur); font: 800 0.95rem/1 var(--f-titre); margin-right: 4px; }
+@media (prefers-reduced-motion: reduce) { .defile { animation: none; flex-wrap: wrap; width: auto; } }
+
+.match-phare { display: grid; gap: 16px; padding: 22px; border-radius: 14px; color: inherit; border: 1px solid var(--trait-fort);
+  background: radial-gradient(ellipse 60% 120% at 50% -20%, var(--lueur), transparent 70%), var(--papier);
+  box-shadow: 0 18px 40px -24px rgb(0 0 0 / 0.8); transition: transform 0.25s, border-color 0.25s; }
+.match-phare:hover { text-decoration: none; transform: translateY(-3px); border-color: var(--projecteur); }
+.mp-affiche { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px; }
+.mp-equipe { display: grid; justify-items: center; gap: 4px; text-align: center; }
+.mp-equipe .logo-club { width: 72px; height: 72px; filter: drop-shadow(0 6px 10px rgb(0 0 0 / 0.45)); transition: transform 0.35s cubic-bezier(0.34, 1.8, 0.5, 1); }
+.match-phare:hover .mp-equipe .logo-club { transform: scale(1.08) rotate(-3deg); }
+.mp-nom { font: 800 clamp(1.3rem, 3.5vw, 2rem)/1 var(--f-titre); text-transform: uppercase; }
+.mp-pct { font: 800 1.4rem/1 var(--f-titre); color: var(--projecteur); }
+.mp-centre { display: grid; justify-items: center; gap: 4px; }
+.mp-centre .score { font-size: 1.4rem; padding: 6px 14px; }
+.mp-enjeu { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; color: var(--encre-2); font-size: var(--t-s); max-width: none; }
+.mp-enjeu .enjeu { margin: 0; }
+
+.grille-cartes { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr)); }
+.grille-cartes.large { grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); }
+.carte-match { display: grid; gap: 8px; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--trait); background: var(--papier); color: inherit;
+  transition: transform 0.25s cubic-bezier(0.34, 1.6, 0.5, 1), border-color 0.2s, box-shadow 0.25s; }
+.carte-match:hover { text-decoration: none; transform: translateY(-4px); border-color: var(--projecteur); box-shadow: 0 14px 28px -18px rgb(0 0 0 / 0.9); }
+.cm-haut { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.cm-haut .heure { font-size: var(--t-xs); color: var(--encre-3); text-transform: uppercase; letter-spacing: 0.04em; }
+.cm-haut .score { min-width: 54px; font-size: 1.05rem; padding: 3px 8px; }
+.cm-equipe { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-weight: 600; }
+.cm-equipe.perdant { color: var(--encre-2); font-weight: 500; }
+.cm-proba { font: 800 1.05rem/1 var(--f-titre); color: var(--encre-2); }
+.carte-match .enjeu { justify-self: start; margin: 0; }
+
+.tendances { display: grid; gap: 8px; }
+.tendance { display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; border-radius: 10px; background: var(--papier); border: 1px solid var(--trait); color: var(--encre); font-size: var(--t-s); transition: transform 0.2s, border-color 0.2s; }
+.tendance:hover { text-decoration: none; transform: translateX(4px); border-color: var(--projecteur); }
+.tendance-type { flex: none; width: 8px; height: 8px; margin-top: 6px; border-radius: 50%; background: var(--projecteur); }
+.tendance-type.relegation, .tendance-type.sousperformance { background: var(--mauvais); }
+.tendance-type.titre, .tendance-type.surperformance { background: var(--bon); }
+@media (max-width: 600px) { .mp-equipe .logo-club { width: 48px; height: 48px; } .match-phare { padding: 16px; } }
+.rl-piste3 { height: 10px; }
+.rl-piste3 .b3 { height: 10px; }
+.frise-match.b3 { display: grid; animation: none; }
+.frise-match.b3:hover { animation: b3-ondule 0.45s ease; transform: translateY(-4px) scale(1.06); }

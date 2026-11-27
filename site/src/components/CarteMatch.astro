@@ -1,25 +1,29 @@
 ---
+// Carte de match (accueil) : logos, noms, probabilités en relief, score lumineux, pastille d'enjeu.
+// Garde les classes .heure / .score et data-match pour que le direct puisse la mettre à jour.
 import ProbaBarre from "./ProbaBarre.astro";
-import { fmt } from "../lib/donnees.js";
-const { m, ctx } = Astro.props;
-const lien = ctx.lienMatch(m.id);
+import Club from "./Club.astro";
+import { fmt, principalEnjeu, phraseEnjeu } from "../lib/donnees.js";
+const { m, ctx, avecJour = false } = Astro.props;
 const pred = m.prediction;
+const joue = m.statut === "joue";
+const res = joue ? Math.sign(m.score[0] - m.score[1]) : null;
+const couleurs = ctx.paire(m.dom, m.ext);
+const enjeu = !joue && ctx.grosEnjeux?.has(m.id) ? principalEnjeu(ctx.enjeux[m.id], m) : null;
+const quand = `${avecJour ? fmt.majuscule(fmt.dateLongue(m.date)).replace(/ \d{4}$/, "") + " · " : ""}${m.heure ?? ""}`;
 ---
-<a class="carte" href={lien} style="color:inherit;text-decoration:none;display:block">
-  <div class="tres-discret">{fmt.majuscule(fmt.dateLongue(m.date))}{m.heure && ` · ${m.heure}`}{m.journee && ` · J${m.journee}`}</div>
-  <div class="match" style="margin-top:6px">
-    <span class="dom">{ctx.court(m.dom)}</span>
-    <span class="score">{m.score ? `${m.score[0]} - ${m.score[1]}` : "—"}</span>
-    <span class="ext">{ctx.court(m.ext)}</span>
+<a class="carte-match" href={ctx.lienMatch(m.id)} data-match={m.id}>
+  <div class="cm-haut">
+    <span class="heure">{quand}</span>
+    <span class={`score ${joue ? "" : "vide"}`}>{joue ? `${m.score[0]} – ${m.score[1]}` : "–"}</span>
   </div>
-  {pred && (
-    <div style="margin-top:8px">
-      <ProbaBarre p={pred.p} dom={ctx.court(m.dom)} ext={ctx.court(m.ext)} compact />
-      {pred.scores?.[0] && (
-        <div class="tres-discret">
-          {m.statut === "joue" ? "Notre prédiction avant-match" : "Score le plus probable"} : {pred.scores[0].score} ({fmt.pct(pred.scores[0].proba)})
-        </div>
-      )}
+  {[["dom", 0], ["ext", 2]].map(([cote, k]) => (
+    <div class={`cm-equipe ${res != null && res !== 0 && (res > 0) !== (cote === "dom") ? "perdant" : ""}`}>
+      <Club id={m[cote]} ctx={ctx} taille={24} />
+      {pred && <span class="cm-proba">{fmt.pct(pred.p[k])}</span>}
     </div>
-  )}
+  ))}
+  {pred && <ProbaBarre p={pred.p} dom={ctx.court(m.dom)} ext={ctx.court(m.ext)} couleurs={couleurs} compact
+    source={joue ? "Notre prédiction avant le match" : "Notre modèle"} />}
+  {enjeu && <span class="enjeu" data-tip={`Gros enjeu|${ctx.court(enjeu.equipe)}|${phraseEnjeu(enjeu, ctx.court)}`}>Gros enjeu</span>}
 </a>

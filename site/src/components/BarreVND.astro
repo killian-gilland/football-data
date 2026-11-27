@@ -10,8 +10,9 @@ const segs = [["V", b.g, "victoire"], ["N", b.n, "nul"], ["D", b.p, "défaite"]]
     <span class="rl-val"><b>{b.pts} pt{b.pts > 1 ? "s" : ""}</b><span class="rl-rang">{fmt.num(b.j ? b.pts / b.j : 0, 2)}/match</span></span>
   </div>
   <div class="vnd-barre" role="img" aria-label={`${libelle} : ${b.g} victoires, ${b.n} nuls, ${b.p} défaites`}>
-    {segs.map(([c, nb, lib]) => nb > 0 && (
-      <span class={`vnd-${c}`} style={`flex:${nb}`} data-tip={`${nb} ${lib}${nb > 1 ? "s" : ""}`}>{nb}{c}</span>
+    {segs.map(([c, nb, lib], i) => nb > 0 && (
+      <span class={`b3 vnd-${c}`} style={`flex:${nb};--i:${i};--c:${c === "V" ? "var(--bon)" : c === "N" ? "#8b96a3" : "var(--mauvais)"}`}
+        data-tip={`${libelle}|${nb} ${lib}${nb > 1 ? "s" : ""}|sur ${b.j} matchs`}><span class="b3-lab">{nb}{c}</span></span>
     ))}
   </div>
   <div class="tres-discret">{b.j} matchs · {b.bp} buts marqués, {b.bc} encaissés</div>

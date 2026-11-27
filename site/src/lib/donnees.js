@@ -56,6 +56,9 @@ export function contexte(slug) {
     nom: (id) => meta.equipes[id]?.nom ?? id,
     court: (id) => meta.equipes[id]?.court ?? id,
     logo: (id) => meta.equipes[id]?.logo ?? null,
+    couleur: (id) => [meta.equipes[id]?.couleur, meta.equipes[id]?.couleur2].find(lisible) ?? null,
+    /** Couleurs domicile / extérieur pour une affiche ; si elles se ressemblent, l'extérieur prend sa 2e couleur. */
+    paire: (dom, ext) => paireCouleurs(meta.equipes[dom], meta.equipes[ext]),
     lienEquipe: (id) => `/${slug}/equipes/${id}/`,
     lienMatch: (id) => (parId[id] ? `/${slug}/matchs/${id}/` : null),
     lire: (f) => lire(cid, f),
@@ -137,4 +140,25 @@ export function phraseEnjeu(p, court) {
   if (!p) return "";
   const lib = LIBELLES_GROUPES[p.groupe];
   return `${court(p.equipe)} : ${lib} de ${fmt.pct(p.victoire)} en cas de victoire, ${fmt.pct(p.defaite)} en cas de défaite.`;
+}
+
+// ---------- Couleurs des clubs ----------
+const rgb = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+const distance = (a, b) => Math.hypot(...rgb(a).map((v, i) => v - rgb(b)[i]));
+/** Couleur de texte lisible sur une couleur de club (sombre sur les couleurs claires). */
+function luminance(h) {
+  const [r, g, b] = rgb(h).map((v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; });
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+}
+export function texteSur(h) {
+  if (!h || !h.startsWith("#")) return "#ffffff";
+  return luminance(h) > 0.45 ? "#0a0e13" : "#ffffff";
+}
+// Une couleur trop claire (blanc, gris clair) ou trop sombre (noir) disparaît sur l'un des deux thèmes : on l'écarte.
+const lisible = (h) => !!h && luminance(h) > 0.03 && luminance(h) < 0.6;
+export function paireCouleurs(d, e) {
+  const cd = lisible(d?.couleur) ? d.couleur : lisible(d?.couleur2) ? d.couleur2 : "var(--dom)";
+  const candidats = [e?.couleur, e?.couleur2].filter(lisible);
+  const ce = candidats.find((c) => !cd.startsWith("#") || distance(cd, c) >= 110) ?? "var(--ext)";
+  return { dom: cd, ext: ce };
 }

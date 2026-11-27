@@ -35,7 +35,7 @@ const resultatsSaison = (sc?.matchs ?? []).map((id) => ctx.parId[id]).filter((m)
   const dom = m.dom === eq.id;
   const [p, cn] = dom ? m.score : [m.score[1], m.score[0]];
   const res = p > cn ? "V" : p === cn ? "N" : "D";
-  return { id: m.id, j: m.journee, res, tip: `J${m.journee} · ${ctx.court(m.dom)} ${m.score[0]}-${m.score[1]} ${ctx.court(m.ext)}` };
+  return { id: m.id, j: m.journee, res, tip: `${m.journee}e journée|${ctx.court(m.dom)} ${m.score[0]}-${m.score[1]} ${ctx.court(m.ext)}|${dom ? "à domicile" : "à l'extérieur"}` };
 });
 const libSeries = { victoires: "victoires de suite", invincibilite: "matchs sans défaite", sans_victoire: "matchs sans victoire", defaites: "défaites de suite" };
 const description = sc
@@ -64,13 +64,13 @@ const description = sc
         </div>
         <div>
           <span class="etiquette">Note Elo</span>
-          <span class="valeur">{fmt.ent(sc.elo)}</span>
+          <span class="valeur" data-compteur>{fmt.ent(sc.elo)}</span>
           <span class="detail">{sc.elo_rang}e note du championnat</span>
         </div>
         {sc.simulation && (
           <div>
             <span class="etiquette">Projection</span>
-            <span class="valeur">{fmt.num(sc.simulation.points_attendus, 0)} <small>pts</small></span>
+            <span class="valeur"><span data-compteur>{fmt.num(sc.simulation.points_attendus, 0)}</span> <small>pts</small></span>
             <span class="detail">entre {fmt.num(sc.simulation.points_p10, 0)} et {fmt.num(sc.simulation.points_p90, 0)} dans 80 % des simulations</span>
           </div>
         )}
@@ -132,9 +132,9 @@ const description = sc
                   <span class="tres-discret" style="text-align:right">Encaissés</span><span></span><span class="tres-discret">Marqués</span>
                   {[["1re période", st.mi_temps.bc_1, st.mi_temps.bp_1], ["2de période", st.mi_temps.bc_2, st.mi_temps.bp_2]].map(([lib, contre, pour]) => (
                     <>
-                      <span class="miroir-g"><b>{contre}</b><span class="barre" style={`width:${(contre / maxMT * 100).toFixed(0)}%`} data-tip={`${lib} : ${contre} buts encaissés`}></span></span>
+                      <span class="miroir-g"><b>{contre}</b><span class="b3 dv-barre gauche" style={`height:16px;width:${Math.max(2, contre / maxMT * 100).toFixed(0)}%;--c:var(--zone-relegation)`} data-tip={`${lib}|${contre} buts encaissés|`}></span></span>
                       <span class="miroir-lib">{lib}</span>
-                      <span class="miroir-d"><span class="barre" style={`width:${(pour / maxMT * 100).toFixed(0)}%`} data-tip={`${lib} : ${pour} buts marqués`}></span><b>{pour}</b></span>
+                      <span class="miroir-d"><span class="b3" style={`height:16px;width:${Math.max(2, pour / maxMT * 100).toFixed(0)}%;--c:${ctx.couleur(eq.id) ?? "var(--dom)"}`} data-tip={`${lib}|${pour} buts marqués|`}></span><b>{pour}</b></span>
                     </>
                   ))}
                 </div>
@@ -148,12 +148,12 @@ const description = sc
               <div class="carte">
                 <h3>De la frappe au but</h3>
                 <div class="entonnoirs">
-                  {[["Pour", st.tirs.tirs_par_match, st.tirs.cadres_par_match, st.general.bp / st.general.j, "var(--dom)"],
+                  {[["Pour", st.tirs.tirs_par_match, st.tirs.cadres_par_match, st.general.bp / st.general.j, ctx.couleur(eq.id) ?? "var(--dom)"],
                     ["Contre", st.tirs.tirs_concedes_par_match, st.tirs.cadres_concedes_par_match, st.general.bc / st.general.j, "var(--zone-relegation)"]].map(([lib, t, ca, b, coul]) => (
                     <div class="entonnoir">
                       <span class="tres-discret">{lib}, par match</span>
                       {[["Tirs", t], ["Cadrés", ca], ["Buts", b]].map(([l, v]) => (
-                        <div class="etage"><span class="barre" style={`width:${(v / maxTirs * 100).toFixed(1)}%;background:${coul}`}></span><span>{l} <b>{fmt.num(v, 1)}</b></span></div>
+                        <div class="etage"><span class="b3" style={`height:12px;width:${Math.max(2, v / maxTirs * 100).toFixed(1)}%;--c:${coul}`} data-tip={`${lib} · ${l}|${fmt.num(v, 1)} par match|`}></span><span>{l} <b>{fmt.num(v, 1)}</b></span></div>
                       ))}
                     </div>
                   ))}
@@ -181,7 +181,7 @@ const description = sc
               <h3>La saison match par match</h3>
               <div class="frise">
                 {resultatsSaison.map((r) => (
-                  <a class={`frise-match ${r.res}`} href={ctx.lienMatch(r.id)} data-tip={r.tip}><b>{r.res}</b><span>J{r.j}</span></a>
+                  <a class={`frise-match b3 vertical ${r.res}`} style={`--c:${r.res === "V" ? "var(--bon)" : r.res === "N" ? "#8b96a3" : "var(--mauvais)"};--i:${r.j}`} href={ctx.lienMatch(r.id)} data-tip={r.tip}><b>{r.res}</b><span>J{r.j}</span></a>
                 ))}
               </div>
               {series && (
