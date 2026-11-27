@@ -8,7 +8,6 @@ const { m, ctx, avecJour = false } = Astro.props;
 const pred = m.prediction;
 const joue = m.statut === "joue";
 const res = joue ? Math.sign(m.score[0] - m.score[1]) : null;
-const couleurs = ctx.paire(m.dom, m.ext);
 const enjeu = !joue && ctx.grosEnjeux?.has(m.id) ? principalEnjeu(ctx.enjeux[m.id], m) : null;
 const quand = `${avecJour ? fmt.majuscule(fmt.dateLongue(m.date)).replace(/ \d{4}$/, "") + " · " : ""}${m.heure ?? ""}`;
 ---
@@ -23,7 +22,7 @@ const quand = `${avecJour ? fmt.majuscule(fmt.dateLongue(m.date)).replace(/ \d{4
       {pred && <span class="cm-proba">{fmt.pct(pred.p[k])}</span>}
     </div>
   ))}
-  {pred && <ProbaBarre p={pred.p} dom={ctx.court(m.dom)} ext={ctx.court(m.ext)} couleurs={couleurs} compact
+  {pred && <ProbaBarre p={pred.p} dom={ctx.court(m.dom)} ext={ctx.court(m.ext)} compact
     source={joue ? "Notre prédiction avant le match" : "Notre modèle"} />}
   {enjeu && <span class="enjeu" data-tip={`Gros enjeu|${ctx.court(enjeu.equipe)}|${phraseEnjeu(enjeu, ctx.court)}`}>Gros enjeu</span>}
 </a>

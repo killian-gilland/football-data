@@ -110,7 +110,7 @@ const zonesParRang = Object.fromEntries(classement.lignes.map((l) => [l.rang, l.
             );
           })}
         </div>
-        {phare.prediction && <ProbaBarre p={phare.prediction.p} dom={ctx.court(phare.dom)} ext={ctx.court(phare.ext)} grande couleurs={ctx.paire(phare.dom, phare.ext)} />}
+        {phare.prediction && <ProbaBarre p={phare.prediction.p} dom={ctx.court(phare.dom)} ext={ctx.court(phare.ext)} grande />}
         {enjeuPhare && <p class="mp-enjeu"><span class="enjeu">Ce qui se joue</span> {phraseEnjeu(enjeuPhare, ctx.court)}</p>}
       </a>
     </section>

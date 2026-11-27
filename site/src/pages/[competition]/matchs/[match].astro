@@ -62,7 +62,7 @@ const jsonld = {
       <section class="carte">
         <h2>{joue ? "Notre prédiction" : "Nos probabilités"}</h2>
         <p class="tres-discret">{typePred[pred.type]}{pred.horodatage && ` le ${new Date(pred.horodatage).toLocaleString("fr-FR", { timeZone: "Europe/Paris" })}`} · modèle : {LIBELLES_MODELES[pred.modele] ?? pred.modele}</p>
-        <ProbaBarre p={pred.p} dom={d} ext={e} grande couleurs={ctx.paire(m.dom, m.ext)} source={LIBELLES_MODELES[pred.modele] ?? "Notre modèle"} />
+        <ProbaBarre p={pred.p} dom={d} ext={e} grande source={LIBELLES_MODELES[pred.modele] ?? "Notre modèle"} />
         {joue && <p class="discret" style="margin-top:8px">Résultat : {["victoire de " + d, "match nul", "victoire de " + e][issue]}, auquel nous donnions {fmt.pct(pred.p[issue])}.</p>}
         {pred.scores?.length > 0 && (
           <>
@@ -85,7 +85,7 @@ const jsonld = {
       <section class="carte">
         <h2>Ce qu'en pensent les bookmakers</h2>
         <p class="tres-discret">Probabilités implicites des cotes moyennes d'avant-match, marge retirée.</p>
-        <ProbaBarre p={m.marche.p} dom={d} ext={e} grande couleurs={ctx.paire(m.dom, m.ext)} source="Cotes moyennes des bookmakers" />
+        <ProbaBarre p={m.marche.p} dom={d} ext={e} grande source="Cotes moyennes des bookmakers" />
         <p class="tres-discret">Cotes moyennes : {m.marche.cotes.map((c) => fmt.num(c, 2)).join(" · ")}</p>
         {pred && <p class="discret">Écart avec notre modèle sur la victoire de {d} : {fmt.signe((pred.p[0] - m.marche.p[0]) * 100, 0)} points de %.</p>}
       </section>

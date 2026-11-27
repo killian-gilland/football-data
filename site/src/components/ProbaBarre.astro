@@ -1,19 +1,20 @@
 ---
-// Barre 1N2 en relief aux couleurs des clubs (domicile, nul en gris, extérieur), infobulle détaillée au survol.
-import { fmt, texteSur } from "../lib/donnees.js";
-const { p, dom, ext, compact = false, grande = false, couleurs = { dom: "var(--dom)", ext: "var(--ext)" }, source = "Notre modèle" } = Astro.props;
+// Barre 1N2 en relief : toujours les trois mêmes couleurs (victoire domicile, nul, victoire extérieur),
+// quel que soit le match, pour qu'on lise la barre d'un coup d'œil. Infobulle détaillée au survol.
+import { fmt } from "../lib/donnees.js";
+const { p, dom, ext, compact = false, grande = false, source = "Notre modèle" } = Astro.props;
 const [a, n, b] = p;
 const segs = [
-  { v: a, c: couleurs.dom, lib: `Victoire de ${dom}`, court: dom },
-  { v: n, c: "var(--nul)", lib: "Match nul", court: "Nul" },
-  { v: b, c: couleurs.ext, lib: `Victoire de ${ext}`, court: ext },
+  { v: a, c: "var(--dom)", texte: "#ffffff", lib: `Victoire de ${dom}` },
+  { v: n, c: "var(--nul)", texte: "var(--encre)", lib: "Match nul" },
+  { v: b, c: "var(--ext)", texte: "#ffffff", lib: `Victoire de ${ext}` },
 ];
 ---
 <div>
   <div class={`proba3 ${grande ? "grande" : ""}`} role="img" aria-label={`${dom} ${fmt.pct(a)}, nul ${fmt.pct(n)}, ${ext} ${fmt.pct(b)}`}>
     {segs.map((s, i) => (
       <span class="b3" style={`flex:${s.v};--c:${s.c};--i:${i}`} data-tip={`${s.lib}|${fmt.pct(s.v, 1)}|${source}`}>
-        {grande && s.v >= 0.12 && <span class="b3-lab" style={`color:${texteSur(s.c)}`}>{fmt.pct(s.v)}</span>}
+        {grande && s.v >= 0.12 && <span class="b3-lab" style={`color:${s.texte}`}>{fmt.pct(s.v)}</span>}
       </span>
     ))}
   </div>
